@@ -1,0 +1,12 @@
+[
+  {
+    "scenario": "u10",
+    "updates": 10,
+    "accept_pct": 90.0,
+    "warning_pct": 10.0,
+    "reject_pct": 0.0,
+    "defer_pct": 0.0,
+    "effective_sla_pct": 100.0,
+    "avg_changed_classes": 2.5
+  }
+]

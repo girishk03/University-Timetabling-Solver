@@ -1,0 +1,11 @@
+scenario,update_id,update_type,decision,changed_classes,quality_score,effective_sla,warning_ratio,pressure_score,drift_quality_total,drift_z3_total,reject_streak,defer_streak,last_reset_reason
+u10,1,extra_class,ACCEPT_WITH_WARNING,2,0.0,1.0,1.0,0.2,0,0,0,0,
+u10,2,timeslot_shift,ACCEPT,2,0.0,1.0,0.5,0.1,0,0,0,0,
+u10,3,room_clash,ACCEPT,2,0.0,1.0,0.3333,0.0,0,0,0,0,
+u10,4,timeslot_shift,ACCEPT,3,0.0,1.0,0.25,0.0,0,0,0,0,
+u10,5,room_clash,ACCEPT,3,0.0,1.0,0.2,0.0,0,0,0,0,
+u10,6,room_clash,ACCEPT,3,0.0,1.0,0.1667,0.0,0,0,0,0,
+u10,7,teacher_absent,ACCEPT,2,0.0,1.0,0.1429,0.0,0,0,0,0,
+u10,8,teacher_absent,ACCEPT,2,0.0,1.0,0.125,0.0,0,0,0,0,
+u10,9,room_clash,ACCEPT,3,0.0,1.0,0.1111,0.0,0,0,0,0,
+u10,10,room_clash,ACCEPT,3,0.0,1.0,0.1,0.0,0,0,0,0,

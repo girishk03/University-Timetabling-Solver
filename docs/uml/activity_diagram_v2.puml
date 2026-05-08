@@ -1,0 +1,107 @@
+@startuml Activity Diagram - CORRECTED
+!theme plain
+skinparam ActivityBackgroundColor LightYellow
+skinparam ActivityBorderColor Black
+
+title University Timetabling Solver - Activity Diagram (Actual Workflow)
+
+|User|
+start
+:Execute run_solver.py;
+
+|run_solver.py|
+:Parse command-line arguments;
+:Call parse_itc2019_xml_to_instance();
+
+|itc2019_parser.py|
+:Parse ITC-2019 XML file;
+:Extract classes, rooms, times;
+:Build time domain mappings;
+:Parse student requests;
+:Create Instance dictionary;
+
+|run_solver.py|
+:Create SolveConfig dataclass;
+:Call solve_instance(instance, config);
+
+|solver_cp_sat.py|
+:Estimate class demand (for search strategy);
+:Create CpModel object;
+
+while (For each class) is (more classes)
+  :Create scheduling variables
+  (y_time, y_phys, y_onl);
+  :Create room variables (x_phys, x_onl);
+  :Create mode indicator variables;
+endwhile (done)
+
+while (For each student) is (more students)
+  :Create module selection vars (n);
+  :Create config selection vars (mvar);
+  :Create class assignment vars (a);
+  :Create attendance vars (alpha_inp, alpha_onl);
+  :Create mode deviation vars (tau);
+endwhile (done)
+
+:Add room-time conflict constraints;
+:Add capacity constraints;
+:Add student clash soft constraints;
+:Add mode compatibility constraints;
+
+:Apply decision strategy (demand-based ordering);
+:Add schedule hints (warm start);
+
+:Create CpSolver object;
+:Set solver parameters (random_seed, max_time);
+
+|OR-Tools CP-SAT|
+:Stage 1: Maximize z1 (elective assignments);
+if (Solution found?) then (yes)
+  :Fix z1 value;
+  :Stage 2: Minimize z2 (mode deviation);
+  :Fix z2 value;
+  :Stage 3: Minimize z3 (student clashes);
+  :Fix z3 value;
+  :Stage 4: Minimize z4 (online penalty);
+  :Fix z4 value;
+  :Stage 5: Minimize z5 (late-evening);
+else (no)
+  :Return infeasible/unknown;
+endif
+
+|solver_cp_sat.py|
+if (LNS enabled?) then (yes)
+  :LNS: Destroy 20% of schedule randomly;
+  :LNS: Fix remaining 80% of classes;
+  :LNS: Re-solve with hints;
+  :LNS: Accept if improvement found;
+  note right
+    Repeat for configured iterations (default: 5)
+  end note
+endif
+
+:Extract solution values from solver;
+:Build schedule dictionary (class -> room/time/mode);
+:Build student attendance dictionary;
+:Calculate objective values (z1-z5);
+:Return SolutionResult dict;
+
+|run_solver.py|
+:Call validate_solution();
+
+|solver_cp_sat.py|
+:Check room-time conflicts;
+:Check student time clashes;
+:Check capacity violations;
+:Return validation report;
+
+|run_solver.py|
+:Print examiner summary;
+:Print baseline vs LNS comparison (if applicable);
+:Save to full_solution.json;
+
+|User|
+:View results in browser (index.html);
+stop
+
+@enduml

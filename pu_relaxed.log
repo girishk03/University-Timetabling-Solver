@@ -1,0 +1,93 @@
+[run_solver] loading instance: instances/itc2019/pu-c8-spr07.xml
+[run_solver] parsed instance: classes=2417, modules=1035, students=29514
+[solver] strict solve started (time=120.0s, workers=1, relaxed=False)
+[solver] strict solve finished: status=INFEASIBLE in 156.77s
+[solver] strict infeasible -> relaxed solve started (time=900.0s, workers=1, max_overlap=2, room_overcap=10)
+[solver] relaxed solve finished: status=UNKNOWN in 1063.93s
+[run_solver] solve complete: status=UNKNOWN, elapsed=1220.71s, relaxed_mode=True
+{
+  "debug": {
+    "max_time_seconds": 900.0,
+    "model": {
+      "num_constraints": 21719316,
+      "num_variables": 8988611
+    },
+    "num_search_workers": 1,
+    "phase_timings": [
+      {
+        "objective_value": 0,
+        "phase": "z1_electives",
+        "seconds": 910.399255990982,
+        "sense": "max",
+        "status": "UNKNOWN"
+      }
+    ],
+    "relaxed_mode": true,
+    "strict_vs_relaxed": {
+      "relaxed_solve_time": 1063.9327948093414,
+      "relaxed_status": "UNKNOWN",
+      "strict_solve_time": 156.7715220451355,
+      "strict_status": "INFEASIBLE"
+    }
+  },
+  "input_risk": "HIGH",
+  "message": "Solver timed out, solution may be incomplete",
+  "pre_warnings": [
+    {
+      "message": "High risk: multiple compulsory modules overlap (5 conflict cases)",
+      "severity": "HIGH",
+      "suggestions": [
+        "Spread modules across different time slots.",
+        "Add alternate compulsory sections to remove forced clashes."
+      ]
+    },
+    {
+      "message": "High risk: physical room capacity is short by 148%",
+      "severity": "HIGH",
+      "suggestions": [
+        "Increase room capacity or add additional physical rooms.",
+        "Shift part of demand to online/hybrid delivery where acceptable."
+      ]
+    }
+  ],
+  "reasons": [
+    "Solver timed out before proving a complete solution"
+  ],
+  "recommendations": [
+    {
+      "details": {
+        "affected_students": 5
+      },
+      "issue": "Compulsory class conflicts",
+      "severity": "CRITICAL",
+      "suggestions": [
+        "Reschedule conflicting compulsory classes to different timeslots.",
+        "Create alternate compulsory slots to avoid forced clashes."
+      ]
+    },
+    {
+      "details": {
+        "physical_room_capacity": 11881,
+        "subscription_capacity": 147823,
+        "total_students": 29514
+      },
+      "issue": "Over-capacity",
+      "severity": "HIGH",
+      "suggestions": [
+        "Increase room capacity for constrained timeslots.",
+        "Add additional class sections for oversubscribed modules."
+      ]
+    },
+    {
+      "issue": "Solver timeout",
+      "severity": "MEDIUM",
+      "suggestions": [
+        "Increase max solver time to improve solution completeness.",
+        "Use relaxation mode or simplify constraints for faster convergence."
+      ]
+    }
+  ],
+  "relaxed_mode": true,
+  "solve_time": 1220.709319114685,
+  "status": "UNKNOWN"
+}

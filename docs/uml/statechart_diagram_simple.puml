@@ -1,0 +1,47 @@
+@startuml State Chart Diagram - SIMPLE
+!theme plain
+skinparam backgroundColor transparent
+
+title University Timetabling Solver - State Diagram
+
+[*] --> Idle
+
+Idle --> Parsing : Load XML
+Parsing --> Solving : Instance ready
+
+state Solving {
+  [*] --> BuildingModel
+  BuildingModel --> Optimizing : Variables & constraints set
+  
+  state Optimizing {
+    [*] --> Stage1 : Max z1 (electives)
+    Stage1 --> Stage2 : Fix z1
+    Stage2 --> Stage3 : Fix z2
+    Stage3 --> Stage4 : Fix z3
+    Stage4 --> Stage5 : Fix z4
+    Stage5 --> [*] : Fix z5
+  }
+  
+  Optimizing --> LNS : LNS enabled?
+  
+  state LNS {
+    [*] --> Destroy : Random 20%
+    Destroy --> ReSolve : Fix 80%
+    ReSolve --> Accept : Improvement?
+    Accept --> Destroy : Next iteration
+  }
+  
+  LNS --> [*] : Solution ready
+  Optimizing --> [*] : No LNS
+}
+
+Solving --> Validating : Solution found
+Validating --> Exporting : Valid
+Exporting --> Viewing : JSON saved
+
+Validating --> [*] : Invalid
+Solving --> [*] : Infeasible
+
+Viewing --> [*] : Done
+
+@enduml

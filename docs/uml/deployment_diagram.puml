@@ -1,0 +1,143 @@
+@startuml Deployment Diagram
+!theme plain
+
+title University Timetabling Solver - Deployment Diagram
+
+node "Developer/Local Machine" as LocalMachine <<Device>> {
+    
+    node "Operating System" as OS <<OS>> {
+        
+        artifact "Python 3.10+" as Python <<Runtime>>
+        artifact "Node.js (optional)" as NodeJS <<Runtime>>
+        
+        node "Development Environment" as DevEnv <<Environment>> {
+            
+            component "Timetabling Solver" as SolverApp <<Application>> {
+                artifact "run_solver.py"
+                artifact "solver_cp_sat.py"
+                artifact "itc2019_parser.py"
+            }
+            
+            component "Web Dashboard" as Dashboard <<Application>> {
+                artifact "index.html"
+                artifact "timetabling-dashboard.html"
+                artifact "CSS/JS Assets"
+            }
+        }
+        
+        node "Python Virtual Environment" as Venv <<Environment>> {
+            
+            artifact "ortools" as ORToolsPkg <<Package>>
+            artifact "numpy" as Numpy <<Package>>
+            artifact "matplotlib" as Matplotlib <<Package>>
+            
+            component "OR-Tools Library" as ORLib <<Library>> {
+                artifact "libortools.so"
+                artifact "ortools/sat"
+            }
+        }
+    }
+}
+
+node "File System" as Storage <<Device>> {
+    
+    storage "Input Data" as InputData <<Storage>> {
+        folder "XML Instances" as XMLData {
+            artifact "wbg-fal10.xml"
+            artifact "[other ITC-2019 files]"
+        }
+    }
+    
+    storage "Output Data" as OutputData <<Storage>> {
+        folder "Solutions" as Solutions {
+            artifact "full_solution.json"
+            artifact "[solution files]"
+        }
+        
+        folder "Names Database" as NamesDB {
+            artifact "student_names.json"
+            artifact "course_names.json"
+        }
+        
+        folder "Documentation" as Docs {
+            artifact "UML Diagrams (*.puml)"
+            artifact "README.md"
+        }
+    }
+}
+
+node "Web Browser" as Browser <<Device>> {
+    
+    node "Browser Engine" as BrowserEngine <<Software>> {
+        
+        component "JavaScript Engine" as JSEngine <<Runtime>>
+        component "Rendering Engine" as RenderEngine <<Runtime>>
+        
+        artifact "Dashboard UI" as DashboardUI <<UI>>
+    }
+}
+
+cloud "External Resources" as External <<Cloud>> {
+    
+    node "Google OR-Tools Repository" as ORRepo <<Repository>> {
+        artifact "OR-Tools Source"
+        artifact "Pre-built Binaries"
+    }
+    
+    node "ITC-2019 Benchmark" as ITCRepo <<Repository>> {
+        artifact "Benchmark Instances"
+        artifact "Problem Specifications"
+    }
+}
+
+' Communication links
+LocalMachine --> Storage : reads/writes
+Browser --> LocalMachine : HTTP/localhost:8000
+
+' Internal connections
+SolverApp --> Venv : imports
+SolverApp --> InputData : reads XML
+SolverApp --> OutputData : writes JSON
+
+Dashboard --> Solutions : loads JSON
+Dashboard --> NamesDB : loads names
+Dashboard --> Browser : renders
+
+' External connections
+Venv --> ORRepo : downloads packages
+InputData --> ITCRepo : source data
+
+' Deployment specifications
+SolverApp ..> Python : deployed on
+Dashboard ..> BrowserEngine : deployed in
+ORToolsPkg ..> ORLib : contains
+
+' Artifacts relationships
+artifact "wbg-fal10.xml" as InstanceFile
+artifact "full_solution.json" as SolutionFile
+
+InstanceFile --> SolverApp : input
+SolverApp --> SolutionFile : output
+SolutionFile --> Dashboard : displayed
+
+note right of SolverApp
+  Python application with
+  CP-SAT solver engine
+end note
+
+note right of Dashboard
+  Static HTML/CSS/JS files
+  served via local HTTP server
+end note
+
+note bottom of ORLib
+  Google's optimization
+  library (C++ backend)
+end note
+
+note left of Browser
+  Any modern browser
+  (Chrome, Firefox, Safari)
+end note
+
+@enduml

@@ -1,0 +1,56 @@
+@startuml Activity Diagram - BALANCED
+!theme plain
+skinparam ActivityBackgroundColor LightYellow
+skinparam ActivityBorderColor Black
+
+title University Timetabling Solver - Workflow
+
+|User|
+start
+:Execute run_solver.py;
+
+|Parser & Solver|
+:Parse ITC-2019 XML;
+note right
+  Extract: classes, rooms, times, students
+end note
+
+:Create SolveConfig;
+:Build CP-SAT Model;
+note right
+  Variables: y_time, x_phys, x_onl, n, a
+  Constraints: room-time, capacity, clashes
+end note
+
+|OR-Tools CP-SAT|
+:Optimize 5 Objectives;
+note right
+  z1→z2→z3→z4→z5
+  (lexicographic order)
+end note
+
+if (Solution found?) then (yes)
+  
+  |Parser & Solver|
+  if (LNS enabled?) then (yes)
+    :Destroy 20% → Fix 80% → Re-solve;
+    note right
+      5 iterations, accept improvements
+    end note
+  endif
+  
+  :Extract solution;
+  :Validate (conflicts, clashes, capacity);
+  :Export JSON;
+  
+  |User|
+  :View in browser dashboard;
+  
+else (no)
+  |User|
+  :Infeasible / timeout;
+endif
+
+stop
+
+@enduml

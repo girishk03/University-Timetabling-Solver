@@ -1,0 +1,88 @@
+@startuml Component Diagram - CORRECTED
+!theme plain
+
+title University Timetabling Solver - Component Diagram (Actual File Structure)
+
+package "Source Code" <<Folder>> {
+    
+    component "run_solver.py" as Runner <<Python Module>> {
+        port "CLI" as CLI
+        port "JSON Output" as JSONOut
+    }
+    
+    component "timetabling/" as Package <<Package>> {
+        component "solver_cp_sat.py" as Solver <<Solver Module>>
+        component "itc2019_parser.py" as Parser <<Parser Module>>
+    }
+    
+    component "visualize_solution.py" as Viz <<Visualizer Module>>
+}
+
+package "Web Dashboard" <<Folder>> {
+    
+    component "index.html" as Dashboard <<HTML/JS>> {
+        port "HTTP Port" as HTTP
+    }
+    
+    component "timetabling-dashboard.html" as Dashboard2 <<HTML/JS>>
+}
+
+package "External Libraries" <<Cloud>> {
+    
+    component "ortools" as ORTools <<Python Package>> {
+        port "CP-SAT API" as CPSATAPI
+    }
+    
+    component "CpModel" as Model <<OR-Tools Class>>
+    component "CpSolver" as CPSolver <<OR-Tools Class>>
+}
+
+package "Data Storage" <<Database>> {
+    
+    storage "ITC-2019 XML" as XMLData <<Input>>
+    storage "full_solution.json" as JSONData <<Output>>
+    storage "student_names.json" as Names1 <<Metadata>>
+    storage "course_names.json" as Names2 <<Metadata>>
+}
+
+' Dependencies
+Runner --> Parser : imports
+Runner --> Solver : imports
+Runner --> Viz : imports (optional)
+
+Solver --> ORTools : imports ortools.sat.python
+ORTools *-- Model
+ORTools *-- CPSolver
+
+Parser --> XMLData : reads
+Runner --> JSONData : writes
+Dashboard --> JSONData : loads via fetch()
+Dashboard --> Names1 : loads
+Dashboard --> Names2 : loads
+
+' Port connections
+CLI -- User : command line
+JSONOut -- JSONData : file I/O
+HTTP -- Browser : localhost:8000
+CPSATAPI -- Solver : API calls
+
+note right of Solver
+  Core solver module (~800 lines)
+  with functions:
+  - solve_instance()
+  - solve_instance_lns()
+  - validate_solution()
+end note
+
+note right of Parser
+  XML parser module (~280 lines)
+  parsing ITC-2019 format
+end note
+
+note right of Dashboard
+  Static HTML/JS files
+  served via local HTTP server
+  (python -m http.server)
+end note
+
+@enduml

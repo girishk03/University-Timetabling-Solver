@@ -1,0 +1,5194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>University Timetabling Solver – Output</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #0f172a;
+      --card: #1e293b;
+      --card-strong: #1e293b;
+      --text: #f1f5f9;
+      --text-soft: #f1f5f9;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --accent: #2563eb;
+      --accent-2: #2563eb;
+      --accent-warm: #2563eb;
+      --success: #15803d;
+      --success-bg: #ecfdf3;
+      --success-border: #86efac;
+      --warning: #b45309;
+      --warning-bg: #fff8eb;
+      --warning-border: #facc6b;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --danger-border: #fca5a5;
+      --shadow-xs: 0 2px 10px rgba(0, 0, 0, 0.22);
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.28);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
+      --radius-sm: 10px;
+      --radius-md: 12px;
+      --radius-lg: 14px;
+      --radius-xl: 16px;
+      --mono: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      --display: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      color: var(--text);
+      font-family: var(--sans);
+      font-feature-settings: "ss01" on, "ss02" on;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(820px 380px at 50% 0%, rgba(30, 58, 95, 0.45), transparent 70%),
+        var(--bg);
+    }
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      display: none;
+    }
+
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(0.7);
+        opacity: 0.55;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      background: #0f172a;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: none;
+      position: sticky;
+      top: 0;
+    }
+
+    header::after {
+      display: none;
+    }
+
+    .container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .top-nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .top-nav-logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+
+    .top-nav-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-nav-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+      min-width: 0;
+      gap: 8px;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.2;
+      color: var(--text-soft);
+    }
+
+    .subtitle {
+      margin: 2px 0 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 0;
+      max-width: 920px;
+    }
+
+    body:not(.has-data) .header-content {
+      display: none;
+    }
+
+    body:not(.has-data) .toolbar {
+      display: none;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #1e293b;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 0 2px;
+    }
+
+    .search,
+    .select,
+    .modal-controls select {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text-soft);
+      border-radius: var(--radius-sm);
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+      min-height: 34px;
+      box-shadow: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease;
+    }
+
+    .search {
+      width: min(280px, 100%);
+      padding: 7px 12px;
+    }
+
+    .select,
+    .modal-controls select {
+      padding: 8px 30px 8px 11px;
+      background-image: linear-gradient(45deg, transparent 50%, #5b7088 50%), linear-gradient(135deg, #5b7088 50%, transparent 50%);
+      background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+    }
+
+    .search:focus,
+    .select:focus,
+    .btn:focus-visible,
+    .modal-controls select:focus {
+      outline: none;
+      border-color: rgba(14, 133, 255, 0.75);
+      box-shadow: 0 0 0 3px rgba(14, 133, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text-soft);
+      padding: 7px 11px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0;
+      font-family: var(--sans);
+      cursor: pointer;
+      box-shadow: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-xs);
+      border-color: var(--border-strong);
+    }
+
+    .btn.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff;
+      text-shadow: none;
+      font-weight: 600;
+    }
+
+    .btn.primary:hover {
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn.mode-on {
+      background: rgba(37, 99, 235, 0.15);
+      border-color: rgba(96, 165, 250, 0.4);
+      color: #60a5fa;
+      text-shadow: none;
+    }
+
+    .btn.mode-off {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #f59e0b;
+    }
+
+    .btn:disabled {
+      opacity: 0.56;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.14px;
+    }
+
+    .toast-stack {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 1200;
+      display: grid;
+      gap: 10px;
+      width: min(380px, calc(100vw - 32px));
+      pointer-events: none;
+    }
+
+    .toast {
+      border-radius: 12px;
+      padding: 11px 14px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      box-shadow: 0 14px 30px rgba(19, 56, 88, 0.18);
+      transform: translateY(-8px);
+      opacity: 0;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(248, 113, 113, 0.45);
+      color: #fecaca;
+    }
+
+    .toast.warning {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(251, 191, 36, 0.45);
+      color: #fde68a;
+    }
+
+    .toast.info {
+      background: rgba(37, 99, 235, 0.18);
+      border-color: rgba(96, 165, 250, 0.42);
+      color: #bfdbfe;
+    }
+
+    .diag-wrap {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .diag-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #0f172a;
+      padding: 10px;
+    }
+
+    .diag-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.55px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .diag-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .diag-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      background: #1e293b;
+      font-size: 12px;
+      color: #e2e8f0;
+    }
+
+    .sev-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-right: 6px;
+    }
+
+    .sev-pill.CRITICAL {
+      background: rgba(239, 68, 68, 0.14);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.38);
+    }
+
+    .sev-pill.HIGH {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fde68a;
+      border: 1px solid rgba(251, 191, 36, 0.36);
+    }
+
+    .sev-pill.MEDIUM {
+      background: rgba(20, 184, 166, 0.14);
+      color: #99f6e4;
+      border: 1px solid rgba(45, 212, 191, 0.35);
+    }
+
+    .sev-pill.LOW {
+      background: rgba(34, 197, 94, 0.14);
+      color: #bbf7d0;
+      border: 1px solid rgba(74, 222, 128, 0.35);
+    }
+
+    .placeholder {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.72);
+      padding: 11px 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-style: normal;
+    }
+
+    .empty-state {
+      margin-bottom: 0;
+      border: 1px solid var(--border);
+      background: #1e293b;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      padding: 40px 48px;
+      border-radius: 16px;
+    }
+
+    .smart-banner {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      background: rgba(37, 99, 235, 0.15);
+      color: #60a5fa;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.55px;
+      text-transform: uppercase;
+      padding: 7px 12px;
+    }
+
+    .system-statement {
+      margin: 12px 0 0 0;
+      font-size: 15px;
+      line-height: 1.45;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .hero-hook {
+      margin: 10px 0 0 0;
+      font-size: 18px;
+      line-height: 1.35;
+      color: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .empty-headline {
+      margin: 12px 0 0 0;
+      font-size: 2.2rem;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      color: #f8fafc;
+      max-width: 760px;
+      font-weight: 700;
+    }
+
+    .credibility-line {
+      margin: 12px 0 0 0;
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .metric-row {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+      margin-top: 16px;
+    }
+
+    .metric-item {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px 18px;
+      display: grid;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+    }
+
+    .metric-item:hover {
+      transform: translateY(-2px);
+    }
+
+    .metric-item.high {
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.16), rgba(239, 68, 68, 0.08));
+      border-color: rgba(248, 113, 113, 0.4);
+      box-shadow: 0 10px 28px rgba(239, 68, 68, 0.18);
+    }
+
+    .metric-item.low {
+      background: linear-gradient(180deg, rgba(34, 197, 94, 0.16), rgba(34, 197, 94, 0.08));
+      border-color: rgba(74, 222, 128, 0.38);
+      box-shadow: 0 10px 28px rgba(34, 197, 94, 0.18);
+    }
+
+    .metric-status {
+      font-size: 28px;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: #f8fafc;
+    }
+
+    .metric-title {
+      color: #e2e8f0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .metric-sub {
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .upload-hero {
+      margin-top: 0;
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+
+    .upload-cta {
+      width: 100%;
+      max-width: 360px;
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      padding: 15px 34px !important;
+      border-radius: 12px !important;
+      letter-spacing: 0;
+      background: linear-gradient(135deg, #2563eb, #3b82f6 52%, #1d4ed8) !important;
+      border-color: rgba(147, 197, 253, 0.35) !important;
+      color: #ffffff !important;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.42) !important;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .upload-cta:hover {
+      transform: translateY(-2px) scale(1.02);
+      background: linear-gradient(135deg, #1d4ed8, #2563eb 52%, #1e40af) !important;
+      box-shadow: 0 0 24px rgba(37, 99, 235, 0.55), 0 18px 34px rgba(37, 99, 235, 0.35) !important;
+    }
+
+    .upload-cta .feature-icon {
+      color: #ffffff;
+      width: 14px;
+      height: 14px;
+    }
+
+    .upload-subtext {
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      letter-spacing: 0;
+    }
+
+    .upload-lead {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e2e8f0;
+      letter-spacing: 0;
+    }
+
+    .hero-divider {
+      margin: 18px 0 0;
+      border: 0;
+      border-top: 1px solid rgba(96, 165, 250, 0.45);
+      box-shadow: 0 0 16px rgba(37, 99, 235, 0.28);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-cta {
+      margin-top: 20px;
+    }
+
+    .hero-gap {
+      height: 26px;
+      width: 100%;
+    }
+
+    .feature-grid {
+      margin-top: 0;
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .landing-features {
+      margin-top: 16px;
+      margin-bottom: 0;
+    }
+
+    #landingFeasibilityAnalysis,
+    #landingLiveMetrics,
+    #landingHowItWorks {
+      display: none;
+    }
+
+    #landingHowItWorks {
+      opacity: 1;
+      transform: none;
+    }
+
+    .landing-extra {
+      width: calc(100% + 64px);
+      margin-left: -32px;
+      margin-right: -32px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .landing-extra.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .landing-section-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #334155;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .feasibility-analysis {
+      padding: 40px 32px;
+    }
+
+    .feasibility-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      align-items: center;
+    }
+
+    .feasibility-card {
+      border-radius: 14px;
+      padding: 32px;
+    }
+
+    .feasibility-card.physical {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.28);
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.07);
+    }
+
+    .feasibility-card.hybrid {
+      background: rgba(6, 182, 212, 0.07);
+      border: 1px solid rgba(6, 182, 212, 0.22);
+      box-shadow: 0 0 40px rgba(6, 182, 212, 0.06);
+    }
+
+    .feasibility-card-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .mode-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .physical .mode-icon {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+    }
+
+    .hybrid .mode-icon {
+      background: rgba(6, 182, 212, 0.15);
+      color: #06b6d4;
+    }
+
+    .mode-pill {
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 11px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .physical .mode-pill {
+      background: rgba(59, 130, 246, 0.12);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.25);
+    }
+
+    .hybrid .mode-pill {
+      background: rgba(6, 182, 212, 0.1);
+      color: #67e8f9;
+      border-color: rgba(6, 182, 212, 0.25);
+    }
+
+    .feasibility-status {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .physical .feasibility-status {
+      color: #bfdbfe;
+    }
+
+    .hybrid .feasibility-status {
+      color: #a5f3fc;
+    }
+
+    .feasibility-value {
+      margin: 14px 0 0;
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .physical .feasibility-value {
+      color: #60a5fa;
+    }
+
+    .hybrid .feasibility-value {
+      color: #22d3ee;
+    }
+
+    .feasibility-caption {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .feasibility-insight {
+      margin-top: 16px;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: 13px;
+      line-height: 1.45;
+      border-left: 3px solid transparent;
+    }
+
+    .physical .feasibility-insight {
+      border-left-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.06);
+      color: #93c5fd;
+    }
+
+    .hybrid .feasibility-insight {
+      border-left-color: #06b6d4;
+      background: rgba(6, 182, 212, 0.06);
+      color: #67e8f9;
+    }
+
+    .mode-arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: #0d1526;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      margin: 0 20px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .mode-arrow .arrow-down {
+      display: none;
+    }
+
+    .live-metrics {
+      padding: 0 32px 40px;
+    }
+
+    .live-metrics-card {
+      background: #0d1526;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 24px 32px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .metric-col {
+      padding: 4px 20px;
+      position: relative;
+    }
+
+    .metric-col:not(:first-child)::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .metric-icon {
+      width: 20px;
+      height: 20px;
+      color: #2563eb;
+      margin-bottom: 10px;
+    }
+
+    .metric-number {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.05;
+      display: inline-block;
+    }
+
+    .metric-number.quality {
+      color: #22c55e;
+      border-bottom: 2px solid #22c55e;
+      padding-bottom: 2px;
+    }
+
+    .metric-name {
+      margin-top: 7px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .how-it-works {
+      padding: 0 32px 60px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: start;
+    }
+
+    .step-card {
+      background: #0d1526;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      color: #60a5fa;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step-title {
+      margin: 12px 0 6px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .step-desc {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .step-connector {
+      width: 40px;
+      align-self: center;
+      margin: 0 14px;
+      position: relative;
+      height: 1px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .step-connector::after {
+      content: "›";
+      position: absolute;
+      right: -2px;
+      top: -10px;
+      color: #334155;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .feature-card {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: #0f172a;
+      padding: 16px 16px;
+      box-shadow: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 26px rgba(0, 0, 0, 0.28);
+      border-color: rgba(37, 99, 235, 0.5);
+    }
+
+    .feature-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      color: #f1f5f9;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      padding: 7px;
+      border-radius: 8px;
+      line-height: 1;
+      color: #60a5fa;
+      background: rgba(37, 99, 235, 0.15);
+      flex-shrink: 0;
+    }
+
+    .feature-desc {
+      margin: 6px 0 0 0;
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.42;
+    }
+
+    #resultCount {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #94a3b8;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+      box-shadow: none;
+      color: var(--muted);
+      user-select: none;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      display: inline-block;
+      animation: pulse-dot 1.6s ease-in-out infinite;
+    }
+
+    .status-badge.loading {
+      color: #94a3b8;
+      border-color: var(--border);
+      background: #0f172a;
+    }
+
+    .status-badge.success {
+      color: #86efac;
+      background: rgba(22, 163, 74, 0.14);
+      border-color: rgba(74, 222, 128, 0.34);
+    }
+
+    .status-badge.warning {
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(251, 191, 36, 0.34);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      letter-spacing: 0.1px;
+    }
+
+    .warn,
+    .ok {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.48;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .warn {
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.32);
+    }
+
+    .ok {
+      color: #bbf7d0;
+      background: rgba(22, 163, 74, 0.14);
+      border: 1px solid rgba(74, 222, 128, 0.32);
+    }
+
+    .link {
+      color: #60a5fa;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+    }
+
+    .footer {
+      margin: 16px 0 4px;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+      width: 100%;
+      align-items: start;
+    }
+
+    .grid.is-hidden {
+      display: none;
+    }
+
+    .card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .card::before {
+      display: none;
+    }
+
+    .panel-title {
+      margin: 0 0 2px 0;
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0;
+      color: var(--text-soft);
+    }
+
+    .summary-kv {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .summary-section {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .summary-section:first-child {
+      margin-top: 8px;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .section-label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .counts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .count-card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      box-shadow: none;
+    }
+
+    .count-value {
+      font-family: var(--mono);
+      font-size: 21px;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.05;
+    }
+
+    .count-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .mode-card {
+      border-radius: var(--radius-md);
+      padding: 10px;
+      border: 1px solid var(--border);
+      box-shadow: none;
+      text-align: center;
+      background: #0f172a;
+    }
+
+    .mode-card.in_person {
+      background: rgba(22, 163, 74, 0.12);
+      border-color: rgba(74, 222, 128, 0.32);
+    }
+
+    .mode-card.hybrid {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(251, 191, 36, 0.32);
+    }
+
+    .mode-card.online {
+      background: rgba(37, 99, 235, 0.14);
+      border-color: rgba(96, 165, 250, 0.34);
+    }
+
+    .mode-num {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 900;
+      color: #f1f5f9;
+    }
+
+    .mode-txt {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.62px;
+      margin-top: 2px;
+    }
+
+    .obj-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .obj-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #0f172a;
+      box-shadow: none;
+    }
+
+    .obj-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    .obj-key {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .obj-val {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--success);
+    }
+
+    .obj-val.bad {
+      color: var(--warning);
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #0f172a;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .k {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .v {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-soft);
+    }
+
+    .table-shell {
+      overflow: auto;
+      max-height: 70vh;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #0f172a;
+      box-shadow: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+      background: transparent;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      text-align: center;
+      padding: 10px 8px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.74px;
+      text-transform: uppercase;
+      color: #94a3b8;
+      background: #1e293b;
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th:nth-child(2),
+    tbody td:nth-child(2) {
+      text-align: left;
+    }
+
+    tbody td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      vertical-align: middle;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #e2e8f0;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    tbody tr {
+      transition: background-color 0.18s ease, transform 0.18s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(37, 99, 235, 0.12);
+    }
+
+    .class-link {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: #60a5fa;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(96, 165, 250, 0.5);
+    }
+
+    .class-link:hover {
+      color: #93c5fd;
+      border-bottom-color: rgba(147, 197, 253, 0.75);
+    }
+
+    .students-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .student-count {
+      font-family: var(--mono);
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .no-students-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--danger);
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      letter-spacing: 0.24px;
+      text-transform: uppercase;
+    }
+
+    .pill[data-mode="in_person"] {
+      background: rgba(22, 163, 74, 0.14);
+      border-color: rgba(74, 222, 128, 0.36);
+      color: #bbf7d0;
+    }
+
+    .pill[data-mode="hybrid"] {
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(251, 191, 36, 0.36);
+      color: #fde68a;
+    }
+
+    .pill[data-mode="online"] {
+      background: rgba(37, 99, 235, 0.14);
+      border-color: rgba(96, 165, 250, 0.36);
+      color: #bfdbfe;
+    }
+
+    .unassigned-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      background: rgba(245, 158, 11, 0.14);
+      color: #fde68a;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.24px;
+    }
+
+    .no-results {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #0f172a;
+    }
+
+    .personal-timetable {
+      margin-top: 6px;
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(9, 22, 36, 0.68);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal {
+      width: min(980px, 96vw);
+      max-height: 88vh;
+      overflow: auto;
+      background: #1e293b;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 16px;
+      animation: rise-in 0.24s ease-out;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .modal-title {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-soft);
+    }
+
+    .modal-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .modal-body {
+      margin-top: 8px;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: auto;
+    }
+
+    .mini-table th {
+      text-align: left;
+      font-size: 10px;
+      color: #94a3b8;
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      background: #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.62px;
+    }
+
+    .mini-table td {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #e2e8f0;
+    }
+
+    .occupancy-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .occupancy-label {
+      width: 76px;
+      flex-shrink: 0;
+      font-family: var(--mono);
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .occupancy-bar-wrap {
+      flex: 1;
+      height: 18px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .occupancy-bar {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .occupancy-count {
+      width: 32px;
+      text-align: right;
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .objective-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .objective-label {
+      width: 148px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    .objective-bar-track {
+      flex: 1;
+      height: 20px;
+      background: rgba(37, 99, 235, 0.15);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      position: relative;
+    }
+
+    .objective-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 7px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #ffffff;
+      min-width: 30px;
+    }
+
+    .objective-bar-fill.good {
+      background: #16a34a;
+    }
+
+    .objective-bar-fill.warning {
+      background: #f59e0b;
+    }
+
+    .objective-bar-fill.bad {
+      background: #ef4444;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: center;
+      box-shadow: none;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f1f5f9;
+      font-family: var(--mono);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .room-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .room-bar-label {
+      width: 64px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+
+    .room-bar-track {
+      flex: 1;
+      height: 16px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .room-bar-fill {
+      height: 100%;
+      background: #2563eb;
+      border-radius: 999px;
+    }
+
+    .room-bar-count {
+      width: 34px;
+      text-align: right;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .timetable-grid {
+      display: grid;
+      grid-template-columns: 64px repeat(5, minmax(0, 1fr));
+      gap: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      font-size: 11px;
+      box-shadow: none;
+    }
+
+    .timetable-grid .cell {
+      background: #0f172a;
+      padding: 7px 5px;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .timetable-grid .cell.header {
+      background: #1e293b;
+      font-weight: 600;
+      text-align: center;
+      min-height: 32px;
+      justify-content: center;
+      color: #94a3b8;
+    }
+
+    .timetable-grid .cell.time-label {
+      background: #1e293b;
+      font-weight: 600;
+      font-size: 10px;
+      justify-content: center;
+      align-items: center;
+      color: #94a3b8;
+    }
+
+    .timetable-grid .class-block {
+      background: #2563eb;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 4px 6px;
+      font-size: 10px;
+      line-height: 1.3;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-xs);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .timetable-grid .class-block:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 16px rgba(14, 133, 255, 0.3);
+    }
+
+    main .grid > * {
+      animation: rise-in 0.38s ease both;
+    }
+
+    main .grid > *:nth-child(1) { animation-delay: 0.04s; }
+    main .grid > *:nth-child(2) { animation-delay: 0.09s; }
+    main .grid > *:nth-child(3) { animation-delay: 0.14s; }
+    main .grid > *:nth-child(4) { animation-delay: 0.2s; }
+    main .grid > *:nth-child(5) { animation-delay: 0.25s; }
+
+    @media (min-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+
+      .metric-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .top-nav {
+        flex-wrap: wrap;
+        row-gap: 10px;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .metric-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .container {
+        padding: 0 32px;
+      }
+
+      .top-nav {
+        align-items: flex-start;
+      }
+
+      .toolbar-group {
+        width: 100%;
+      }
+
+      .search,
+      .select {
+        width: 100%;
+      }
+
+      .panel-title {
+        font-size: 17px;
+      }
+
+      .table-shell {
+        max-height: 56vh;
+      }
+
+      .objective-label {
+        width: 112px;
+        font-size: 11px;
+      }
+
+      #occupancyCard {
+        min-height: 440px;
+        max-height: 440px;
+      }
+
+      #occupancyChart .occupancy-row {
+        grid-template-columns: 92px minmax(0, 1fr) 36px;
+        gap: 12px;
+        padding: 7px 8px;
+      }
+
+      #occupancyChart .occupancy-label {
+        font-size: 12px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-gap {
+        height: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .feasibility-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .mode-arrow {
+        margin: 0 auto;
+      }
+
+      .mode-arrow .arrow-right {
+        display: none;
+      }
+
+      .mode-arrow .arrow-down {
+        display: inline;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metric-col {
+        padding: 14px 16px;
+      }
+
+      .metric-col::before {
+        display: none !important;
+      }
+
+      .metric-col:nth-child(-n+2) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .realtime-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .rt-bars {
+        grid-template-columns: 1fr;
+      }
+
+      #howItWorksGrid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      .step-connector {
+        width: 1px;
+        height: 24px;
+        border-top: 0;
+        border-left: 1px dashed rgba(255, 255, 255, 0.1);
+        margin: 0 auto;
+      }
+
+      .step-connector::after {
+        content: "↓";
+        right: -6px;
+        top: 16px;
+      }
+    }
+
+    /* Production SaaS overhaul */
+    html,
+    body {
+      background: #060b18;
+      color: #f1f5f9;
+    }
+
+    .container {
+      max-width: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0 32px;
+    }
+
+    header {
+      background: #060b18;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      min-height: 160px;
+      box-shadow: none;
+      z-index: 60;
+      position: relative;
+      top: auto;
+    }
+
+    .nav-wrap {
+      min-height: 160px;
+      height: auto;
+      display: flex;
+      align-items: center;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .top-nav-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .top-nav-title {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: #f1f5f9;
+    }
+
+    .top-nav {
+      width: 100%;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .top-nav-brand {
+      flex-shrink: 0;
+      gap: 20px;
+    }
+
+    .top-nav-actions .toolbar {
+      justify-content: flex-end;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+
+    .app-shell {
+      width: 100%;
+      padding-top: 16px;
+      padding-bottom: 40px;
+    }
+
+    .content-col {
+      min-width: 0;
+      width: 100%;
+    }
+
+    #objectivesCard,
+    #timetableCard,
+    #personalTimetable,
+    #realtimeCard {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+
+    #overviewCard,
+    #roomUtilizationCard,
+    #diagnosticsCard,
+    #occupancyCard {
+      grid-column: auto;
+      align-self: start;
+    }
+
+    #dashboardGrid {
+      gap: 16px;
+      align-items: start;
+    }
+
+    .realtime-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(96, 165, 250, 0.22);
+      background:
+        radial-gradient(1200px 240px at -5% -20%, rgba(59, 130, 246, 0.16), transparent 58%),
+        radial-gradient(860px 200px at 110% -30%, rgba(16, 185, 129, 0.12), transparent 54%),
+        linear-gradient(180deg, rgba(8, 16, 34, 0.96), rgba(7, 14, 29, 0.94));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 36px rgba(2, 6, 23, 0.32);
+    }
+
+    .realtime-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .rt-kpi {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.68), rgba(2, 6, 23, 0.7));
+      padding: 12px 14px;
+      min-height: 82px;
+    }
+
+    .rt-kpi-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .rt-kpi-value {
+      font-size: 26px;
+      line-height: 1;
+      color: #f8fafc;
+      font-weight: 800;
+    }
+
+    .rt-kpi-sub {
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .rt-health-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .rt-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: #cbd5e1;
+      background: rgba(30, 41, 59, 0.45);
+    }
+
+    .rt-pill.healthy {
+      color: #86efac;
+      border-color: rgba(34, 197, 94, 0.45);
+      background: rgba(22, 101, 52, 0.22);
+    }
+
+    .rt-pill.degraded {
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.45);
+      background: rgba(120, 53, 15, 0.22);
+    }
+
+    .rt-pill.critical {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(127, 29, 29, 0.24);
+    }
+
+    .rt-bars {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .rt-bar-card {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 10px;
+      background: rgba(2, 6, 23, 0.44);
+      padding: 10px 10px 9px;
+    }
+
+    .rt-bar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #cbd5e1;
+      font-size: 12px;
+      margin-bottom: 7px;
+      gap: 10px;
+    }
+
+    .rt-track {
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(30, 41, 59, 0.9);
+      overflow: hidden;
+    }
+
+    .rt-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 260ms ease;
+      background: linear-gradient(90deg, #3b82f6 0%, #22d3ee 100%);
+    }
+
+    .rt-fill.warn {
+      background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+    }
+
+    .rt-fill.danger {
+      background: linear-gradient(90deg, #ef4444 0%, #f97316 100%);
+    }
+
+    .rt-empty {
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px dashed rgba(148, 163, 184, 0.34);
+      background: rgba(15, 23, 42, 0.32);
+      color: #94a3b8;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    #occupancyCard {
+      max-height: 520px;
+      min-height: 520px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #occupancyChart {
+      margin-top: 12px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      padding-right: 6px;
+    }
+
+    .table-shell {
+      width: 100%;
+    }
+
+    .toolbar-shell {
+      background: #0d1526;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+
+    .header-content {
+      margin-top: 0;
+      display: block;
+    }
+
+    body:not(.has-data) .header-content {
+      display: block;
+    }
+
+    .toolbar {
+      justify-content: flex-start;
+      max-width: none;
+      gap: 8px;
+    }
+
+    body:not(.has-data) .toolbar {
+      display: flex;
+    }
+
+    .toolbar-group {
+      background: #131f35;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px;
+      box-shadow: none;
+    }
+
+    #studentScopeBar {
+      display: none !important;
+    }
+
+    .search,
+    .select {
+      background: #131f35;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      min-height: 34px;
+    }
+
+    .search::placeholder {
+      color: #64748b;
+    }
+
+    .toolbar-divider {
+      background: rgba(255, 255, 255, 0.08);
+      height: 30px;
+    }
+
+    .btn {
+      background: #131f35;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: border-color 150ms ease, color 150ms ease, transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    }
+
+    .btn:hover {
+      border-color: rgba(147, 197, 253, 0.45);
+      color: #cbd5e1;
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
+      box-shadow: 0 0 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn.mode-on {
+      position: relative;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      color: #4ade80;
+      padding-left: 24px;
+    }
+
+    .btn.mode-on::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #4ade80;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    }
+
+    .btn.mode-off {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+    }
+
+    .status-badge {
+      border-radius: 20px;
+    }
+
+    .status-badge.success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid #22c55e;
+      color: #4ade80;
+    }
+
+    .status-badge.loading {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+    }
+
+    .status-badge.warning {
+      background: rgba(234, 179, 8, 0.1);
+      border-color: rgba(234, 179, 8, 0.3);
+      color: #fcd34d;
+    }
+
+    .card {
+      background: #0d1526;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 20px 24px;
+      box-shadow: none;
+    }
+
+    .empty-headline {
+      margin: 8px 0 0 0;
+    }
+
+    .system-statement,
+    .hero-hook,
+    .credibility-line {
+      margin: 6px 0 0 0;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .section-label,
+    .diag-title {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: #334155;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .counts-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      background: #131f35;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .count-card {
+      background: transparent;
+      padding: 16px 12px;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0;
+    }
+
+    .count-card:last-child {
+      border-right: none;
+    }
+
+    .count-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .count-label {
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .mode-grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .mode-card {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 8px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      text-align: center;
+    }
+
+    .mode-card.is-active {
+      border-bottom-color: #2563eb;
+    }
+
+    .mode-txt {
+      order: 1;
+      color: #94a3b8;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 12px;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .mode-num {
+      order: 2;
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      padding: 2px 8px;
+      line-height: 1.2;
+    }
+
+    .quality-grid {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .quality-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+
+    .quality-ring svg {
+      width: 64px;
+      height: 64px;
+      transform: rotate(-90deg);
+    }
+
+    .quality-ring-track {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.12);
+      stroke-width: 8;
+    }
+
+    .quality-ring-fill {
+      fill: none;
+      stroke: #22c55e;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 150ms ease;
+    }
+
+    .quality-ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+      font-family: var(--mono);
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: #131f35;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: none;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .room-bar-track,
+    .objective-bar-track,
+    .occupancy-bar-wrap {
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .room-bar-fill,
+    .objective-bar-fill,
+    .occupancy-bar {
+      background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);
+      border-radius: 4px;
+      transition: width 150ms ease;
+    }
+
+    .room-bar-label,
+    .objective-label {
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .room-bar-count,
+    .occupancy-count {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    #occupancyChart .occupancy-row {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr) 44px;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      transition: background-color 150ms ease;
+    }
+
+    #occupancyChart .occupancy-row:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    #occupancyChart .occupancy-label {
+      width: auto;
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    #occupancyChart .occupancy-bar-wrap {
+      width: 100%;
+      min-width: 0;
+    }
+
+    #occupancyChart .occupancy-count {
+      width: auto;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .occupancy-count.zero {
+      color: #334155;
+    }
+
+    .obj-row {
+      background: #0b1324;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .obj-name {
+      font-size: 14px;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    .obj-key {
+      display: inline-flex;
+      margin-top: 4px;
+      background: #131f35;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #60a5fa;
+    }
+
+    .obj-val {
+      background: rgba(37, 99, 235, 0.16);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      color: #93c5fd;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .obj-val.zero {
+      background: #1e293b;
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+    }
+
+    .objective-bar {
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .objective-bar-track {
+      position: relative;
+      height: 16px;
+    }
+
+    .objective-bar-fill {
+      height: 100%;
+      min-width: 0;
+      padding-right: 6px;
+      font-size: 10px;
+      color: #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .objective-fill-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #dbeafe;
+      transform: none;
+      line-height: 1;
+    }
+
+    .objective-bar-fill.good,
+    .objective-bar-fill.warning,
+    .objective-bar-fill.bad {
+      background: linear-gradient(90deg, #1d4ed8 0%, #3b82f6 100%);
+    }
+
+    .diag-card {
+      background: #0d1526;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+    }
+
+    .diag-item {
+      background: #060b18;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.9;
+      color: #94a3b8;
+    }
+
+    .diag-key {
+      color: #60a5fa;
+    }
+
+    .sev-pill.LOW {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 2px 8px;
+    }
+
+    .table-shell {
+      background: #0a1120;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      max-height: 66vh;
+    }
+
+    thead th {
+      background: #060b18;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: #475569;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #0d1526;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #0a1120;
+    }
+
+    tbody tr:hover {
+      background: #131f35;
+    }
+
+    .link,
+    .class-link {
+      color: #60a5fa;
+      text-decoration: none;
+      border-bottom: none;
+    }
+
+    .link:hover,
+    .class-link:hover {
+      color: #93c5fd;
+      text-decoration: underline;
+      border-bottom: none;
+    }
+
+    .pill[data-mode="in_person"] {
+      background: rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      color: #93c5fd;
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 3px 8px;
+      font-weight: 500;
+    }
+
+    .unassigned-badge {
+      background: rgba(234, 179, 8, 0.1);
+      border: 1px solid rgba(234, 179, 8, 0.3);
+      color: #fcd34d;
+    }
+
+    .view-btn {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 2px 10px;
+      font-size: 12px;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: border-color 150ms ease, color 150ms ease;
+    }
+
+    .view-btn:hover {
+      border-color: #2563eb;
+      color: #60a5fa;
+    }
+
+    /* Final UI polish overrides (visual only, no logic changes) */
+    .container {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    #dashboardGrid {
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .card {
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 10px 26px rgba(2, 8, 22, 0.22);
+    }
+
+    .panel-title {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .hint {
+      font-size: 16px;
+      line-height: 1.55;
+      color: #8fa2c3;
+      margin-bottom: 16px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.09em;
+      margin-bottom: 10px;
+    }
+
+    .toolbar {
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .toolbar-group {
+      border-radius: 12px;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .btn,
+    .search,
+    .select {
+      min-height: 44px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .search {
+      padding: 10px 14px;
+    }
+
+    .select {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .status-badge {
+      min-height: 44px;
+      padding: 10px 14px;
+    }
+
+    .table-shell {
+      border-radius: 12px;
+      max-height: 64vh;
+    }
+
+    #occupancyCard {
+      max-height: 540px;
+      min-height: 540px;
+    }
+
+    #occupancyChart .occupancy-row {
+      gap: 20px;
+      padding: 10px 12px;
+      grid-template-columns: 140px minmax(0, 1fr) 48px;
+    }
+
+    @media (max-width: 1200px) {
+      header,
+      .nav-wrap {
+        min-height: 124px;
+      }
+
+      .top-nav-title {
+        font-size: 42px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      #dashboardGrid {
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .panel-title {
+        font-size: 20px;
+      }
+
+      .hint {
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .btn,
+      .search,
+      .select,
+      .status-badge {
+        min-height: 40px;
+        font-size: 14px;
+      }
+
+      header,
+      .nav-wrap {
+        min-height: 96px;
+      }
+
+      .top-nav-logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        font-size: 20px;
+      }
+
+      .top-nav-title {
+        font-size: 28px;
+      }
+
+      #occupancyCard {
+        min-height: 430px;
+        max-height: 430px;
+      }
+
+      #occupancyChart .occupancy-row {
+        grid-template-columns: 92px minmax(0, 1fr) 36px;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .counts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .count-card {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .count-card:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav-wrap">
+      <div class="top-nav">
+        <div class="top-nav-brand">
+          <span class="top-nav-logo">TS</span>
+          <span class="top-nav-title">University Timetabling Solver</span>
+        </div>
+        <div class="top-nav-actions">
+          <div class="toolbar">
+            <div id="studentScopeBar" class="toolbar-group" data-requires-data="1" style="display:none">
+              <select id="userFilter" class="select">
+                <option value="">Select Student</option>
+              </select>
+              <input id="searchInput" class="search" placeholder="Search classes, courses, rooms..." />
+              <button id="clearFilters" class="btn" type="button">Clear</button>
+            </div>
+
+            <div class="toolbar-divider" data-requires-data="1" style="display:none"></div>
+
+            <div class="toolbar-group" data-requires-data="1" style="display:none">
+              <button id="studentsBtn" class="btn" type="button">Students</button>
+              <button id="downloadJson" class="btn" type="button">Download</button>
+              <span id="resultCount" class="status"></span>
+              <span id="solutionBadge" class="status-badge loading"><span class="status-dot"></span><span id="solutionBadgeText">Waiting</span></span>
+              <span id="loadStatus" class="status" style="display:none">Waiting</span>
+            </div>
+          </div>
+          <input id="fileInput" type="file" accept="application/json" style="display:none" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container app-shell">
+      <div class="content-col">
+      <div id="localFileHint" class="warn" style="display:none"></div>
+
+      <section id="emptyStateCard" class="card empty-state">
+        <div class="hero-copy">
+          <h2 class="empty-headline">Turn infeasible timetables into workable schedules using hybrid optimization.</h2>
+          <p class="system-statement">Automatically detects infeasibility and resolves it using hybrid scheduling.</p>
+          <p class="hero-hook">Solve schedules that would otherwise be impossible.</p>
+          <p class="credibility-line">Powered by constraint optimization and hybrid scheduling algorithms.</p>
+        </div>
+
+        <div class="hero-cta">
+          <div class="upload-hero">
+            <label class="btn primary upload-cta" for="fileInput">
+              Upload Your Timetable JSON
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section id="landingFeatures" class="landing-features" aria-label="System capabilities">
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3 class="feature-title">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 19h16M7 15V9m5 6V5m5 10v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              Room Utilization
+            </h3>
+            <p class="feature-desc">Find unused capacity instantly</p>
+          </article>
+          <article class="feature-card">
+            <h3 class="feature-title">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 9v4m0 3h.01M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Student Conflicts
+            </h3>
+            <p class="feature-desc">Catch clashes before they happen</p>
+          </article>
+          <article class="feature-card">
+            <h3 class="feature-title">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7h8a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4H7m0 0 3-3m-3 3 3 3M17 9l-3-3m3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Hybrid Feasibility
+            </h3>
+            <p class="feature-desc">Automatically rebalance load when needed</p>
+          </article>
+          <article class="feature-card">
+            <h3 class="feature-title">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 18h16M6 15l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Risk Diagnostics
+            </h3>
+            <p class="feature-desc">Know if your timetable will fail — before solving</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="landingFeasibilityAnalysis" class="landing-extra feasibility-analysis" aria-label="Feasibility Analysis">
+        <div class="landing-section-label">Feasibility Analysis</div>
+        <div class="feasibility-grid">
+          <article class="feasibility-card physical">
+            <div class="feasibility-card-top">
+              <span class="mode-icon">✓</span>
+              <span class="mode-pill">Physical Mode</span>
+            </div>
+            <h3 class="feasibility-status">PHYSICALLY INFEASIBLE</h3>
+            <p class="feasibility-value">58%</p>
+            <div class="feasibility-caption">shortage in room capacity</div>
+            <div class="feasibility-insight">Cannot be solved with physical rooms alone.</div>
+          </article>
+
+          <div class="mode-arrow" aria-hidden="true">
+            <span class="arrow-right">→</span>
+            <span class="arrow-down">↓</span>
+          </div>
+
+          <article class="feasibility-card hybrid">
+            <div class="feasibility-card-top">
+              <span class="mode-icon">✓</span>
+              <span class="mode-pill">Hybrid Mode</span>
+            </div>
+            <h3 class="feasibility-status">FEASIBLE WITH HYBRID</h3>
+            <p class="feasibility-value">100%</p>
+            <div class="feasibility-caption">classes successfully scheduled</div>
+            <div class="feasibility-insight">Load automatically rebalanced. Zero conflicts.</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="landingLiveMetrics" class="landing-extra live-metrics" aria-label="Live Metrics">
+        <div class="live-metrics-card">
+          <div class="metrics-grid">
+            <div class="metric-col">
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <p class="metric-number">150</p>
+              <div class="metric-name">Total Classes</div>
+            </div>
+            <div class="metric-col">
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 20h16M7 16V8m5 8V5m5 11V10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <p class="metric-number">7</p>
+              <div class="metric-name">Unique Rooms</div>
+            </div>
+            <div class="metric-col">
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm14 10v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 10.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="metric-number">19</p>
+              <div class="metric-name">Students</div>
+            </div>
+            <div class="metric-col">
+              <svg class="metric-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 2 3 6l9 4 9-4-9-4Zm0 9L3 7v11l9 4 9-4V7l-9 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+              <p class="metric-number quality">100</p>
+              <div class="metric-name">Quality Score</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="landingHowItWorks" class="how-it-works" aria-label="How It Works">
+        <div style="padding: 18px 32px 40px;">
+          <div id="howItWorksGrid" style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr auto 1fr;align-items:start;gap:0;">
+            <div class="step-card">
+              <span class="step-badge">1</span>
+              <svg style="width:20px;height:20px;color:#60a5fa;margin:10px 0 6px;display:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M12 3v13M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <h3 class="step-title">Upload Timetable JSON</h3>
+            </div>
+
+            <div class="step-connector" aria-hidden="true"></div>
+
+            <div class="step-card">
+              <span class="step-badge">2</span>
+              <svg style="width:20px;height:20px;color:#60a5fa;margin:10px 0 6px;display:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <h3 class="step-title">Detect Constraints</h3>
+            </div>
+
+            <div class="step-connector" aria-hidden="true"></div>
+
+            <div class="step-card">
+              <span class="step-badge">3</span>
+              <svg style="width:20px;height:20px;color:#60a5fa;margin:10px 0 6px;display:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3l7 4v5c0 4.5-3 8.3-7 9.5C8 20.3 5 16.5 5 12V7l7-4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              </svg>
+              <h3 class="step-title">Check Feasibility</h3>
+            </div>
+
+            <div class="step-connector" aria-hidden="true"></div>
+
+            <div class="step-card">
+              <span class="step-badge">4</span>
+              <svg style="width:20px;height:20px;color:#60a5fa;margin:10px 0 6px;display:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7h8a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4H7m0 0 3-3m-3 3 3 3M17 9l-3-3m3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <h3 class="step-title">Apply Hybrid Optimization</h3>
+            </div>
+
+            <div class="step-connector" aria-hidden="true"></div>
+
+            <div class="step-card">
+              <span class="step-badge">5</span>
+              <svg style="width:20px;height:20px;color:#22c55e;margin:10px 0 6px;display:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 13 9 17 19 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <h3 class="step-title" style="color:#86efac">Generate Schedule</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="dashboardGrid" class="grid is-hidden">
+        <section id="overviewCard" class="card">
+          <h2 class="panel-title">Summary</h2>
+          <div class="hint">This section shows solver objectives and solution quality metrics.</div>
+          <div id="summary"></div>
+        </section>
+
+        <section id="roomUtilizationCard" class="card">
+          <h2 class="panel-title">Room Utilization</h2>
+          <div class="hint">Statistics on room usage across all scheduled classes.</div>
+          <div id="roomStats" style="margin-top: 12px;"></div>
+        </section>
+
+        <section id="objectivesCard" class="card" style="grid-column: 1 / -1;">
+          <h2 class="panel-title">Optimization Objectives</h2>
+          <div class="hint">Score breakdown across all optimization objectives z1–z5.</div>
+          <div id="objectivesChart" style="margin-top: 16px;"></div>
+        </section>
+
+        <section id="realtimeCard" class="card realtime-card">
+          <h2 class="panel-title">Realtime Control Center</h2>
+          <div class="hint">Live controller signals for SLA, drift, pressure, and decision stability.</div>
+          <div id="realtimePanel"></div>
+        </section>
+
+        <section id="diagnosticsCard" class="card">
+          <h2 class="panel-title">Diagnostics</h2>
+          <div class="hint">Input risk, violations, and recommendations from solver output.</div>
+          <div id="diagnosticsPanel" class="diag-wrap"></div>
+        </section>
+
+        <section id="occupancyCard" class="card">
+          <h2 class="panel-title">Class Occupancy</h2>
+          <div class="hint">Visual representation of students per class. Each bar shows number of enrolled students.</div>
+          <div id="occupancyChart" style="margin-top: 12px;"></div>
+        </section>
+
+        <section id="timetableCard" class="card">
+          <h2 class="panel-title">Timetable</h2>
+          <div class="hint">One row per class. Sorted by day and start time. Use filters above to narrow results.</div>
+
+          <div class="table-shell">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 70px">Class ID</th>
+                  <th style="width: 180px">Course Name</th>
+                  <th style="width: 90px">Day</th>
+                  <th style="width: 70px">Start</th>
+                  <th style="width: 70px">End</th>
+                  <th style="width: 100px">Room</th>
+                  <th style="width: 120px">Students</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="noResults" class="hint no-results" style="display:none;">
+            No classes match your current filters.
+            <a id="resetFiltersLink" class="link" href="#">Reset</a>
+          </div>
+
+          <div class="footer">
+            Tip: Use <b>Upload Your Timetable JSON</b> and select a solver output JSON file.
+          </div>
+        </section>
+
+      </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="detailsBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="detailsTitle" class="modal-title">Details</h3>
+        <div class="modal-controls">
+          <select id="detailsType" style="padding:8px 10px; border-radius:8px; border:1px solid var(--border);">
+            <option value="class">Class</option>
+            <option value="student">Student</option>
+            <option value="course">Course</option>
+          </select>
+          <select id="detailsSelect" style="padding:8px 10px; border-radius:8px; border:1px solid var(--border); min-width: 240px;"></select>
+          <button id="detailsClose" class="btn" type="button">Close</button>
+        </div>
+      </div>
+      <div id="detailsBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toastStack" class="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+  <script>
+    const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+    function minutesToHHMM(m) {
+      if (typeof m !== "number" || !isFinite(m) || m < 0) return "?";
+      const h = Math.floor(m / 60);
+      const mm = m % 60;
+      return String(h).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+    }
+
+    function decodeDays(days) {
+      // Preferred format: 7-char binary string (Mon..Sun). Legacy bitmask ints are handled as fallback.
+      if (typeof days === "string") {
+        const s = days.trim();
+        if (s.length === 7 && !/[^01]/.test(s)) {
+          const out = [];
+          for (let i = 0; i < 7; i++) if (s[i] === "1") out.push(DAY_NAMES[i]);
+          return out.length ? out.join(",") : "?";
+        }
+        // If already rendered as weekday names in external files, keep it readable instead of crashing.
+        if (/[A-Za-z]/.test(s)) return s;
+        if (/^\d+$/.test(s)) {
+          const n = Number(s);
+          if (Number.isFinite(n)) {
+            const out = [];
+            for (let i = 0; i < 7; i++) if ((n & (1 << i)) !== 0) out.push(DAY_NAMES[i]);
+            return out.length ? out.join(",") : "?";
+          }
+        }
+        return "?";
+      }
+      if (typeof days === "number" && Number.isFinite(days)) {
+        const out = [];
+        for (let i = 0; i < 7; i++) if ((days & (1 << i)) !== 0) out.push(DAY_NAMES[i]);
+        return out.length ? out.join(",") : "?";
+      }
+      return "?";
+    }
+
+    function debounce(fn, ms) {
+      let t = null;
+      return (...args) => {
+        if (t) clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    function getModeCounts(schedule) {
+      const counts = { in_person: 0, hybrid: 0, online: 0 };
+      if (!schedule) return counts;
+      for (const cid of Object.keys(schedule)) {
+        const m = schedule[cid]?.mode;
+        if (m && counts[m] !== undefined) counts[m] += 1;
+      }
+      return counts;
+    }
+
+    function hasActualAttendance(modeData) {
+      if (!modeData || typeof modeData !== "object") return false;
+      const inPerson = Number(modeData.in_person || 0);
+      const online = Number(modeData.online || 0);
+      return inPerson > 0 || online > 0;
+    }
+
+    function normalizeAttendanceData(data) {
+      if (!data || typeof data !== "object") return data;
+      const students = data.students;
+      if (!students || typeof students !== "object" || Array.isArray(students)) return data;
+
+      Object.values(students).forEach((student) => {
+        if (!student || typeof student !== "object") return;
+        const attended = student.attended;
+        if (!attended || typeof attended !== "object" || Array.isArray(attended)) return;
+
+        const cleaned = {};
+        Object.entries(attended).forEach(([cid, modeData]) => {
+          if (hasActualAttendance(modeData)) cleaned[cid] = modeData;
+        });
+        student.attended = cleaned;
+      });
+
+      return data;
+    }
+
+    function safeGet(obj, path, fallback) {
+      try {
+        let cur = obj;
+        for (const p of path) {
+          if (cur == null) return fallback;
+          cur = cur[p];
+        }
+        return cur ?? fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function updateSolutionBadge(statusText) {
+      const badge = document.getElementById("solutionBadge");
+      const badgeText = document.getElementById("solutionBadgeText");
+      if (!badge || !badgeText) return;
+      const s = String(statusText ?? "Waiting");
+      badgeText.textContent = s;
+      badge.classList.remove("loading", "success", "warning");
+      const sl = s.toLowerCase();
+      if (sl === "optimal" || sl === "feasible" || sl === "loaded" || sl === "success") {
+        badge.classList.add("success");
+      } else if (sl === "infeasible" || sl === "unknown" || sl.includes("fail") || sl.includes("error")) {
+        badge.classList.add("warning");
+      }
+      else badge.classList.add("loading");
+    }
+
+    function normalizeSolverStatus(value) {
+      const s = String(value || "").trim().toUpperCase();
+      if (s === "OPTIMAL" || s === "FEASIBLE" || s === "INFEASIBLE" || s === "UNKNOWN") return s;
+      return "UNKNOWN";
+    }
+
+    function clearFeedback() {
+      const stack = document.getElementById("toastStack");
+      if (stack) stack.innerHTML = "";
+    }
+
+    function pushFeedback(kind, message) {
+      const stack = document.getElementById("toastStack");
+      if (!stack || !message) return;
+      const div = document.createElement("div");
+      div.className = `toast ${kind}`;
+      div.textContent = String(message);
+      stack.appendChild(div);
+      requestAnimationFrame(() => div.classList.add("show"));
+
+      const dismissMs = kind === "error" ? 5200 : kind === "warning" ? 4200 : 2400;
+      const cleanup = () => {
+        div.classList.remove("show");
+        setTimeout(() => div.remove(), 180);
+      };
+      const timer = setTimeout(cleanup, dismissMs);
+      div.addEventListener("click", () => {
+        clearTimeout(timer);
+        cleanup();
+      }, { once: true });
+    }
+
+    function showError(message) { pushFeedback("error", message); }
+    function showWarning(message) { pushFeedback("warning", message); }
+    function showInfo(message) { pushFeedback("info", message); }
+
+    function showLoadStatusMessage(status) {
+      const s = normalizeSolverStatus(status);
+      if (s === "OPTIMAL" || s === "FEASIBLE") {
+        showInfo("File loaded successfully.");
+      } else if (s === "UNKNOWN") {
+        showInfo("Partial file loaded.");
+      }
+      // For INFEASIBLE we intentionally avoid a success/info message.
+    }
+
+    function setPlaceholder(el, message) {
+      if (!el) return;
+      el.innerHTML = `<div class="placeholder">${String(message || "No data available")}</div>`;
+    }
+
+    const LANDING_DYNAMIC_IDS = [
+      "landingFeasibilityAnalysis",
+      "landingLiveMetrics",
+    ];
+
+    function coerceFiniteNumber(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function formatLandingInt(value) {
+      return Number.isFinite(value) ? Math.round(value).toLocaleString() : "—";
+    }
+
+    function normalizeRiskValue(value) {
+      if (value == null) return "";
+      return String(value).trim().toUpperCase();
+    }
+
+    function computeLandingMetrics(data) {
+      const classesArray = Array.isArray(data?.classes) ? data.classes : null;
+
+      let classCount = null;
+      const roomValues = [];
+
+      if (classesArray) {
+        classCount = classesArray.length;
+        classesArray.forEach((entry) => {
+          const room = entry?.room_id ?? entry?.roomId ?? entry?.room;
+          if (room != null && String(room).trim() !== "") roomValues.push(String(room));
+        });
+      } else if (data?.schedule && typeof data.schedule === "object" && !Array.isArray(data.schedule)) {
+        const scheduleEntries = Object.entries(data.schedule);
+        classCount = scheduleEntries.length;
+        scheduleEntries.forEach(([, entry]) => {
+          const room = entry?.room ?? entry?.room_id ?? entry?.roomId;
+          if (room != null && String(room).trim() !== "") roomValues.push(String(room));
+        });
+      }
+
+      const uniqueRooms = roomValues.length ? new Set(roomValues).size : null;
+      const totalStudents =
+        coerceFiniteNumber(data?.total_students) ??
+        coerceFiniteNumber(data?.counts?.n_students) ??
+        ((data?.students && typeof data.students === "object" && !Array.isArray(data.students))
+          ? Object.keys(data.students).length
+          : null);
+      const qualityScore =
+        coerceFiniteNumber(data?.quality_score) ??
+        coerceFiniteNumber(data?.solution_quality);
+
+      return { classCount, uniqueRooms, totalStudents, qualityScore };
+    }
+
+    function updateFeasibilityCards(data) {
+      const root = document.getElementById("landingFeasibilityAnalysis");
+      if (!root) return;
+
+      const physicalRisk = normalizeRiskValue(data?.physical_risk);
+      const hybridRisk = normalizeRiskValue(data?.hybrid_risk);
+      const physicalShortage = coerceFiniteNumber(data?.physical_shortage_percent);
+      const hybridShortage = coerceFiniteNumber(data?.hybrid_shortage_percent);
+      const schedule = (data?.schedule && typeof data.schedule === "object" && !Array.isArray(data.schedule))
+        ? data.schedule
+        : {};
+      const modeCounts = getModeCounts(schedule);
+      const totalClasses = (modeCounts.in_person || 0) + (modeCounts.hybrid || 0) + (modeCounts.online || 0);
+      const physicalClassShare = totalClasses > 0
+        ? Math.round(((modeCounts.in_person || 0) + (modeCounts.hybrid || 0)) * 100 / totalClasses)
+        : null;
+      const hybridClassShare = totalClasses > 0
+        ? Math.round(((modeCounts.hybrid || 0) + (modeCounts.online || 0)) * 100 / totalClasses)
+        : null;
+      const hasPhysicalRiskData = Boolean(physicalRisk) || Number.isFinite(physicalShortage);
+      const hasHybridRiskData = Boolean(hybridRisk) || Number.isFinite(hybridShortage);
+
+      const physicalCard = root.querySelector(".feasibility-card.physical");
+      if (physicalCard) {
+        const statusEl = physicalCard.querySelector(".feasibility-status");
+        const valueEl = physicalCard.querySelector(".feasibility-value");
+        const captionEl = physicalCard.querySelector(".feasibility-caption");
+        const insightEl = physicalCard.querySelector(".feasibility-insight");
+
+        if (statusEl) {
+          if (physicalRisk === "HIGH" || physicalRisk === "CRITICAL") {
+            statusEl.textContent = "PHYSICALLY INFEASIBLE";
+          } else if (physicalRisk === "LOW") {
+            statusEl.textContent = "PHYSICALLY FEASIBLE";
+          } else if (physicalRisk === "MEDIUM") {
+            statusEl.textContent = "PHYSICAL MODE CONSTRAINED";
+          } else if (!hasPhysicalRiskData && totalClasses > 0) {
+            statusEl.textContent = "PHYSICAL COVERAGE";
+          } else {
+            statusEl.textContent = "—";
+          }
+        }
+
+        if (valueEl) {
+          if (Number.isFinite(physicalShortage)) valueEl.textContent = `${Math.round(physicalShortage)}%`;
+          else if (physicalClassShare !== null) valueEl.textContent = `${physicalClassShare}%`;
+          else valueEl.textContent = "—";
+        }
+        if (captionEl) {
+          captionEl.textContent = Number.isFinite(physicalShortage)
+            ? "shortage in room capacity"
+            : "classes with physical delivery";
+        }
+
+        if (insightEl) {
+          if (physicalRisk === "HIGH" || physicalRisk === "CRITICAL") {
+            insightEl.textContent = "Cannot be solved with physical rooms alone.";
+          } else if (physicalRisk === "LOW") {
+            insightEl.textContent = "Physical-only scheduling is feasible for this input.";
+          } else if (physicalRisk === "MEDIUM") {
+            insightEl.textContent = "Physical mode may require room balancing.";
+          } else if (!hasPhysicalRiskData && totalClasses > 0) {
+            insightEl.textContent = "Risk fields not present in this file. Showing derived class-mode coverage.";
+          } else {
+            insightEl.textContent = "—";
+          }
+        }
+      }
+
+      const hybridCard = root.querySelector(".feasibility-card.hybrid");
+      if (hybridCard) {
+        const statusEl = hybridCard.querySelector(".feasibility-status");
+        const valueEl = hybridCard.querySelector(".feasibility-value");
+        const captionEl = hybridCard.querySelector(".feasibility-caption");
+        const insightEl = hybridCard.querySelector(".feasibility-insight");
+
+        if (statusEl) {
+          if (hybridRisk === "LOW") {
+            statusEl.textContent = "FEASIBLE WITH HYBRID";
+          } else if (hybridRisk === "HIGH" || hybridRisk === "CRITICAL") {
+            statusEl.textContent = "HYBRID AT RISK";
+          } else if (hybridRisk === "MEDIUM") {
+            statusEl.textContent = "HYBRID MODE CONSTRAINED";
+          } else if (!hasHybridRiskData && totalClasses > 0) {
+            statusEl.textContent = "HYBRID/ONLINE COVERAGE";
+          } else {
+            statusEl.textContent = "—";
+          }
+        }
+
+        const hybridSuccessPct = Number.isFinite(hybridShortage)
+          ? Math.max(0, Math.min(100, Math.round(100 - hybridShortage)))
+          : (hybridRisk === "LOW" ? 100 : null);
+        if (valueEl) {
+          if (Number.isFinite(hybridSuccessPct)) valueEl.textContent = `${hybridSuccessPct}%`;
+          else if (hybridClassShare !== null) valueEl.textContent = `${hybridClassShare}%`;
+          else valueEl.textContent = "—";
+        }
+        if (captionEl) {
+          captionEl.textContent = Number.isFinite(hybridSuccessPct)
+            ? "classes successfully scheduled"
+            : "classes with alternate delivery";
+        }
+
+        if (insightEl) {
+          if (hybridRisk === "LOW") {
+            insightEl.textContent = "Load automatically rebalanced.";
+          } else if (hybridRisk === "HIGH" || hybridRisk === "CRITICAL") {
+            insightEl.textContent = "Hybrid mode still has unresolved capacity pressure.";
+          } else if (hybridRisk === "MEDIUM") {
+            insightEl.textContent = "Hybrid mode reduces pressure but needs tuning.";
+          } else if (!hasHybridRiskData && totalClasses > 0) {
+            insightEl.textContent = "Risk fields not present in this file. Showing derived class-mode coverage.";
+          } else {
+            insightEl.textContent = "—";
+          }
+        }
+      }
+    }
+
+    function updateLandingMetricsStrip(data) {
+      const root = document.getElementById("landingLiveMetrics");
+      if (!root) return;
+      const metricCols = root.querySelectorAll(".metric-col");
+      if (metricCols.length < 4) return;
+
+      const metrics = computeLandingMetrics(data || {});
+      const classCountEl = metricCols[0].querySelector(".metric-number");
+      const uniqueRoomsEl = metricCols[1].querySelector(".metric-number");
+      const studentsEl = metricCols[2].querySelector(".metric-number");
+      const qualityEl = metricCols[3].querySelector(".metric-number");
+
+      if (classCountEl) classCountEl.textContent = formatLandingInt(metrics.classCount);
+      if (uniqueRoomsEl) uniqueRoomsEl.textContent = formatLandingInt(metrics.uniqueRooms);
+      if (studentsEl) studentsEl.textContent = formatLandingInt(metrics.totalStudents);
+
+      if (qualityEl) {
+        if (!Number.isFinite(metrics.qualityScore)) {
+          qualityEl.textContent = "—";
+          qualityEl.style.color = "#94a3b8";
+          qualityEl.style.borderBottom = "none";
+        } else {
+          const q = Math.max(0, Math.min(100, Math.round(metrics.qualityScore)));
+          let color = "#ef4444";
+          if (q >= 100) color = "#22c55e";
+          else if (q >= 80) color = "#f59e0b";
+          qualityEl.textContent = String(q);
+          qualityEl.style.color = color;
+          qualityEl.style.borderBottom = `2px solid ${color}`;
+          qualityEl.style.paddingBottom = "2px";
+        }
+      }
+    }
+
+    function setLandingDynamicVisible(visible, opts = {}) {
+      const { animate = true, scroll = false } = opts;
+      const sections = LANDING_DYNAMIC_IDS
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+
+      sections.forEach((el) => {
+        if (!visible) {
+          el.classList.remove("is-visible");
+          el.style.display = "none";
+          return;
+        }
+        el.style.display = "block";
+        if (!animate) {
+          el.classList.add("is-visible");
+        } else {
+          el.classList.remove("is-visible");
+          requestAnimationFrame(() => el.classList.add("is-visible"));
+        }
+      });
+
+      if (visible && scroll) {
+        const anchor = document.getElementById("landingFeasibilityAnalysis");
+        if (anchor) {
+          setTimeout(() => {
+            anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 40);
+        }
+      }
+    }
+
+    function resetLandingDynamicValues() {
+      updateFeasibilityCards({});
+      updateLandingMetricsStrip({});
+    }
+
+    function renderDashboard(data) {
+      updateFeasibilityCards(data || {});
+      updateLandingMetricsStrip(data || {});
+      setLandingDynamicVisible(true, { animate: true, scroll: true });
+    }
+
+    function collectRealtimeMetrics(data) {
+      const rt = (data && typeof data === "object" ? (data.realtime || data.realtime_control || data.realtime_metrics || {}) : {}) || {};
+      const debugRt = (data?.debug && typeof data.debug === "object" ? data.debug.realtime : {}) || {};
+      const logsRt = (data?.logs && typeof data.logs === "object" ? data.logs.realtime : {}) || {};
+      const merged = { ...rt, ...debugRt, ...logsRt };
+      const sourceHasRealtime = Object.keys(merged).length > 0;
+
+      const pickNum = (...vals) => {
+        for (const v of vals) {
+          const n = Number(v);
+          if (Number.isFinite(n)) return n;
+        }
+        return null;
+      };
+
+      const pickStr = (...vals) => {
+        for (const v of vals) {
+          if (v == null) continue;
+          const s = String(v).trim();
+          if (s) return s;
+        }
+        return null;
+      };
+
+      const out = {
+        decision: pickStr(merged.latest_decision, merged.decision, data?.status),
+        sla: pickNum(merged.effective_sla, data?.effective_sla),
+        slaWindow: pickNum(merged.effective_sla_last_window, data?.effective_sla_last_window),
+        slaStatus: pickStr(merged.sla_status, data?.sla_status),
+        warningRatio: pickNum(merged.warning_ratio, data?.warning_ratio),
+        pressure: pickNum(merged.pressure_score, data?.pressure_score),
+        driftRatio: pickNum(merged.drift_ratio, merged.drift_ratio_permille != null ? Number(merged.drift_ratio_permille) / 1000 : null, data?.drift_ratio),
+        changedClasses: pickNum(merged.changed_classes, data?.changed_classes),
+        quality: pickNum(merged.quality_score, data?.quality_score, data?.solution_quality),
+        rejectStreak: pickNum(merged.reject_streak, data?.reject_streak),
+        deferStreak: pickNum(merged.defer_streak, data?.defer_streak),
+      };
+
+      out.hasTelemetry = sourceHasRealtime && ([
+        out.sla, out.slaWindow, out.warningRatio, out.pressure, out.driftRatio,
+        out.changedClasses, out.rejectStreak, out.deferStreak,
+      ].some(v => v !== null) || Boolean((out.decision || "").toUpperCase().includes("ACCEPT") || (out.decision || "").toUpperCase().includes("REJECT") || (out.decision || "").toUpperCase().includes("DEFER")));
+
+      return out;
+    }
+
+    function renderRealtimePanel(data) {
+      const wrap = document.getElementById("realtimePanel");
+      const realtimeCard = document.getElementById("realtimeCard");
+      if (!wrap) return;
+
+      const m = collectRealtimeMetrics(data || {});
+      const fmtPct = (v) => Number.isFinite(v) ? `${Math.round(v * 100)}%` : "—";
+      const fmtNum = (v) => Number.isFinite(v) ? String(Math.round(v)) : "—";
+      const normalizePct = (v) => {
+        if (!Number.isFinite(v)) return 0;
+        return Math.max(0, Math.min(100, Math.round(v * 100)));
+      };
+      const driftPct = Number.isFinite(m.driftRatio) ? Math.max(0, Math.min(100, Math.round(m.driftRatio * 100))) : 0;
+      const warningPct = Number.isFinite(m.warningRatio) ? Math.max(0, Math.min(100, Math.round(m.warningRatio * 100))) : 0;
+      const pressurePct = Number.isFinite(m.pressure) ? Math.max(0, Math.min(100, Math.round(m.pressure * 100))) : 0;
+
+      const health = String(m.slaStatus || "N/A").toUpperCase();
+      const healthClass = health === "HEALTHY" ? "healthy" : health === "DEGRADED" ? "degraded" : health === "CRITICAL" ? "critical" : "";
+      const decision = String(m.decision || "NO TELEMETRY").toUpperCase();
+
+      if (realtimeCard) {
+        realtimeCard.style.display = m.hasTelemetry ? "" : "none";
+      }
+
+      wrap.innerHTML = `
+        <div class="realtime-grid">
+          <div class="rt-kpi">
+            <div class="rt-kpi-label">Controller Decision</div>
+            <div class="rt-health-row">
+              <span class="rt-pill ${healthClass}">${health}</span>
+              <span class="rt-pill">${decision}</span>
+            </div>
+            <div class="rt-kpi-sub">Changed classes: <b>${fmtNum(m.changedClasses)}</b> | Quality: <b>${fmtNum(m.quality)}</b></div>
+          </div>
+          <div class="rt-kpi">
+            <div class="rt-kpi-label">Effective SLA</div>
+            <div class="rt-kpi-value">${fmtPct(m.sla)}</div>
+            <div class="rt-kpi-sub">Rolling window: <b>${fmtPct(m.slaWindow)}</b></div>
+          </div>
+          <div class="rt-kpi">
+            <div class="rt-kpi-label">Stability Streaks</div>
+            <div class="rt-kpi-value">${fmtNum(m.rejectStreak)} / ${fmtNum(m.deferStreak)}</div>
+            <div class="rt-kpi-sub">Reject streak / Defer streak</div>
+          </div>
+        </div>
+
+        <div class="rt-bars">
+          <div class="rt-bar-card">
+            <div class="rt-bar-top"><span>Warning Pressure</span><b>${warningPct}%</b></div>
+            <div class="rt-track"><div class="rt-fill ${warningPct >= 65 ? "danger" : warningPct >= 35 ? "warn" : ""}" style="width:${warningPct}%;"></div></div>
+          </div>
+          <div class="rt-bar-card">
+            <div class="rt-bar-top"><span>Control Pressure</span><b>${pressurePct}%</b></div>
+            <div class="rt-track"><div class="rt-fill ${pressurePct >= 65 ? "danger" : pressurePct >= 35 ? "warn" : ""}" style="width:${pressurePct}%;"></div></div>
+          </div>
+          <div class="rt-bar-card">
+            <div class="rt-bar-top"><span>Drift Load</span><b>${driftPct}%</b></div>
+            <div class="rt-track"><div class="rt-fill ${driftPct >= 100 ? "danger" : driftPct >= 70 ? "warn" : ""}" style="width:${Math.min(100, driftPct)}%;"></div></div>
+          </div>
+        </div>
+        ${m.hasTelemetry ? "" : `<div class="rt-empty">No realtime telemetry found in this file yet. Run via realtime update path to populate control metrics.</div>`}
+      `;
+    }
+
+    function resetUploadedFileView() {
+      const fileInput = document.getElementById("fileInput");
+      if (fileInput) fileInput.value = "";
+      clearFeedback();
+      clearDashboardState(true);
+      setStatus("Choose a JSON file to begin.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function bindFilePillResetHandler() {
+      const selector = [
+        "[data-clear-file]",
+        "[data-action='clear-file']",
+        "[data-file-clear]",
+        "[aria-label*='clear file' i]",
+        "[aria-label*='remove file' i]",
+        "[title*='clear file' i]",
+        "[title*='remove file' i]",
+        ".file-pill-clear",
+        ".file-pill .clear",
+        ".file-pill .close",
+        ".file-pill [aria-label*='clear' i]",
+        ".file-pill [aria-label*='remove' i]",
+        ".uploaded-file-pill .clear",
+        ".uploaded-file-pill .close",
+      ].join(",");
+
+      document.addEventListener("click", (event) => {
+        const trigger = event.target && event.target.closest(selector);
+        if (!trigger) return;
+        event.preventDefault();
+        resetUploadedFileView();
+      });
+    }
+
+    function clearDashboardState(showEmpty = false) {
+      const ids = ["summary", "objectivesChart", "roomStats", "occupancyChart", "diagnosticsPanel", "realtimePanel", "tbody", "detailsBody"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = "";
+      });
+      const noRes = document.getElementById("noResults");
+      if (noRes) noRes.style.display = "none";
+      const hint = document.getElementById("localFileHint");
+      if (hint) hint.style.display = "none";
+      __allRows = [];
+      __currentData = null;
+      __classEnroll = { counts: {}, studentsByClass: {} };
+      const search = document.getElementById("searchInput");
+      if (search) search.value = "";
+      updateResultCount(0, 0);
+      resetLandingDynamicValues();
+      setLandingDynamicVisible(false, { animate: false, scroll: false });
+      setEmptyStateVisible(showEmpty);
+      setDashboardVisible(!showEmpty);
+    }
+
+    function setTablePlaceholder(message) {
+      const tbody = document.getElementById("tbody");
+      if (!tbody) return;
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">${String(message || "No data available")}</td></tr>`;
+    }
+
+    function validateSolutionData(data) {
+      const errors = [];
+      const warnings = [];
+      if (!data || typeof data !== "object" || Array.isArray(data)) {
+        return { ok: false, status: "UNKNOWN", errors: ["Invalid solution structure"], warnings };
+      }
+      if (!Object.prototype.hasOwnProperty.call(data, "status")) {
+        errors.push("Invalid solution structure");
+      }
+      const status = normalizeSolverStatus(data.status);
+      if (!Object.prototype.hasOwnProperty.call(data, "status")) {
+        return { ok: false, status, errors, warnings };
+      }
+
+      const hasAssignedClasses = (
+        data.student_to_assigned_classes &&
+        typeof data.student_to_assigned_classes === "object" &&
+        !Array.isArray(data.student_to_assigned_classes)
+      );
+      if ((status === "OPTIMAL" || status === "FEASIBLE") && !hasAssignedClasses) {
+        errors.push("Invalid solution structure");
+      }
+
+      const hasScheduleObject = (
+        data.schedule &&
+        typeof data.schedule === "object" &&
+        !Array.isArray(data.schedule)
+      );
+      if ((status === "OPTIMAL" || status === "FEASIBLE") && !hasScheduleObject) {
+        errors.push("Invalid solution structure");
+      }
+
+      // UNKNOWN is a valid partial-result state; avoid noisy warning banners.
+
+      if (status === "INFEASIBLE" && !Array.isArray(data.reasons)) {
+        warnings.push("Infeasible solution file has no reasons list");
+      }
+
+      return { ok: errors.length === 0, status, errors, warnings };
+    }
+
+    function severityRank(sev) {
+      const s = String(sev || "").toUpperCase();
+      if (s === "CRITICAL") return 0;
+      if (s === "HIGH") return 1;
+      if (s === "MEDIUM") return 2;
+      return 9;
+    }
+
+    function renderDiagnosticsPanel(data) {
+      const wrap = document.getElementById("diagnosticsPanel");
+      if (!wrap) return;
+      wrap.innerHTML = "";
+
+      const inputRisk = String(data?.input_risk || "N/A");
+      const physicalRisk = data?.physical_risk != null ? String(data.physical_risk).toUpperCase() : null;
+      const hybridRisk = data?.hybrid_risk != null ? String(data.hybrid_risk).toUpperCase() : null;
+      const physicalShortage = Number(data?.physical_shortage_percent);
+      const hybridShortage = Number(data?.hybrid_shortage_percent);
+      const totalStudents = Number(data?.total_students);
+      const physicalCapacity = Number(data?.physical_capacity);
+      const estimatedOnlineStudents = Number(data?.estimated_online_students);
+      const effectiveAfterOnline = Number(data?.effective_students_after_online);
+      const preWarnings = Array.isArray(data?.pre_warnings) ? data.pre_warnings : [];
+      const violations = data?.violations || null;
+      const recsRaw = Array.isArray(data?.recommendations) ? data.recommendations.slice() : [];
+      const recs = recsRaw.sort((a, b) => severityRank(a?.severity) - severityRank(b?.severity));
+
+      const fmtInt = (v) => Number.isFinite(v) ? Math.round(v).toLocaleString() : "N/A";
+      const fmtPct = (v) => Number.isFinite(v) ? `${Math.round(v)}%` : "N/A";
+      const riskPill = (risk) => {
+        const r = String(risk || "N/A").toUpperCase();
+        if (["CRITICAL", "HIGH", "MEDIUM", "LOW"].includes(r)) {
+          return `<span class="sev-pill ${r}">${r}</span>`;
+        }
+        return `<b>${r}</b>`;
+      };
+
+      const riskCard = document.createElement("div");
+      riskCard.className = "diag-card";
+      const riskSummary = document.createElement("div");
+      riskSummary.className = "diag-item";
+      const riskLines = [
+        `<span class="diag-key">overall_input_risk</span>: ${riskPill(inputRisk)}`,
+      ];
+      if (physicalRisk) {
+        riskLines.push(
+          `<span class="diag-key">physical_risk</span>: ${riskPill(physicalRisk)} | <span class="diag-key">physical_shortage_percent</span>: <b>${fmtPct(physicalShortage)}</b>`
+        );
+      }
+      if (hybridRisk) {
+        riskLines.push(
+          `<span class="diag-key">hybrid_risk</span>: ${riskPill(hybridRisk)} | <span class="diag-key">hybrid_shortage_percent</span>: <b>${fmtPct(hybridShortage)}</b>`
+        );
+      }
+      riskLines.push(
+        `<span class="diag-key">total_students</span>: <b>${fmtInt(totalStudents)}</b> | <span class="diag-key">physical_capacity</span>: <b>${fmtInt(physicalCapacity)}</b>`
+      );
+      if (hybridRisk) {
+        riskLines.push(
+          `<span class="diag-key">estimated_rebalanced_students</span>: <b>${fmtInt(estimatedOnlineStudents)}</b> | <span class="diag-key">effective_students_after_rebalance</span>: <b>${fmtInt(effectiveAfterOnline)}</b>`
+        );
+      }
+      riskSummary.innerHTML = riskLines.join("<br/>");
+      riskCard.innerHTML = `<div class="diag-title">Input Risk</div>`;
+      riskCard.appendChild(riskSummary);
+      if (preWarnings.length) {
+        const list = document.createElement("div");
+        list.className = "diag-list";
+        preWarnings.forEach(w => {
+          const sev = String(w?.severity || "MEDIUM").toUpperCase();
+          const msg = String(w?.message || w || "");
+          const item = document.createElement("div");
+          item.className = "diag-item";
+          item.innerHTML = `<span class="sev-pill ${sev}">${sev}</span>${msg}`;
+          list.appendChild(item);
+        });
+        riskCard.appendChild(list);
+      } else {
+        const p = document.createElement("div");
+        p.className = "placeholder";
+        p.textContent = "No pre-solve warnings.";
+        riskCard.appendChild(p);
+      }
+      wrap.appendChild(riskCard);
+
+      const violationCard = document.createElement("div");
+      violationCard.className = "diag-card";
+      violationCard.innerHTML = `<div class="diag-title">Violations</div>`;
+      if (violations && typeof violations === "object") {
+        const ov = Number(violations.student_overlaps || 0);
+        const ro = Number(violations.room_overflow || 0);
+        const item = document.createElement("div");
+        item.className = "diag-item";
+        item.innerHTML = `<span class="diag-key">student_overlaps</span>: <b style="color:${ov > 0 ? "#ef4444" : "#22c55e"}">${ov}</b><br/><span class="diag-key">room_overflow</span>: <b style="color:${ro > 0 ? "#ef4444" : "#22c55e"}">${ro}</b>`;
+        violationCard.appendChild(item);
+      } else {
+        const p = document.createElement("div");
+        p.className = "placeholder";
+        p.textContent = "No violations data available.";
+        violationCard.appendChild(p);
+      }
+      wrap.appendChild(violationCard);
+
+      const recCard = document.createElement("div");
+      recCard.className = "diag-card";
+      recCard.innerHTML = `<div class="diag-title">Recommendations</div>`;
+      if (recs.length) {
+        const orderedSeverities = ["CRITICAL", "HIGH", "MEDIUM"];
+        const grouped = new Map();
+        recs.forEach(r => {
+          const sev = String(r?.severity || "MEDIUM").toUpperCase();
+          if (!grouped.has(sev)) grouped.set(sev, []);
+          grouped.get(sev).push(r);
+        });
+
+        const allSev = [...orderedSeverities, ...Array.from(grouped.keys()).filter(s => !orderedSeverities.includes(s))];
+        allSev.forEach(sev => {
+          const bucket = grouped.get(sev) || [];
+          if (!bucket.length) return;
+
+          const heading = document.createElement("div");
+          heading.className = "diag-title";
+          heading.style.marginTop = "6px";
+          heading.innerHTML = `Severity <span class="sev-pill ${sev}">${sev}</span>`;
+          recCard.appendChild(heading);
+
+          const list = document.createElement("div");
+          list.className = "diag-list";
+          bucket.forEach(r => {
+            const issue = String(r?.issue || "Recommendation");
+            const suggestions = Array.isArray(r?.suggestions) ? r.suggestions : [];
+            const item = document.createElement("div");
+            item.className = "diag-item";
+            item.innerHTML = `<b>${issue}</b>${suggestions.length ? `<br/>${suggestions.map(s => `- ${String(s)}`).join("<br/>")}` : ""}`;
+            list.appendChild(item);
+          });
+          recCard.appendChild(list);
+        });
+      } else {
+        const p = document.createElement("div");
+        p.className = "diag-item";
+        p.style.color = "#475569";
+        p.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+            <path d="M5 13 9 17 19 7" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          No issues detected
+        </span>`;
+        recCard.appendChild(p);
+      }
+      wrap.appendChild(recCard);
+    }
+
+    function renderSummary(data) {
+      const summary = document.getElementById("summary");
+      summary.innerHTML = "";
+
+      const schedule = data.schedule || {};
+      const students = data.students || {};
+      const objectives = data.objectives || {};
+      const nClasses = Object.keys(schedule).length;
+      const nStudents = Object.keys(students).length;
+      const quality = (typeof data.solution_quality === "number") ? data.solution_quality : null;
+      const prefViol = Number(((data.constraint_metrics || {}).preference_violations || {}).total || 0);
+      const hasMetrics = Boolean(data.constraint_metrics && typeof data.constraint_metrics === "object");
+
+      const enroll = computeClassEnrollment(data);
+      const emptyClasses = Object.values(enroll.counts || {}).filter(v => (Number(v) || 0) <= 0).length;
+
+      const statusText = data.status ?? "unknown";
+      const statusNorm = String(statusText).trim().toUpperCase();
+      updateSolutionBadge(statusText);
+
+      const safeQuality = quality !== null ? Math.max(0, Math.min(100, Number(quality) || 0)) : 0;
+      const ringRadius = 26;
+      const ringCirc = 2 * Math.PI * ringRadius;
+      const ringOffset = ringCirc * (1 - safeQuality / 100);
+
+      const statusBadgeClass = (statusNorm === "OPTIMAL" || statusNorm === "FEASIBLE")
+        ? "success"
+        : (statusNorm === "INFEASIBLE" || statusNorm === "UNKNOWN")
+          ? "warning"
+          : "loading";
+
+      summary.innerHTML = `
+        <div class="summary-section">
+          <div class="section-label">Solution Status</div>
+          <span class="status-badge ${statusBadgeClass}"><span class="status-dot"></span>${statusNorm}</span>
+        </div>
+
+        <div class="summary-section">
+          <div class="section-label">Overview</div>
+          <div class="counts-grid">
+            <div class="count-card">
+              <div class="count-value">${nClasses}</div>
+              <div class="count-label">Total Classes</div>
+            </div>
+            <div class="count-card">
+              <div class="count-value">${nStudents}</div>
+              <div class="count-label">Total Students</div>
+            </div>
+            <div class="count-card">
+              <div class="count-value">${emptyClasses}</div>
+              <div class="count-label">Empty Classes</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-section">
+          <div class="section-label">Solution Quality</div>
+          <div class="quality-grid">
+            <div class="quality-ring" aria-label="Quality score">
+              <svg viewBox="0 0 64 64" aria-hidden="true">
+                <circle class="quality-ring-track" cx="32" cy="32" r="${ringRadius}"></circle>
+                <circle
+                  class="quality-ring-fill"
+                  cx="32"
+                  cy="32"
+                  r="${ringRadius}"
+                  stroke-dasharray="${ringCirc}"
+                  stroke-dashoffset="${ringOffset}"
+                ></circle>
+              </svg>
+              <div class="quality-ring-text">${quality !== null ? safeQuality : "N/A"}</div>
+            </div>
+            <div class="kv" style="margin:0;">
+              <div class="k">Quality Score</div>
+              <div class="v">${quality !== null ? safeQuality : "N/A"}</div>
+            </div>
+          </div>
+          <div class="kv">
+            <div class="k">Constraint Metrics</div>
+            <div class="v">${hasMetrics ? "Available" : "No data"}</div>
+          </div>
+          <div class="kv">
+            <div class="k">Preference Violations</div>
+            <div class="v">${hasMetrics ? prefViol : "N/A"}</div>
+          </div>
+        </div>
+
+      `;
+
+      // Quality-of-life note if metadata is missing.
+      const timeMeta = data.time_meta || null;
+      const classToCourse = data.class_to_course || null;
+      const hint = document.getElementById("localFileHint");
+      if (!timeMeta || !classToCourse) {
+        hint.style.display = "block";
+        hint.innerHTML = `This JSON is missing <span class="mono">time_meta</span> and/or <span class="mono">class_to_course</span>. ` +
+          `Day/Start/End/Course may show as <span class="mono">?</span> or <span class="mono">-</span>. ` +
+          `Re-generate JSON with the latest runner by re-running the solver to embed this metadata.`;
+      } else {
+        hint.style.display = "none";
+      }
+    }
+
+    function buildRows(data) {
+      const schedule = data.schedule || {};
+      const timeMeta = data.time_meta || {};
+      const classToCourse = data.class_to_course || {};
+
+      const rows = [];
+      for (const cid of Object.keys(schedule)) {
+        const entry = schedule[cid] || {};
+        const timeId = entry.time;
+
+        // Keys might be stringified in JSON.
+        const meta = (timeId !== undefined && timeId !== null)
+          ? (timeMeta[String(timeId)] || timeMeta[Number(timeId)] || null)
+          : null;
+
+        const days = meta ? decodeDays(meta.days) : "?";
+        const startMin = meta?.start_min;
+        const lengthMin = meta?.length_min;
+        const start = meta ? minutesToHHMM(startMin) : "?";
+        const end = meta ? minutesToHHMM((startMin ?? -1) + (lengthMin ?? -1)) : "?";
+
+        rows.push({
+          classId: cid,
+          course: classToCourse[String(cid)] ?? "-",
+          courseId: classToCourse[String(cid)] ?? "-",
+          day: days,
+          start,
+          end,
+          room: entry.room ?? "",
+          enrolledCount: (__classEnroll?.counts && __classEnroll.counts[String(cid)] !== undefined) ? __classEnroll.counts[String(cid)] : 0,
+          startMin: (typeof startMin === "number" && isFinite(startMin)) ? startMin : null,
+          sortKey: [days, (typeof startMin === "number" && isFinite(startMin)) ? startMin : 1e9, cid]
+        });
+      }
+
+      rows.sort((a, b) => {
+        if (a.sortKey[0] !== b.sortKey[0]) return a.sortKey[0].localeCompare(b.sortKey[0]);
+        if (a.sortKey[1] !== b.sortKey[1]) return a.sortKey[1] - b.sortKey[1];
+        return String(a.sortKey[2]).localeCompare(String(b.sortKey[2]));
+      });
+
+      return rows;
+    }
+
+    // Client-side filtering: search
+    function applyFilters(rows) {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      if (!q) return rows;
+      return rows.filter(r => {
+        return String(r.classId).toLowerCase().includes(q)
+          || String(r.course).toLowerCase().includes(q)
+          || String(r.room).toLowerCase().includes(q);
+      });
+    }
+
+    function renderTable(rows) {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+      const frag = document.createDocumentFragment();
+
+      for (const r of rows) {
+        const tr = document.createElement("tr");
+
+        // Class ID
+        {
+          const td = document.createElement("td");
+          td.textContent = r.classId;
+          td.style.fontFamily = "var(--mono)";
+          td.style.fontWeight = "500";
+          tr.appendChild(td);
+        }
+
+        // Course name (clickable)
+        {
+          const td = document.createElement("td");
+          const a = document.createElement("a");
+          a.href = "#";
+          a.className = "link";
+          a.textContent = String(r.course);
+          a.title = String(r.course);
+          a.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            if (r.courseId && r.courseId !== "-") openCourseDetails(String(r.courseId));
+          });
+          td.appendChild(a);
+          tr.appendChild(td);
+        }
+
+        // Day, Start, End, Room
+        for (const val of [r.day, r.start, r.end, r.room]) {
+          const td = document.createElement("td");
+          td.textContent = String(val);
+          td.style.fontFamily = "var(--mono)";
+          td.style.fontWeight = "500";
+          tr.appendChild(td);
+        }
+
+        // Students (count + view roster)
+        {
+          const td = document.createElement("td");
+          const wrap = document.createElement("div");
+          wrap.style.display = "flex";
+          wrap.style.alignItems = "center";
+          wrap.style.gap = "8px";
+
+          const count = document.createElement("span");
+          count.textContent = String(r.enrolledCount ?? 0);
+          count.style.fontFamily = "var(--mono)";
+          count.style.fontWeight = "600";
+
+          if ((Number(r.enrolledCount) || 0) <= 0) {
+            const badge = document.createElement("span");
+            badge.className = "unassigned-badge";
+            badge.textContent = "Unassigned";
+            badge.title = "No students are assigned to this class";
+            wrap.appendChild(badge);
+          }
+
+          const btn = document.createElement("button");
+          btn.className = "view-btn";
+          btn.type = "button";
+          btn.textContent = "View";
+          btn.addEventListener("click", () => openClassDetails(String(r.classId)));
+
+          wrap.appendChild(count);
+          wrap.appendChild(btn);
+          td.appendChild(wrap);
+          tr.appendChild(td);
+        }
+
+        frag.appendChild(tr);
+      }
+
+      tbody.appendChild(frag);
+
+      const noRes = document.getElementById("noResults");
+      if (noRes) noRes.style.display = rows.length ? "none" : "block";
+    }
+
+    function setStatus(text) {
+      document.getElementById("loadStatus").textContent = text;
+      updateSolutionBadge(text);
+    }
+
+    function setEmptyStateVisible(visible) {
+      const emptyState = document.getElementById("emptyStateCard");
+      const landingFeatures = document.getElementById("landingFeatures");
+      const howItWorks = document.getElementById('landingHowItWorks');
+      if (emptyState) emptyState.style.display = visible ? "" : "none";
+      if (landingFeatures) landingFeatures.style.display = visible ? "" : "none";
+      if (howItWorks) {
+        howItWorks.style.display = visible ? 'block' : 'none';
+      }
+    }
+
+    function setDashboardVisible(visible) {
+      const dashboardGrid = document.getElementById("dashboardGrid");
+      if (!dashboardGrid) return;
+      dashboardGrid.classList.toggle("is-hidden", !visible);
+      document.body.classList.toggle("has-data", !!visible);
+      const dataControls = document.querySelectorAll('[data-requires-data="1"]');
+      dataControls.forEach(el => {
+        el.style.display = visible ? "" : "none";
+      });
+    }
+
+    function loadByFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            resolve(JSON.parse(String(reader.result || "")));
+          } catch (e) {
+            reject(e);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsText(file);
+      });
+    }
+
+    // Avoid stacking event handlers on repeated loads.
+    let __handlersBound = false;
+    let __allRows = [];
+    let __currentData = null;
+    let __classEnroll = { counts: {}, studentsByClass: {} };
+    function updateResultCount(nShown, nTotal) {
+      const el = document.getElementById("resultCount");
+      if (!el) return;
+      el.textContent = (typeof nShown === "number" && typeof nTotal === "number")
+        ? `Showing ${nShown} / ${nTotal}`
+        : "";
+    }
+
+    function rerenderWithFilters() {
+      const filtered = applyFilters(__allRows);
+      renderTable(filtered);
+      updateResultCount(filtered.length, __allRows.length);
+    }
+
+    function renderOccupancyChart(data) {
+      const container = document.getElementById("occupancyChart");
+      container.innerHTML = "";
+
+      const schedule = data.schedule || {};
+      const students = data.students || {};
+      if (!schedule || Object.keys(schedule).length === 0) {
+        setPlaceholder(container, "No data available");
+        return;
+      }
+
+      // Count students per class
+      const classCounts = {};
+      Object.keys(schedule).forEach(cid => classCounts[cid] = 0);
+
+      Object.entries(students).forEach(([sid, studentData]) => {
+        const attended = studentData?.attended || {};
+        Object.entries(attended).forEach(([cid, modeData]) => {
+          if (classCounts[cid] !== undefined && hasActualAttendance(modeData)) {
+            classCounts[cid]++;
+          }
+        });
+      });
+
+      __classEnroll = computeClassEnrollment(data);
+
+      // Sort by class ID (numeric order)
+      const sorted = Object.entries(classCounts)
+        .sort((a, b) => {
+          const numA = parseInt(a[0], 10);
+          const numB = parseInt(b[0], 10);
+          return numA - numB;
+        });
+
+      const maxCount = Math.max(...sorted.map(x => x[1]), 1);
+
+      sorted.forEach(([cid, count]) => {
+        const row = document.createElement("div");
+        row.className = "occupancy-row";
+
+        const label = document.createElement("div");
+        label.className = "occupancy-label";
+        label.textContent = `Class ${cid}`;
+
+        const barWrap = document.createElement("div");
+        barWrap.className = "occupancy-bar-wrap";
+
+        const bar = document.createElement("div");
+        bar.className = "occupancy-bar";
+        bar.dataset.width = `${(count / maxCount) * 100}`;
+        bar.style.width = "0%";
+
+        barWrap.appendChild(bar);
+
+        const countDiv = document.createElement("div");
+        countDiv.className = "occupancy-count";
+        if ((Number(count) || 0) === 0) countDiv.classList.add("zero");
+        countDiv.textContent = count;
+
+        row.appendChild(label);
+        row.appendChild(barWrap);
+        row.appendChild(countDiv);
+        container.appendChild(row);
+      });
+
+      requestAnimationFrame(() => {
+        container.querySelectorAll(".occupancy-bar").forEach((el) => {
+          const pct = Number(el.dataset.width || 0);
+          el.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        });
+      });
+    }
+
+    async function loadAndRender(data) {
+      clearDashboardState(false);
+      setDashboardVisible(true);
+      __currentData = data || {};
+      normalizeAttendanceData(__currentData);
+      __currentData.status = normalizeSolverStatus(__currentData.status);
+      const status = __currentData.status;
+
+      renderSummary(__currentData);
+      renderDiagnosticsPanel(__currentData);
+      renderRealtimePanel(__currentData);
+
+      if (__currentData.relaxed_mode === true) {
+        showInfo("Relaxed solution mode is enabled.");
+      }
+
+      if (status === "INFEASIBLE") {
+        showError("No valid timetable possible");
+        const reasons = Array.isArray(__currentData.reasons) ? __currentData.reasons : [];
+        if (reasons.length) {
+          reasons.forEach(r => showInfo(`Reason: ${String(r)}`));
+        }
+        setPlaceholder(document.getElementById("objectivesChart"), "No data available");
+        setPlaceholder(document.getElementById("roomStats"), "No data available");
+        setPlaceholder(document.getElementById("occupancyChart"), "No data available");
+        setTablePlaceholder("No timetable data available for INFEASIBLE status.");
+        setStatus("INFEASIBLE");
+        return;
+      }
+
+      // Keep UNKNOWN visible via status badge/info message only (no warning banner).
+
+      const hasSchedule = Boolean(__currentData.schedule && typeof __currentData.schedule === "object" && Object.keys(__currentData.schedule).length > 0);
+      if (!hasSchedule) {
+        setPlaceholder(document.getElementById("objectivesChart"), "No data available");
+        setPlaceholder(document.getElementById("roomStats"), "No data available");
+        setPlaceholder(document.getElementById("occupancyChart"), "No data available");
+        setTablePlaceholder("No timetable data available.");
+        setStatus(status);
+        return;
+      }
+
+      renderObjectivesChart(__currentData);
+      renderRoomStats(__currentData);
+      renderOccupancyChart(__currentData);
+      const rows = buildRows(__currentData);
+      __allRows = rows;
+
+      if (!__handlersBound) {
+        __handlersBound = true;
+
+        // wire up filter events
+        document.getElementById('searchInput').addEventListener('input', debounce(rerenderWithFilters, 150));
+        const clearBtn = document.getElementById('clearFilters');
+        if (clearBtn) {
+          clearBtn.addEventListener('click', () => {
+            const userFilter = document.getElementById('userFilter');
+            if (userFilter.options.length > 1) {
+              userFilter.value = userFilter.options[1].value;
+              __currentUserId = userFilter.value;
+            } else {
+              userFilter.value = '';
+              __currentUserId = null;
+            }
+            rerenderStudentScope();
+          });
+        }
+
+        const resetLink = document.getElementById('resetFiltersLink');
+        if (resetLink) {
+          resetLink.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            const clearBtnNow = document.getElementById('clearFilters');
+            if (clearBtnNow) clearBtnNow.click();
+          });
+        }
+
+        // download JSON button
+        document.getElementById('downloadJson').addEventListener('click', () => {
+          const dataToSave = __currentData || {};
+          const blob = new Blob([JSON.stringify(dataToSave, null, 2)], {type: 'application/json'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url; a.download = 'full_solution.json'; a.click(); URL.revokeObjectURL(url);
+        });
+      }
+
+      initializeStudentScope();
+      setStatus(status);
+    }
+
+    function renderObjectivesChart(data) {
+      const container = document.getElementById("objectivesChart");
+      const objectives = data.objectives || {};
+      if (!objectives || Object.keys(objectives).length === 0) {
+        setPlaceholder(container, "No data available");
+        return;
+      }
+      
+      const objData = [
+        { key: "z1_electives", label: "Electives Assigned", value: objectives.z1_electives ?? 0, max: 50, isMax: true },
+        { key: "z2_mode", label: "Mode Deviation", value: objectives.z2_mode ?? 0, max: 50 },
+        { key: "relaxation_penalty", label: "Relax Penalty", value: objectives.relaxation_penalty ?? objectives.z3_clashes ?? 0, max: 1000 },
+        { key: "z4_online", label: "Adaptation Penalty", value: objectives.z4_online ?? 0, max: 50 },
+        { key: "z5_late", label: "Late-evening", value: objectives.z5_late ?? 0, max: 30 }
+      ];
+
+      let html = '<h3 class="section-label" style="margin:0 0 12px 0;">Objectives (z1–z5)</h3>';
+      
+      objData.forEach(obj => {
+        const pct = Math.min(100, (obj.value / obj.max) * 100);
+        const displayVal = obj.isMax ? `${obj.value}/${obj.max}` : obj.value;
+        
+        html += `
+          <div class="objective-bar">
+            <div class="objective-label">${obj.label}</div>
+            <div class="objective-bar-track">
+              <div class="objective-bar-fill" data-width="${pct}" style="width:0%">
+                ${obj.isMax ? `<span class="objective-fill-label">${displayVal}</span>` : ``}
+              </div>
+            </div>
+            ${obj.isMax ? "" : `<div class="room-bar-count">${displayVal}</div>`}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      requestAnimationFrame(() => {
+        container.querySelectorAll(".objective-bar-fill").forEach((el) => {
+          const pct = Number(el.dataset.width || 0);
+          el.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        });
+      });
+    }
+
+    function renderRoomStats(data) {
+      const container = document.getElementById("roomStats");
+      const schedule = data.schedule || {};
+      if (!schedule || Object.keys(schedule).length === 0) {
+        setPlaceholder(container, "No data available");
+        return;
+      }
+      
+      // Count classes per room
+      const roomCounts = {};
+      Object.values(schedule).forEach(entry => {
+        const room = entry.room;
+        if (room) {
+          roomCounts[room] = (roomCounts[room] || 0) + 1;
+        }
+      });
+
+      const rooms = Object.entries(roomCounts)
+        .sort((a, b) => b[1] - a[1]);
+      
+      const totalClasses = Object.keys(schedule).length;
+      const uniqueRooms = rooms.length;
+      const maxCount = Math.max(...rooms.map(r => r[1]), 1);
+      if (uniqueRooms === 0) {
+        setPlaceholder(container, "No data available");
+        return;
+      }
+
+      let html = '<div class="stats-grid" style="margin-bottom: 16px;">';
+      html += `
+        <div class="stat-card">
+          <div class="stat-value">${uniqueRooms}</div>
+          <div class="stat-label">Unique Rooms</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${totalClasses}</div>
+          <div class="stat-label">Total Classes</div>
+        </div>
+        <div class="stat-card">
+	          <div class="stat-value">${(uniqueRooms > 0 ? (totalClasses / uniqueRooms).toFixed(1) : "0.0")}</div>
+          <div class="stat-label">Avg Classes/Room</div>
+        </div>
+      `;
+      html += '</div>';
+
+      html += '<h3 class="section-label" style="margin:0 0 8px 0;">Room Usage Distribution</h3>';
+      
+      rooms.forEach(([room, count]) => {
+        const pct = (count / maxCount) * 100;
+        html += `
+          <div class="room-bar">
+            <div class="room-bar-label">Room ${room}</div>
+            <div class="room-bar-track">
+              <div class="room-bar-fill" data-width="${pct}" style="width:0%"></div>
+            </div>
+            <div class="room-bar-count">${count}</div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      requestAnimationFrame(() => {
+        container.querySelectorAll(".room-bar-fill").forEach((el) => {
+          const pct = Number(el.dataset.width || 0);
+          el.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        });
+      });
+    }
+
+    function computeClassEnrollment(data) {
+      const schedule = data.schedule || {};
+      const students = data.students || {};
+      const counts = {};
+      const studentsByClass = {};
+      Object.keys(schedule).forEach(cid => { counts[cid] = 0; studentsByClass[cid] = []; });
+      Object.entries(students).forEach(([sid, studentData]) => {
+        const attended = studentData?.attended || {};
+        Object.entries(attended).forEach(([cid, modeData]) => {
+          if (counts[cid] === undefined) return;
+          if (hasActualAttendance(modeData)) {
+            counts[cid] += 1;
+            const nm = `Student ${sid}`;
+            studentsByClass[cid].push({ id: String(sid), name: nm });
+          }
+        });
+      });
+      return { counts, studentsByClass };
+    }
+
+    function openModal() {
+      document.getElementById("detailsBackdrop").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("detailsBackdrop").style.display = "none";
+    }
+
+    function buildStudentOptions() {
+      const students = __currentData?.students || {};
+      const ids = Object.keys(students).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      return ids.map(id => ({
+        id,
+        label: `Student ${id} (ID ${id})`
+      }));
+    }
+
+    function buildCourseOptions() {
+      const classToCourse = __currentData?.class_to_course || {};
+      const courseIds = Array.from(new Set(Object.values(classToCourse)));
+      courseIds.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      return courseIds.map(id => ({
+        id,
+        label: `Course ${id} (ID ${id})`
+      }));
+    }
+
+    function buildClassOptions() {
+      const rowsByClass = new Map(__allRows.map(r => [String(r.classId), r]));
+      const classIds = Array.from(rowsByClass.keys()).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      return classIds.map(cid => {
+        const r = rowsByClass.get(String(cid));
+        const courseLabel = r ? String(r.course) : "-";
+        return {
+          id: String(cid),
+          label: `Class ${cid} — ${courseLabel}`
+        };
+      });
+    }
+
+    function setDetailsOptions(items, selectedId) {
+      const sel = document.getElementById("detailsSelect");
+      sel.innerHTML = items.map(it => `<option value="${it.id}">${it.label}</option>`).join("");
+      if (selectedId) sel.value = String(selectedId);
+    }
+
+    function renderStudentDetails(studentId) {
+      const students = __currentData?.students || {};
+      const s = students[String(studentId)] || null;
+      const body = document.getElementById("detailsBody");
+      if (!s) {
+        body.textContent = "Student not found.";
+        return;
+      }
+      const attended = s.attended || {};
+      const enrolledClassIds = Object.entries(attended)
+        .filter(([, modeData]) => hasActualAttendance(modeData))
+        .map(([cid]) => String(cid));
+
+      const rowsByClass = new Map(__allRows.map(r => [String(r.classId), r]));
+      const detailRows = enrolledClassIds.map(cid => {
+        const r = rowsByClass.get(cid);
+        if (!r) return null;
+        return {
+          classId: cid,
+          course: r.course,
+          day: r.day,
+          start: r.start,
+          end: r.end,
+          room: r.room,
+        };
+      }).filter(Boolean);
+
+      document.getElementById("detailsTitle").textContent = `Student ID ${studentId}`;
+      
+      // Build weekly timetable
+      const timetableHtml = buildStudentTimetable(detailRows);
+      
+      body.innerHTML = `
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:300px;">
+            <div class="hint" style="margin-bottom:10px">Enrolled classes: <span class="mono">${detailRows.length}</span></div>
+            <div style="border:1px solid var(--border); border-radius:10px; overflow:auto; max-height:60vh;">
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Course</th>
+                    <th>Day</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Room</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${detailRows.map(r => `
+                    <tr>
+                      <td>${r.classId}</td>
+                      <td title="${String(r.course)}">${String(r.course)}</td>
+                      <td>${r.day}</td>
+                      <td>${r.start}</td>
+                      <td>${r.end}</td>
+                      <td>${r.room}</td>
+                    </tr>
+                  `).join("") || `<tr><td colspan="6" class="muted">No enrolled classes found for this student.</td></tr>`}
+                </tbody>
+              </table>
+            </div>
+            ${detailRows.length === 0 ? `<div class="warn" style="margin-top:10px;">This student currently has 0 actual enrollments in the loaded file.</div>` : ``}
+          </div>
+          <div style="flex:1; min-width:300px;">
+            <div class="hint" style="margin-bottom:10px">Weekly Schedule</div>
+            ${timetableHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderClassDetails(classId) {
+      const cid = String(classId);
+      const body = document.getElementById("detailsBody");
+
+      const rowsByClass = new Map(__allRows.map(r => [String(r.classId), r]));
+      const r = rowsByClass.get(cid) || null;
+      if (!r) {
+        document.getElementById("detailsTitle").textContent = `Class ${cid}`;
+        body.textContent = "Class not found.";
+        return;
+      }
+
+      const roster = (__classEnroll?.studentsByClass && __classEnroll.studentsByClass[cid]) ? __classEnroll.studentsByClass[cid] : [];
+      const count = roster.length;
+
+      document.getElementById("detailsTitle").textContent = `Class ${cid}: ${String(r.course)} • ${count} students`;
+
+      const rosterRows = roster
+        .slice()
+        .sort((a, b) => String(a.name).localeCompare(String(b.name)))
+        .map(s => {
+          const nm = String(s.name || `Student ${s.id}`);
+          const sid = String(s.id);
+          return `
+            <tr>
+              <td><a class="link" href="#" data-student-id="${sid}">${nm}</a></td>
+              <td class="mono">${sid}</td>
+            </tr>
+          `;
+        }).join("");
+
+      body.innerHTML = `
+        <div class="hint" style="margin-bottom:10px">
+          <b>Course:</b> ${String(r.course)}<br/>
+          <b>Time:</b> ${String(r.day)} ${String(r.start)}–${String(r.end)}<br/>
+          <b>Room:</b> <span class="mono">${String(r.room)}</span>
+        </div>
+        <div style="overflow:auto; border:1px solid var(--border); border-radius:10px">
+          <table>
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th style="width:120px">Student ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rosterRows || `<tr><td colspan="2" class="muted">No students assigned to this class.</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      body.querySelectorAll("[data-student-id]").forEach(a => {
+        a.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          openStudentDetails(String(a.getAttribute("data-student-id") || ""));
+        });
+      });
+    }
+
+    function openClassDetails(classId) {
+      if (!__currentData) return;
+      document.getElementById("detailsType").value = "class";
+      setDetailsOptions(buildClassOptions(), classId);
+      openModal();
+      renderClassDetails(String(classId));
+    }
+
+    function renderCourseDetails(courseId) {
+      const classToCourse = __currentData?.class_to_course || {};
+      const classIds = Object.entries(classToCourse)
+        .filter(([cid, co]) => String(co) === String(courseId))
+        .map(([cid]) => String(cid))
+        .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+
+      const rowsByClass = new Map(__allRows.map(r => [String(r.classId), r]));
+      const detailRows = classIds.map(cid => {
+        const r = rowsByClass.get(cid);
+        if (!r) return null;
+        return {
+          classId: cid,
+          day: r.day,
+          start: r.start,
+          end: r.end,
+          room: r.room,
+          students: __classEnroll.counts?.[cid] ?? 0,
+        };
+      }).filter(Boolean);
+
+      document.getElementById("detailsTitle").textContent = `Course ID ${courseId}`;
+      const body = document.getElementById("detailsBody");
+      body.innerHTML = `
+        <div class="hint" style="margin-bottom:10px">Classes in course: <span class="mono">${detailRows.length}</span></div>
+        <div style="border:1px solid var(--border); border-radius:10px; overflow:auto; max-height:60vh;">
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Day</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Room</th>
+                <th>Students</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${detailRows.map(r => `
+                <tr>
+                  <td>${r.classId}</td>
+                  <td>${r.day}</td>
+                  <td>${r.start}</td>
+                  <td>${r.end}</td>
+                  <td>${r.room}</td>
+                  <td>${r.students}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function buildStudentTimetable(detailRows) {
+      const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+      const timeSlots = ["07:30", "08:30", "09:30", "10:30", "11:30", "12:30", "13:30", "14:30", "15:30", "16:30", "17:30"];
+      
+      function expandDays(dayValue) {
+        if (!dayValue) return [];
+        return String(dayValue)
+          .split(",")
+          .map(d => d.trim())
+          .filter(d => days.includes(d));
+      }
+      
+      // Map classes to grid positions
+      const grid = {};
+      detailRows.forEach(r => {
+        const classDays = expandDays(r.day);
+        if (!classDays.length) return;
+        
+        // Find time slot
+        const startTime = r.start;
+        let timeIdx = timeSlots.findIndex(t => startTime >= t && startTime < timeSlots[timeSlots.indexOf(t) + 1] || t === startTime);
+        if (timeIdx === -1) timeIdx = timeSlots.findIndex(t => startTime <= t);
+        if (timeIdx === -1) timeIdx = 0;
+
+        classDays.forEach(day => {
+          const dayIdx = days.indexOf(day);
+          if (dayIdx === -1) return;
+          const key = `${dayIdx}-${timeIdx}`;
+          if (!grid[key]) grid[key] = [];
+          grid[key].push(r);
+        });
+      });
+
+      let html = '<div class="timetable-grid">';
+      
+      // Header row
+      html += '<div class="cell header">Time</div>';
+      days.forEach(day => {
+        html += `<div class="cell header">${day}</div>`;
+      });
+      
+      // Time rows
+      timeSlots.forEach((time, timeIdx) => {
+        html += `<div class="cell time-label">${time}</div>`;
+        days.forEach((day, dayIdx) => {
+          const key = `${dayIdx}-${timeIdx}`;
+          const classes = grid[key] || [];
+          
+          html += '<div class="cell">';
+          classes.forEach(c => {
+            html += `<div class="class-block" title="${c.course} (${c.start}-${c.end})">${c.classId}<br><small>${c.start}</small></div>`;
+          });
+          html += '</div>';
+        });
+      });
+      
+      html += '</div>';
+      return html;
+    }
+
+    function countWeekdays(dayValue) {
+      if (!dayValue) return 1;
+      return String(dayValue)
+        .split(",")
+        .map(d => d.trim())
+        .filter(Boolean)
+        .length || 1;
+    }
+
+    function openStudentDetails(studentId) {
+      if (!__currentData) return;
+      document.getElementById("detailsType").value = "student";
+      setDetailsOptions(buildStudentOptions(), studentId);
+      openModal();
+      renderStudentDetails(String(studentId));
+    }
+
+    function openCourseDetails(courseId) {
+      if (!__currentData) return;
+      document.getElementById("detailsType").value = "course";
+      setDetailsOptions(buildCourseOptions(), courseId);
+      openModal();
+      renderCourseDetails(String(courseId));
+    }
+
+    const fileInputEl = document.getElementById("fileInput");
+    fileInputEl.addEventListener("click", (ev) => {
+      // Allow re-selecting the same file to trigger `change` every time.
+      ev.target.value = "";
+    });
+
+    fileInputEl.addEventListener("change", async (ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      clearFeedback();
+      clearDashboardState(true);
+      try {
+        setStatus(`Loading: ${file.name}`);
+        showInfo("Parsing uploaded file...");
+        const data = await loadByFile(file);
+        const validation = validateSolutionData(data);
+        if (!validation.ok) {
+          showError("Invalid solution structure");
+          setStatus("Invalid");
+          setEmptyStateVisible(true);
+          setDashboardVisible(false);
+          return;
+        }
+        validation.warnings.forEach(w => showWarning(String(w)));
+        await loadAndRender(data);
+        renderDashboard(data);
+        document.getElementById("localFileHint").style.display = "none";
+        showLoadStatusMessage(validation.status);
+      } catch (e) {
+        setStatus("Failed to load selected file");
+        showError("Invalid file format. Please upload a valid solver JSON.");
+        setEmptyStateVisible(true);
+        setDashboardVisible(false);
+        const hint = document.getElementById("localFileHint");
+        hint.style.display = "block";
+        hint.textContent = "Could not parse the selected JSON file.";
+      }
+    });
+
+    let __currentUserId = null;
+
+    function getStudentClasses(studentId) {
+      const data = __currentData;
+      if (!data || !studentId) return [];
+      
+      // Get student data
+      const students = data.students || {};
+      const student = students[String(studentId)];
+      if (!student) return [];
+      
+      // Get attended classes with their schedule info
+      const attended = student.attended || {};
+      const enrolledClassIds = Object.entries(attended)
+        .filter(([, modeData]) => hasActualAttendance(modeData))
+        .map(([cid]) => String(cid));
+      
+      const rowsByClass = new Map(__allRows.map(r => [String(r.classId), r]));
+      return enrolledClassIds.map(cid => rowsByClass.get(cid)).filter(Boolean);
+    }
+
+    function populateUserFilter() {
+      const userFilter = document.getElementById('userFilter');
+      userFilter.innerHTML = '<option value="">Select Student</option>';
+      const students = __currentData?.students || {};
+      const studentIds = Object.keys(students).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      studentIds.forEach(id => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = `Student ${id} (ID ${id})`;
+        userFilter.appendChild(option);
+      });
+    }
+
+    function initializeStudentScope() {
+      const userFilter = document.getElementById('userFilter');
+      const searchInput = document.getElementById('searchInput');
+      userFilter.style.display = '';
+      searchInput.style.display = 'none';
+      populateUserFilter();
+      if (userFilter.options.length > 1) {
+        userFilter.value = userFilter.options[1].value;
+        __currentUserId = userFilter.value;
+      } else {
+        __currentUserId = null;
+      }
+      rerenderStudentScope();
+    }
+
+    function rerenderStudentScope() {
+      const filteredRows = (__currentUserId ? getStudentClasses(__currentUserId) : []);
+      renderTable(__allRows);
+      updateResultCount(__allRows.length, __allRows.length);
+      // Weekly/personal section removed by request; keep only main table.
+    }
+
+    function renderPersonalTimetable(rows) {
+      const container = document.getElementById('personalTimetable');
+      if (!container) return;
+      
+      if (!__currentUserId) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.style.display = 'block';
+      const timetableHtml = buildStudentTimetable(rows);
+      
+      // Calculate total hours
+      const totalMinutes = rows.reduce((sum, r) => {
+        const start = r.start?.split(':').map(Number) || [0, 0];
+        const end = r.end?.split(':').map(Number) || [0, 0];
+        const startMin = start[0] * 60 + start[1];
+        const endMin = end[0] * 60 + end[1];
+        const oneSessionMinutes = Math.max(0, endMin - startMin);
+        const sessionsPerWeek = countWeekdays(r.day);
+        return sum + (oneSessionMinutes * sessionsPerWeek);
+      }, 0);
+      const totalHours = (totalMinutes / 60).toFixed(1);
+      
+      const roleLabel = 'Weekly Schedule';
+      const statsLabel = `Enrolled: ${rows.length} classes | ${totalHours} hours/week`;
+      
+      container.innerHTML = `
+        <div class="card">
+          <div class="section-label">${roleLabel}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+            <div class="hint">${statsLabel}</div>
+            <span class="status-badge loading" style="text-transform:none;letter-spacing:0;font-family:var(--sans);">Enrolled Classes: ${rows.length}</span>
+          </div>
+          ${rows.length === 0 ? `<div class="warn" style="margin-top:0;margin-bottom:10px;">No classes are currently enrolled for this student.</div>` : ``}
+          ${timetableHtml}
+        </div>
+      `;
+    }
+
+    // Wire up user filter
+    document.getElementById('userFilter').addEventListener('change', (ev) => {
+      __currentUserId = ev.target.value;
+      rerenderStudentScope();
+    });
+
+    const studentsBtn = document.getElementById("studentsBtn");
+    if (studentsBtn) {
+      studentsBtn.addEventListener("click", () => {
+        if (!__currentData) {
+          showWarning("Please upload/load a solution JSON first.");
+          return;
+        }
+        initializeStudentScope();
+        const opts = buildStudentOptions();
+        if (opts.length) {
+          openStudentDetails(opts[0].id);
+        }
+      });
+    }
+
+    document.getElementById("detailsClose").addEventListener("click", closeModal);
+    document.getElementById("detailsBackdrop").addEventListener("click", (ev) => {
+      if (ev.target && ev.target.id === "detailsBackdrop") closeModal();
+    });
+
+    document.getElementById("detailsType").addEventListener("change", () => {
+      const t = document.getElementById("detailsType").value;
+      if (t === "class") {
+        const opts = buildClassOptions();
+        setDetailsOptions(opts, opts[0]?.id);
+        renderClassDetails(document.getElementById("detailsSelect").value);
+      } else if (t === "student") {
+        const opts = buildStudentOptions();
+        setDetailsOptions(opts, opts[0]?.id);
+        renderStudentDetails(document.getElementById("detailsSelect").value);
+      } else {
+        const opts = buildCourseOptions();
+        setDetailsOptions(opts, opts[0]?.id);
+        renderCourseDetails(document.getElementById("detailsSelect").value);
+      }
+    });
+
+    document.getElementById("detailsSelect").addEventListener("change", () => {
+      const t = document.getElementById("detailsType").value;
+      const id = document.getElementById("detailsSelect").value;
+      if (t === "class") renderClassDetails(id);
+      else if (t === "student") renderStudentDetails(id);
+      else renderCourseDetails(id);
+    });
+
+    bindFilePillResetHandler();
+    setEmptyStateVisible(true);
+    setLandingDynamicVisible(false, { animate: false, scroll: false });
+    resetLandingDynamicValues();
+    setDashboardVisible(false);
+    setStatus("Choose a JSON file to begin.");
+  </script>
+</body>
+</html>

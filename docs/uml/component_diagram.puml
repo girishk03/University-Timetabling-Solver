@@ -1,0 +1,142 @@
+@startuml Component Diagram
+!theme plain
+
+title University Timetabling Solver - Component Diagram
+
+package "Presentation Layer" <<Rectangle>> {
+    
+    component "Web Dashboard" as Dashboard <<HTML/CSS/JS>> {
+        port "HTTP Port" as HTTP
+        port "File I/O" as FilePort
+    }
+    
+    component "Summary View" as SummaryView <<UI>>
+    component "Timetable Grid" as TimetableView <<UI>>
+    component "Charts Module" as ChartsModule <<UI>>
+    component "Filter Controls" as Filters <<UI>>
+}
+
+package "Application Layer" <<Rectangle>> {
+    
+    component "SolverRunner" as Runner <<Python>> {
+        port "CLI Interface" as CLI
+        port "JSON Output" as JSONOut
+    }
+    
+    component "Solver Orchestrator" as Orchestrator <<Python>>
+    component "Solution Validator" as Validator <<Python>>
+    component "Solution Exporter" as Exporter <<Python>>
+}
+
+package "Solver Engine Layer" <<Rectangle>> {
+    
+    component "TimetablingSolver" as Solver <<Python>> {
+        port "Constraint API" as ConstraintAPI
+        port "Objective API" as ObjectiveAPI
+    }
+    
+    component "Constraint Builder" as Constraints <<Python>>
+    component "Objective Manager" as Objectives <<Python>>
+    component "LNS Optimizer" as LNS <<Python>>
+    
+    component "Search Strategy" as Strategy <<Python>> {
+        port "Decision Strategy" as DecisionAPI
+    }
+}
+
+package "External Solver" <<Rectangle>> {
+    
+    component "Google OR-Tools" as ORTools <<C++/Python>> {
+        port "CP-SAT API" as CPSATAPI
+    }
+    
+    component "CpModel" as CpModel <<OR-Tools>>
+    component "CpSolver" as CpSolver <<OR-Tools>>
+}
+
+package "Data Layer" <<Rectangle>> {
+    
+    component "ITC2019Parser" as Parser <<Python>> {
+        port "XML Input" as XMLIn
+    }
+    
+    component "Instance Model" as Instance <<Data>>
+    component "Solution Result" as Result <<Data>>
+}
+
+package "Storage" <<Folder>> {
+    database "ITC-2019 XML" as XMLDB <<XML>>
+    database "Solution JSON" as JSONDB <<JSON>>
+    database "Student Names" as StudentNames <<JSON>>
+    database "Course Names" as CourseNames <<JSON>>
+}
+
+' Presentation Layer connections
+Dashboard --> Runner : invokes via browser
+Dashboard --> JSONDB : loads
+Dashboard --> StudentNames : loads
+Dashboard --> CourseNames : loads
+
+Dashboard *-- SummaryView
+Dashboard *-- TimetableView
+Dashboard *-- ChartsModule
+Dashboard *-- Filters
+
+' Application Layer connections
+Runner --> Orchestrator : delegates
+Orchestrator --> Solver : uses
+Orchestrator --> Validator : validates
+Orchestrator --> Exporter : exports
+
+' Solver Engine connections
+Solver --> Constraints : uses
+Solver --> Objectives : uses
+Solver --> LNS : wraps
+Solver --> Strategy : applies
+
+' External connections
+Solver --> ORTools : invokes
+ORTools *-- CpModel
+ORTools *-- CpSolver
+
+' Data Layer connections
+Runner --> Parser : uses
+Parser --> Instance : creates
+Solver --> Instance : reads
+Solver --> Result : produces
+Exporter --> Result : reads
+
+' Storage connections
+Parser --> XMLDB : parses
+Exporter --> JSONDB : writes
+Dashboard --> JSONDB : reads
+
+' Port connections
+HTTP -- CLI : user access
+JSONOut -- FilePort : data exchange
+ConstraintAPI -- CPSATAPI : constraint posting
+ObjectiveAPI -- CPSATAPI : objective setting
+DecisionAPI -- CPSATAPI : search strategy
+
+note right of Dashboard
+  Interactive web interface
+  for solution visualization
+end note
+
+note right of Solver
+  Core CP-SAT solver with
+  custom constraints and
+  LNS optimization wrapper
+end note
+
+note bottom of ORTools
+  Google's OR-Tools library
+  provides CP-SAT solver
+end note
+
+note left of Instance
+  Data models shared
+  across components
+end note
+
+@enduml

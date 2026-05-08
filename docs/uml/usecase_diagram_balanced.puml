@@ -1,0 +1,73 @@
+@startuml Use Case Diagram - BALANCED
+!theme plain
+skinparam backgroundColor transparent
+
+title University Timetabling Solver - Use Case Diagram
+
+left to right direction
+
+actor "System User" as User
+actor "Student" as Student
+
+rectangle "Timetabling System" {
+
+    package "Input & Configuration" {
+        usecase "Import ITC-2019 XML" as UC1
+        usecase "Set Solver Parameters" as UC2
+    }
+
+    package "Constraint Solving" {
+        usecase "Run CP-SAT Solver" as UC3
+        usecase "Apply Room-Time Constraints" as UC4
+        usecase "Apply Capacity Constraints" as UC5
+        usecase "Apply Student Clash Constraints" as UC6
+    }
+
+    package "Optimization" {
+        usecase "Optimize 5 Objectives" as UC7
+        usecase "Run LNS Heuristic" as UC8
+    }
+
+    package "Output & Validation" {
+        usecase "Validate Solution" as UC9
+        usecase "Export Solution JSON" as UC10
+        usecase "View Timetable Dashboard" as UC11
+        usecase "View Student Schedule" as UC12
+    }
+}
+
+' User relationships
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC9
+User --> UC10
+User --> UC11
+
+' Student relationships
+Student --> UC12
+
+' Include relationships
+UC3 ..> UC4 : <<include>>
+UC3 ..> UC5 : <<include>>
+UC3 ..> UC6 : <<include>>
+UC3 ..> UC7 : <<include>>
+UC3 ..> UC8 : <<include>> (optional)
+UC3 ..> UC9 : <<include>>
+
+note right of UC7
+  5-Objective Lexicographic:
+  z1: Max electives
+  z2: Min mode deviation
+  z3: Min student clashes
+  z4: Min online penalty
+  z5: Min late-evening classes
+end note
+
+note right of UC8
+  Large Neighborhood Search:
+  Destroy 20% of schedule,
+  fix 80%, re-solve 5x
+end note
+
+@enduml

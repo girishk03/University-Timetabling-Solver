@@ -1,0 +1,92 @@
+@startuml Collaboration Diagram
+!theme plain
+title University Timetabling Solver - Communication/Collaboration Diagram
+
+actor User
+
+rectangle "Timetabling System" {
+    
+    object "SolverRunner" as Runner <<Controller>>
+    object "ITC2019Parser" as Parser <<Parser>>
+    object "SolveConfig" as Config <<Configuration>>
+    object "Instance" as Instance <<Data Model>>
+    object "TimetablingSolver" as Solver <<Solver Engine>>
+    object "CpModel" as Model <<OR-Tools Model>>
+    object "CpSolver" as CPSolver <<OR-Tools Solver>>
+    object "LNSOptimizer" as LNS <<LNS Wrapper>>
+    object "SolutionValidator" as Validator <<Validator>>
+    object "SolutionResult" as Result <<Result Model>>
+    object "SolutionVisualizer" as Visualizer <<View>>
+    object "DashboardRenderer" as Dashboard <<Web UI>>
+}
+
+' User interactions
+User --> Runner : 1: execute(argv)
+User --> Dashboard : 10: view results
+
+' Runner orchestration
+Runner --> Parser : 2: parse_itc2019_xml()
+Runner --> Config : 3: create config
+Runner --> Instance : 4: pass to solver
+Runner --> Solver : 5: solve_instance()
+Runner --> Validator : 8: validate_solution()
+Runner --> Visualizer : 9: generate_charts()
+Runner --> Dashboard : 9.1: render dashboard
+
+' Parser creates Instance
+Parser --> Instance : creates
+
+' Solver collaboration
+Solver --> Config : reads parameters
+Solver --> Instance : uses constraints
+Solver --> Model : 6.1: creates & builds
+Solver --> CPSolver : 6.2: solves baseline
+Solver --> LNS : 6.3: runs LNS (optional)
+Solver --> Result : 7: produces
+
+' LNS collaboration
+LNS --> CPSolver : re-solves with hints
+LNS --> Result : returns improved
+
+' Validator collaboration
+Validator --> Result : validates
+Validator --> Instance : checks against
+
+' Visualization collaboration
+Visualizer --> Result : reads data
+Dashboard --> Visualizer : renders charts
+
+' Numbered message flow (explicit)
+Runner -[#red]-> Parser : (1) Load XML
+Parser -[#red]-> Instance : (2) Create Instance
+Runner -[#blue]-> Config : (3) Configure
+Runner -[#blue]-> Solver : (4) Start solving
+Solver -[#green]-> Model : (5.1) Build constraints
+Solver -[#green]-> CPSolver : (5.2) Baseline solve
+Solver -[#orange]-> LNS : (5.3) LNS optimize (optional)
+Solver -[#purple]-> Result : (6) Extract solution
+Runner -[#brown]-> Validator : (7) Validate
+Runner -[#gray]-> Visualizer : (8) Visualize
+Runner -[#gray]-> Dashboard : (9) Render HTML
+
+note right of Runner
+  Controller component
+  orchestrates workflow
+end note
+
+note right of Solver
+  Core CP-SAT solver with
+  LNS optimization wrapper
+end note
+
+note bottom of Result
+  Central data structure
+  shared between components
+end note
+
+note right of Dashboard
+  Web-based dashboard
+  for interactive viewing
+end note
+
+@enduml

@@ -1,0 +1,72 @@
+@startuml Collaboration Diagram - CORRECTED
+!theme plain
+title University Timetabling Solver - Communication Diagram (Actual Structure)
+
+actor User
+
+rectangle "Timetabling System" {
+    
+    object "run_solver.py" as Runner <<Entry Point>>
+    object "itc2019_parser.py" as Parser <<Parser Module>>
+    object "SolveConfig" as Config <<Dataclass>>
+    object "Instance" as Instance <<Data Dict>>
+    object "solver_cp_sat.py" as Solver <<Solver Module>>
+    object "CpModel" as Model <<OR-Tools>>
+    object "CpSolver" as CPSolver <<OR-Tools>>
+    object "SolutionResult" as Result <<Data Dict>>
+    object "full_solution.json" as JSON <<Output>>
+    object "index.html" as Dashboard <<Web UI>>
+}
+
+' Numbered message flow
+User -(1)-> Runner : execute
+Runner -(2)-> Parser : parse_itc2019_xml_to_instance()
+Parser -(3)-> Instance : creates dict
+Runner -(4)-> Config : create SolveConfig()
+Runner -(5)-> Solver : solve_instance(instance, config)
+Solver -(6)-> Model : create CpModel()
+Solver -(7)-> CPSolver : create CpSolver()
+Solver -(8)-> CPSolver : solve() [lexicographic stages]
+Solver -(9)-> Solver : solve_instance_lns() [if enabled]
+Solver -(10)-> Result : produces dict
+Runner -(11)-> Solver : validate_solution()
+Runner -(12)-> JSON : save dict
+Runner -(13)-> Dashboard : launch browser view
+User -(14)-> Dashboard : view results
+
+' Self-messages / internal calls
+Solver -(8a)-> Solver : _estimate_class_demand()
+Solver -(8b)-> Solver : _add_schedule_hints()
+Solver -(8c)-> Solver : Add constraints (in-line)
+
+note right of Runner
+  Entry point module with
+  main(), _summarize(),
+  _print_examiner_output()
+end note
+
+note right of Solver
+  Solver module with functions:
+  - solve_instance()
+  - solve_instance_lns()
+  - validate_solution()
+  - _add_schedule_hints()
+  - _estimate_class_demand()
+  ~800 lines total
+end note
+
+note right of Parser
+  Parser module with:
+  - parse_itc2019_xml_to_instance()
+  - _build_time_domain()
+  - _collect_rooms()
+  - _parse_students()
+end note
+
+note bottom of Result
+  Plain dictionary with:
+  status, schedule, students,
+  objectives, baseline/lns metrics
+end note
+
+@enduml

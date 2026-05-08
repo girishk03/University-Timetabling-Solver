@@ -1,0 +1,51 @@
+@startuml Use Case Diagram - SIMPLE
+!theme plain
+
+title University Timetabling Solver - Use Cases
+
+left to right direction
+
+actor "User" as User
+actor "Student" as Student
+
+rectangle "Timetabling System" {
+    usecase "Import XML Dataset" as UC1
+    usecase "Configure Solver" as UC2
+    usecase "Run CP-SAT Solver" as UC3
+    usecase "Apply LNS Heuristic" as UC4
+    usecase "Validate Solution" as UC5
+    usecase "Export Results" as UC6
+    usecase "View Dashboard" as UC7
+    usecase "View Personal Schedule" as UC8
+}
+
+' User relationships
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC5
+User --> UC6
+User --> UC7
+
+' Student relationships
+Student --> UC8
+
+' Include relationships
+UC3 ..> UC4 : <<include>> (if enabled)
+UC3 ..> UC5 : <<include>>
+
+note right of UC3
+  CP-SAT with 5 objectives:
+  z1: Max electives
+  z2: Min mode deviation
+  z3: Min clashes
+  z4: Min online penalty
+  z5: Min late-evening
+end note
+
+note right of UC4
+  LNS: Destroy 20%,
+  fix 80%, re-solve
+end note
+
+@enduml

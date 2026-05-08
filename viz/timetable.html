@@ -1,0 +1,3724 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>University Timetable</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --border: #e5e7eb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+    header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 18px; background: var(--panel); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .brand { font-weight: 800; letter-spacing: 0.2px; }
+    .chips { display:flex; gap:10px; flex-wrap: wrap; justify-content:flex-end; }
+    .chip { background:#f1f5f9; border: 1px solid #e2e8f0; padding: 6px 10px; border-radius: 999px; font-size: 12px; color: #0f172a; }
+    .chip b { font-weight: 900; }
+
+    .top-actions { display:flex; gap:10px; align-items:center; }
+    .segmented { display:flex; border: 1px solid var(--border); border-radius: 999px; overflow:hidden; background:#fff; }
+    .segmented button {
+      border: 0; background: transparent; padding: 7px 10px; font-weight: 900; font-size: 12px; cursor: pointer; color:#0f172a;
+    }
+    .segmented button.active { background:#0f172a; color:#fff; }
+
+    .layout { display:grid; grid-template-columns: 300px 1fr 320px; gap: 14px; padding: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+    .card h3 { margin: 0; font-size: 13px; color: #0f172a; }
+    .card .section { padding: 14px; border-bottom: 1px solid var(--border); }
+    .card .section:last-child { border-bottom: none; }
+
+    label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select { width: 100%; padding: 10px 10px; border-radius: 10px; border: 1px solid var(--border); background: #fff; color: var(--text); }
+    button.btn { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: #0f172a; color: #fff; font-weight: 700; cursor: pointer; }
+    button.btn.secondary { background: #fff; color: #0f172a; }
+    .help { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+    .grid-card { overflow:hidden; }
+    .days-grid { display:grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 14px; }
+    .day-col { border: 1px solid var(--border); border-radius: 14px; overflow:hidden; background: #fff; }
+    .day-head { padding: 10px 12px; font-weight: 900; font-size: 12px; background: #fbfcff; border-bottom: 1px solid var(--border); }
+    .day-events { padding: 10px; display:flex; flex-direction:column; gap: 10px; }
+    .empty { font-size: 12px; color: var(--muted); padding: 10px 0; }
+
+    .event-card {
+      width: 100%;
+      border: 1px solid rgba(15,23,42,0.10);
+      border-left: 6px solid #3b82f6;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 6px 14px rgba(15,23,42,0.06);
+      padding: 10px 10px;
+      text-align: left;
+      cursor: pointer;
+    }
+    .event-card:hover { transform: translateY(-1px); }
+    .event-top { display:flex; justify-content:space-between; align-items:center; gap: 10px; }
+    .event-time { font-size: 12px; font-weight: 900; }
+    .event-main { margin-top: 6px; font-size: 12px; }
+    .event-sub { margin-top: 4px; font-size: 11px; color: #475569; }
+    .event-badge {
+      font-size: 10px; font-weight: 900;
+      padding: 4px 8px; border-radius: 999px;
+      background: #f1f5f9; border: 1px solid #e2e8f0;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .hidden { display:none !important; }
+
+    .legend { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .legend-item { display:flex; gap:8px; align-items:center; font-size: 12px; color:#0f172a; }
+    .swatch { width: 12px; height: 12px; border-radius: 4px; border: 1px solid rgba(15,23,42,0.15); }
+
+    .onboard { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .onboard b { color:#0f172a; }
+    .onboard .step { margin-top: 8px; }
+
+    .grid-wrap { padding: 14px; }
+    .hour-grid { border: 1px solid var(--border); border-radius: 14px; overflow:hidden; background:#fff; }
+    .grid-header { display:grid; grid-template-columns: 72px repeat(5, 1fr); background:#fbfcff; border-bottom:1px solid var(--border); }
+    .grid-header div { padding: 10px 10px; font-weight: 900; font-size: 12px; border-right:1px solid var(--border); }
+    .grid-header div:last-child { border-right: none; }
+    .grid-row { display:grid; grid-template-columns: 72px repeat(5, 1fr); border-bottom: 1px solid #eef2f7; }
+    .grid-row:last-child { border-bottom: none; }
+    .grid-time { padding: 10px 10px; font-size: 11px; color: var(--muted); background:#fbfcff; border-right:1px solid var(--border); }
+    .grid-cell { padding: 8px; border-right:1px solid #eef2f7; min-height: 54px; display:flex; flex-direction:column; gap:6px; }
+    .grid-cell:last-child { border-right: none; }
+    .grid-pill {
+      width:100%; border: 1px solid rgba(15,23,42,0.10); border-left: 6px solid var(--pill);
+      border-radius: 12px; background:#fff; text-align:left; padding: 8px 8px; cursor:pointer;
+      display:grid; grid-template-columns: 64px 1fr; gap: 6px 10px; align-items:center;
+      box-shadow: 0 6px 14px rgba(15,23,42,0.04);
+    }
+    .pill-time { font-size: 11px; font-weight: 900; color:#0f172a; }
+    .pill-main { font-size: 12px; font-weight: 900; }
+    .pill-room { grid-column: 1 / -1; font-size: 11px; color:#475569; }
+
+    .details-empty { color: var(--muted); font-size: 12px; }
+    .kv { display:grid; grid-template-columns: 110px 1fr; gap: 8px; font-size: 12px; }
+    .kv div:nth-child(odd) { color: var(--muted); }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">University Timetable</div>
+    <div class="top-actions">
+      <div class="segmented" role="tablist" aria-label="View toggle">
+        <button id="tabAgenda" class="active" type="button">Agenda</button>
+        <button id="tabGrid" type="button">Hourly grid</button>
+      </div>
+      <div class="chips">
+        <div class="chip"><b>Status</b>: optimal</div>
+        <div class="chip"><b>z1 electives</b>: 40</div>
+        <div class="chip"><b>z2 mode</b>: 0</div>
+        <div class="chip"><b>z3 clashes</b>: 0</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="card">
+      <div class="section">
+        <h3>Filters</h3>
+      </div>
+      <div class="section">
+        <div class="legend">
+          <div class="legend-item"><span class="swatch" style="background:#3b82f6"></span>Online</div>
+          <div class="legend-item"><span class="swatch" style="background:#22c55e"></span>In-person</div>
+          <div class="legend-item"><span class="swatch" style="background:#a855f7"></span>Hybrid</div>
+        </div>
+      </div>
+      <div class="section">
+        <label for="search">Search</label>
+        <input id="search" placeholder="Class id or room (e.g., 78, __online__)" />
+      </div>
+      <div class="section">
+        <label for="modeFilter">Mode</label>
+        <select id="modeFilter">
+          <option value="">All modes</option>
+          <option value="online">Online</option>
+          <option value="in_person">In-person</option>
+          <option value="hybrid">Hybrid</option>
+        </select>
+      </div>
+      <div class="section">
+        <label for="roomFilter">Room</label>
+        <select id="roomFilter">
+          <option value="">All rooms</option>
+        </select>
+      </div>
+      <div class="section">
+        <button class="btn" id="clear">Clear filters</button>
+        <div style="height:10px"></div>
+        <button class="btn secondary" id="resetView">Reset view</button>
+      </div>
+      <div class="section">
+        <div class="help">
+          Tip: pick a Room to see a single-room timetable. Click any class card/pill to see details.
+        </div>
+      </div>
+    </aside>
+
+    <main class="card grid-card">
+      <div class="section" style="border-bottom:1px solid var(--border);">
+        <h3>Week View (Mon–Fri)</h3>
+        <div class="help">Use the view toggle in the top-right: <b>Agenda</b> is easiest to read, <b>Hourly grid</b> helps you see the day structure.</div>
+      </div>
+      <div id="viewAgenda">
+        <div class="days-grid" id="daysGrid">
+          
+            <div class="day-col">
+              <div class="day-head">Mon</div>
+              <div class="day-events"><div class="empty">No classes</div></div>
+            </div>
+            
+            <div class="day-col">
+              <div class="day-head">Tue</div>
+              <div class="day-events"><div class="empty">No classes</div></div>
+            </div>
+            
+            <div class="day-col">
+              <div class="day-head">Wed</div>
+              <div class="day-events">
+                <button class="event-card" type="button"
+                  data-class="138" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="07:30" data-end="09:20" data-timeid="110"
+                  style="border-left-color:#22c55e" title="Class 138 | Wed 07:30-09:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>138</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="141" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="07:30" data-end="08:20" data-timeid="133"
+                  style="border-left-color:#22c55e" title="Class 141 | Wed 07:30-08:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>141</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="37" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="07:30" data-end="08:20" data-timeid="133"
+                  style="border-left-color:#22c55e" title="Class 37 | Wed 07:30-08:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>37</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="60" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="07:30" data-end="10:20" data-timeid="138"
+                  style="border-left-color:#22c55e" title="Class 60 | Wed 07:30-10:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>60</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="116" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="67"
+                  style="border-left-color:#22c55e" title="Class 116 | Wed 08:30-09:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>116</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="144" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="0"
+                  style="border-left-color:#22c55e" title="Class 144 | Wed 08:30-09:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>144</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="44" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="67"
+                  style="border-left-color:#22c55e" title="Class 44 | Wed 08:30-09:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>44</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="98" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="0"
+                  style="border-left-color:#22c55e" title="Class 98 | Wed 08:30-09:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>98</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="107" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="09:30" data-end="10:20" data-timeid="72"
+                  style="border-left-color:#22c55e" title="Class 107 | Wed 09:30-10:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>107</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="23" data-room="1" data-mode="in_person"
+                  data-day="Wed" data-start="09:30" data-end="11:20" data-timeid="113"
+                  style="border-left-color:#22c55e" title="Class 23 | Wed 09:30-11:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>23</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="7" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="09:30" data-end="10:20" data-timeid="72"
+                  style="border-left-color:#22c55e" title="Class 7 | Wed 09:30-10:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>7</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="93" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="09:30" data-end="10:20" data-timeid="1"
+                  style="border-left-color:#22c55e" title="Class 93 | Wed 09:30-10:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>93</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="13" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="77"
+                  style="border-left-color:#22c55e" title="Class 13 | Wed 10:30-11:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>13</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="143" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="2"
+                  style="border-left-color:#22c55e" title="Class 143 | Wed 10:30-11:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>143</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="32" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="31"
+                  style="border-left-color:#22c55e" title="Class 32 | Wed 10:30-11:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>32</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="39" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="2"
+                  style="border-left-color:#22c55e" title="Class 39 | Wed 10:30-11:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>39</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="95" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="2"
+                  style="border-left-color:#22c55e" title="Class 95 | Wed 10:30-11:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>95</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="114" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="3"
+                  style="border-left-color:#22c55e" title="Class 114 | Wed 11:30-12:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>114</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="145" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="3"
+                  style="border-left-color:#22c55e" title="Class 145 | Wed 11:30-12:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>145</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="27" data-room="1" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="13:20" data-timeid="116"
+                  style="border-left-color:#22c55e" title="Class 27 | Wed 11:30-13:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>27</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="36" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="13:20" data-timeid="116"
+                  style="border-left-color:#22c55e" title="Class 36 | Wed 11:30-13:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>36</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="56" data-room="5" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="14:20" data-timeid="142"
+                  style="border-left-color:#22c55e" title="Class 56 | Wed 11:30-14:20 | Room 5 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>56</b></div>
+                  <div class="event-sub">Room: 5</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="63" data-room="1" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="14:20" data-timeid="142"
+                  style="border-left-color:#22c55e" title="Class 63 | Wed 11:30-14:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>63</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="75" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="82"
+                  style="border-left-color:#22c55e" title="Class 75 | Wed 11:30-12:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>75</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="94" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="3"
+                  style="border-left-color:#22c55e" title="Class 94 | Wed 11:30-12:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>94</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="147" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="87"
+                  style="border-left-color:#22c55e" title="Class 147 | Wed 12:30-13:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>147</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="31" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="39"
+                  style="border-left-color:#22c55e" title="Class 31 | Wed 12:30-13:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>31</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="96" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="4"
+                  style="border-left-color:#22c55e" title="Class 96 | Wed 12:30-13:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>96</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="97" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="4"
+                  style="border-left-color:#22c55e" title="Class 97 | Wed 12:30-13:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>97</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="1" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="5"
+                  style="border-left-color:#22c55e" title="Class 1 | Wed 13:30-14:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>1</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="11" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="92"
+                  style="border-left-color:#22c55e" title="Class 11 | Wed 13:30-14:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>11</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="115" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="92"
+                  style="border-left-color:#22c55e" title="Class 115 | Wed 13:30-14:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>115</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="136" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="15:20" data-timeid="119"
+                  style="border-left-color:#22c55e" title="Class 136 | Wed 13:30-15:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>136</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="19" data-room="1" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="15:20" data-timeid="119"
+                  style="border-left-color:#22c55e" title="Class 19 | Wed 13:30-15:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>19</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="77" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="92"
+                  style="border-left-color:#22c55e" title="Class 77 | Wed 13:30-14:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>77</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="91" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="5"
+                  style="border-left-color:#22c55e" title="Class 91 | Wed 13:30-14:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>91</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="128" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="49"
+                  style="border-left-color:#22c55e" title="Class 128 | Wed 14:30-15:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>128</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="72" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="97"
+                  style="border-left-color:#22c55e" title="Class 72 | Wed 14:30-15:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>72</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="78" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="97"
+                  style="border-left-color:#22c55e" title="Class 78 | Wed 14:30-15:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>78</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="88" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="6"
+                  style="border-left-color:#22c55e" title="Class 88 | Wed 14:30-15:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>88</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="2" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="15:00" data-end="16:50" data-timeid="16"
+                  style="border-left-color:#22c55e" title="Class 2 | Wed 15:00-16:50 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–16:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>2</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="57" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="15:00" data-end="17:50" data-timeid="146"
+                  style="border-left-color:#22c55e" title="Class 57 | Wed 15:00-17:50 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–17:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>57</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="64" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="15:00" data-end="17:50" data-timeid="146"
+                  style="border-left-color:#22c55e" title="Class 64 | Wed 15:00-17:50 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–17:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>64</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="66" data-room="5" data-mode="in_person"
+                  data-day="Wed" data-start="15:00" data-end="17:50" data-timeid="146"
+                  style="border-left-color:#22c55e" title="Class 66 | Wed 15:00-17:50 | Room 5 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–17:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>66</b></div>
+                  <div class="event-sub">Room: 5</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="100" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="102"
+                  style="border-left-color:#22c55e" title="Class 100 | Wed 15:30-16:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>100</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="113" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="7"
+                  style="border-left-color:#22c55e" title="Class 113 | Wed 15:30-16:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>113</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="121" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="7"
+                  style="border-left-color:#22c55e" title="Class 121 | Wed 15:30-16:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>121</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="38" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="7"
+                  style="border-left-color:#22c55e" title="Class 38 | Wed 15:30-16:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>38</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="70" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="102"
+                  style="border-left-color:#22c55e" title="Class 70 | Wed 15:30-16:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>70</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="71" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="102"
+                  style="border-left-color:#22c55e" title="Class 71 | Wed 15:30-16:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>71</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="103" data-room="2" data-mode="in_person"
+                  data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="107"
+                  style="border-left-color:#22c55e" title="Class 103 | Wed 16:30-17:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>103</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="129" data-room="6" data-mode="in_person"
+                  data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="55"
+                  style="border-left-color:#22c55e" title="Class 129 | Wed 16:30-17:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>129</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="89" data-room="3" data-mode="in_person"
+                  data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="134"
+                  style="border-left-color:#22c55e" title="Class 89 | Wed 16:30-17:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>89</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="90" data-room="7" data-mode="in_person"
+                  data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="134"
+                  style="border-left-color:#22c55e" title="Class 90 | Wed 16:30-17:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>90</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="92" data-room="4" data-mode="in_person"
+                  data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="134"
+                  style="border-left-color:#22c55e" title="Class 92 | Wed 16:30-17:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>92</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                </div>
+            </div>
+            
+            <div class="day-col">
+              <div class="day-head">Thu</div>
+              <div class="day-events">
+                <button class="event-card" type="button"
+                  data-class="109" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:20" data-timeid="20"
+                  style="border-left-color:#22c55e" title="Class 109 | Thu 07:30-08:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>109</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="119" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                  style="border-left-color:#22c55e" title="Class 119 | Thu 07:30-08:45 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>119</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="146" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                  style="border-left-color:#22c55e" title="Class 146 | Thu 07:30-08:45 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>146</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="22" data-room="1" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="09:20" data-timeid="109"
+                  style="border-left-color:#22c55e" title="Class 22 | Thu 07:30-09:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>22</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="43" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:20" data-timeid="61"
+                  style="border-left-color:#22c55e" title="Class 43 | Thu 07:30-08:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>43</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="55" data-room="2" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="10:20" data-timeid="137"
+                  style="border-left-color:#22c55e" title="Class 55 | Thu 07:30-10:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>55</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="68" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:20" data-timeid="61"
+                  style="border-left-color:#22c55e" title="Class 68 | Thu 07:30-08:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>68</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="79" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                  style="border-left-color:#22c55e" title="Class 79 | Thu 07:30-08:45 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>79</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="82" data-room="4" data-mode="in_person"
+                  data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                  style="border-left-color:#22c55e" title="Class 82 | Thu 07:30-08:45 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>82</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="150" data-room="2" data-mode="in_person"
+                  data-day="Thu" data-start="08:30" data-end="09:20" data-timeid="66"
+                  style="border-left-color:#22c55e" title="Class 150 | Thu 08:30-09:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>150</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="3" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="08:30" data-end="09:20" data-timeid="24"
+                  style="border-left-color:#22c55e" title="Class 3 | Thu 08:30-09:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>3</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="8" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="08:30" data-end="09:20" data-timeid="66"
+                  style="border-left-color:#22c55e" title="Class 8 | Thu 08:30-09:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>8</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="142" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="09:00" data-end="10:15" data-timeid="148"
+                  style="border-left-color:#22c55e" title="Class 142 | Thu 09:00-10:15 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:00–10:15</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>142</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="85" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="09:00" data-end="10:15" data-timeid="148"
+                  style="border-left-color:#22c55e" title="Class 85 | Thu 09:00-10:15 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:00–10:15</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>85</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="132" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="09:30" data-end="10:20" data-timeid="71"
+                  style="border-left-color:#22c55e" title="Class 132 | Thu 09:30-10:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>132</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="137" data-room="2" data-mode="in_person"
+                  data-day="Thu" data-start="09:30" data-end="11:20" data-timeid="112"
+                  style="border-left-color:#22c55e" title="Class 137 | Thu 09:30-11:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>137</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="24" data-room="1" data-mode="in_person"
+                  data-day="Thu" data-start="09:30" data-end="11:20" data-timeid="112"
+                  style="border-left-color:#22c55e" title="Class 24 | Thu 09:30-11:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>24</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="80" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="10:30" data-end="11:45" data-timeid="149"
+                  style="border-left-color:#22c55e" title="Class 80 | Thu 10:30-11:45 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>80</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="62" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="11:30" data-end="14:20" data-timeid="141"
+                  style="border-left-color:#22c55e" title="Class 62 | Thu 11:30-14:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>62</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="127" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="12:00" data-end="13:15" data-timeid="150"
+                  style="border-left-color:#22c55e" title="Class 127 | Thu 12:00-13:15 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:00–13:15</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>127</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="83" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="12:00" data-end="13:15" data-timeid="150"
+                  style="border-left-color:#22c55e" title="Class 83 | Thu 12:00-13:15 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:00–13:15</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>83</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="110" data-room="2" data-mode="in_person"
+                  data-day="Thu" data-start="13:30" data-end="15:20" data-timeid="118"
+                  style="border-left-color:#22c55e" title="Class 110 | Thu 13:30-15:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>110</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="148" data-room="2" data-mode="in_person"
+                  data-day="Thu" data-start="13:30" data-end="14:20" data-timeid="91"
+                  style="border-left-color:#22c55e" title="Class 148 | Thu 13:30-14:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>148</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="26" data-room="1" data-mode="in_person"
+                  data-day="Thu" data-start="13:30" data-end="15:20" data-timeid="118"
+                  style="border-left-color:#22c55e" title="Class 26 | Thu 13:30-15:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>26</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="54" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="13:30" data-end="14:20" data-timeid="44"
+                  style="border-left-color:#22c55e" title="Class 54 | Thu 13:30-14:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>54</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="81" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="13:30" data-end="14:45" data-timeid="151"
+                  style="border-left-color:#22c55e" title="Class 81 | Thu 13:30-14:45 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>81</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="84" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="13:30" data-end="14:45" data-timeid="151"
+                  style="border-left-color:#22c55e" title="Class 84 | Thu 13:30-14:45 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>84</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="126" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="14:30" data-end="15:20" data-timeid="96"
+                  style="border-left-color:#22c55e" title="Class 126 | Thu 14:30-15:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>126</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="16" data-room="4" data-mode="in_person"
+                  data-day="Thu" data-start="14:30" data-end="15:20" data-timeid="96"
+                  style="border-left-color:#22c55e" title="Class 16 | Thu 14:30-15:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>16</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="42" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="14:30" data-end="15:20" data-timeid="96"
+                  style="border-left-color:#22c55e" title="Class 42 | Thu 14:30-15:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>42</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="140" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="15:00" data-end="16:15" data-timeid="152"
+                  style="border-left-color:#22c55e" title="Class 140 | Thu 15:00-16:15 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–16:15</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>140</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="2" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="15:00" data-end="16:50" data-timeid="16"
+                  style="border-left-color:#22c55e" title="Class 2 | Thu 15:00-16:50 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–16:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>2</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="65" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="15:00" data-end="17:50" data-timeid="145"
+                  style="border-left-color:#22c55e" title="Class 65 | Thu 15:00-17:50 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–17:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>65</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="25" data-room="1" data-mode="in_person"
+                  data-day="Thu" data-start="15:30" data-end="17:20" data-timeid="121"
+                  style="border-left-color:#22c55e" title="Class 25 | Thu 15:30-17:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>25</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="52" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="15:30" data-end="16:20" data-timeid="52"
+                  style="border-left-color:#22c55e" title="Class 52 | Thu 15:30-16:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>52</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="120" data-room="3" data-mode="in_person"
+                  data-day="Thu" data-start="16:30" data-end="17:45" data-timeid="153"
+                  style="border-left-color:#22c55e" title="Class 120 | Thu 16:30-17:45 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>120</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="4" data-room="6" data-mode="in_person"
+                  data-day="Thu" data-start="16:30" data-end="17:20" data-timeid="56"
+                  style="border-left-color:#22c55e" title="Class 4 | Thu 16:30-17:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>4</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="86" data-room="4" data-mode="in_person"
+                  data-day="Thu" data-start="16:30" data-end="17:45" data-timeid="153"
+                  style="border-left-color:#22c55e" title="Class 86 | Thu 16:30-17:45 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>86</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="87" data-room="7" data-mode="in_person"
+                  data-day="Thu" data-start="16:30" data-end="17:45" data-timeid="153"
+                  style="border-left-color:#22c55e" title="Class 87 | Thu 16:30-17:45 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:45</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>87</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="99" data-room="2" data-mode="in_person"
+                  data-day="Thu" data-start="16:30" data-end="17:20" data-timeid="106"
+                  style="border-left-color:#22c55e" title="Class 99 | Thu 16:30-17:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>99</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                </div>
+            </div>
+            
+            <div class="day-col">
+              <div class="day-head">Fri</div>
+              <div class="day-events">
+                <button class="event-card" type="button"
+                  data-class="122" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="18"
+                  style="border-left-color:#22c55e" title="Class 122 | Fri 07:30-08:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>122</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="141" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="133"
+                  style="border-left-color:#22c55e" title="Class 141 | Fri 07:30-08:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>141</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="17" data-room="1" data-mode="in_person"
+                  data-day="Fri" data-start="07:30" data-end="09:20" data-timeid="108"
+                  style="border-left-color:#22c55e" title="Class 17 | Fri 07:30-09:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>17</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="34" data-room="2" data-mode="in_person"
+                  data-day="Fri" data-start="07:30" data-end="09:20" data-timeid="108"
+                  style="border-left-color:#22c55e" title="Class 34 | Fri 07:30-09:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>34</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="37" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="133"
+                  style="border-left-color:#22c55e" title="Class 37 | Fri 07:30-08:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>37</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="69" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="60"
+                  style="border-left-color:#22c55e" title="Class 69 | Fri 07:30-08:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">07:30–08:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>69</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="133" data-room="4" data-mode="in_person"
+                  data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="65"
+                  style="border-left-color:#22c55e" title="Class 133 | Fri 08:30-09:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>133</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="144" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="0"
+                  style="border-left-color:#22c55e" title="Class 144 | Fri 08:30-09:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>144</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="46" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="65"
+                  style="border-left-color:#22c55e" title="Class 46 | Fri 08:30-09:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>46</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="98" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="0"
+                  style="border-left-color:#22c55e" title="Class 98 | Fri 08:30-09:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">08:30–09:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>98</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="101" data-room="2" data-mode="in_person"
+                  data-day="Fri" data-start="09:30" data-end="10:20" data-timeid="70"
+                  style="border-left-color:#22c55e" title="Class 101 | Fri 09:30-10:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>101</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="21" data-room="1" data-mode="in_person"
+                  data-day="Fri" data-start="09:30" data-end="11:20" data-timeid="111"
+                  style="border-left-color:#22c55e" title="Class 21 | Fri 09:30-11:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>21</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="5" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="09:30" data-end="10:20" data-timeid="26"
+                  style="border-left-color:#22c55e" title="Class 5 | Fri 09:30-10:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>5</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="93" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="09:30" data-end="10:20" data-timeid="1"
+                  style="border-left-color:#22c55e" title="Class 93 | Fri 09:30-10:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">09:30–10:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>93</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="131" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="75"
+                  style="border-left-color:#22c55e" title="Class 131 | Fri 10:30-11:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>131</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="143" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="2"
+                  style="border-left-color:#22c55e" title="Class 143 | Fri 10:30-11:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>143</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="39" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="2"
+                  style="border-left-color:#22c55e" title="Class 39 | Fri 10:30-11:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>39</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="53" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="30"
+                  style="border-left-color:#22c55e" title="Class 53 | Fri 10:30-11:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>53</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="95" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="2"
+                  style="border-left-color:#22c55e" title="Class 95 | Fri 10:30-11:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">10:30–11:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>95</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="111" data-room="2" data-mode="in_person"
+                  data-day="Fri" data-start="11:30" data-end="13:20" data-timeid="114"
+                  style="border-left-color:#22c55e" title="Class 111 | Fri 11:30-13:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>111</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="114" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="11:30" data-end="12:20" data-timeid="3"
+                  style="border-left-color:#22c55e" title="Class 114 | Fri 11:30-12:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>114</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="145" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="11:30" data-end="12:20" data-timeid="3"
+                  style="border-left-color:#22c55e" title="Class 145 | Fri 11:30-12:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>145</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="20" data-room="1" data-mode="in_person"
+                  data-day="Fri" data-start="11:30" data-end="13:20" data-timeid="114"
+                  style="border-left-color:#22c55e" title="Class 20 | Fri 11:30-13:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>20</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="61" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="11:30" data-end="14:20" data-timeid="140"
+                  style="border-left-color:#22c55e" title="Class 61 | Fri 11:30-14:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>61</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="94" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="11:30" data-end="12:20" data-timeid="3"
+                  style="border-left-color:#22c55e" title="Class 94 | Fri 11:30-12:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">11:30–12:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>94</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="29" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="12:30" data-end="13:20" data-timeid="85"
+                  style="border-left-color:#22c55e" title="Class 29 | Fri 12:30-13:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>29</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="96" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="12:30" data-end="13:20" data-timeid="4"
+                  style="border-left-color:#22c55e" title="Class 96 | Fri 12:30-13:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>96</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="97" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="12:30" data-end="13:20" data-timeid="4"
+                  style="border-left-color:#22c55e" title="Class 97 | Fri 12:30-13:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">12:30–13:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>97</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="1" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="13:30" data-end="14:20" data-timeid="5"
+                  style="border-left-color:#22c55e" title="Class 1 | Fri 13:30-14:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>1</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="149" data-room="2" data-mode="in_person"
+                  data-day="Fri" data-start="13:30" data-end="14:20" data-timeid="90"
+                  style="border-left-color:#22c55e" title="Class 149 | Fri 13:30-14:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>149</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="18" data-room="1" data-mode="in_person"
+                  data-day="Fri" data-start="13:30" data-end="15:20" data-timeid="117"
+                  style="border-left-color:#22c55e" title="Class 18 | Fri 13:30-15:20 | Room 1 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>18</b></div>
+                  <div class="event-sub">Room: 1</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="91" data-room="4" data-mode="in_person"
+                  data-day="Fri" data-start="13:30" data-end="14:20" data-timeid="5"
+                  style="border-left-color:#22c55e" title="Class 91 | Fri 13:30-14:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">13:30–14:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>91</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="128" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="14:30" data-end="15:20" data-timeid="49"
+                  style="border-left-color:#22c55e" title="Class 128 | Fri 14:30-15:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>128</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="48" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="14:30" data-end="15:20" data-timeid="95"
+                  style="border-left-color:#22c55e" title="Class 48 | Fri 14:30-15:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>48</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="88" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="14:30" data-end="15:20" data-timeid="6"
+                  style="border-left-color:#22c55e" title="Class 88 | Fri 14:30-15:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">14:30–15:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>88</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="2" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="15:00" data-end="16:50" data-timeid="16"
+                  style="border-left-color:#22c55e" title="Class 2 | Fri 15:00-16:50 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:00–16:50</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>2</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="113" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="7"
+                  style="border-left-color:#22c55e" title="Class 113 | Fri 15:30-16:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>113</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="12" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="100"
+                  style="border-left-color:#22c55e" title="Class 12 | Fri 15:30-16:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>12</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="121" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="7"
+                  style="border-left-color:#22c55e" title="Class 121 | Fri 15:30-16:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>121</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="135" data-room="2" data-mode="in_person"
+                  data-day="Fri" data-start="15:30" data-end="17:20" data-timeid="120"
+                  style="border-left-color:#22c55e" title="Class 135 | Fri 15:30-17:20 | Room 2 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>135</b></div>
+                  <div class="event-sub">Room: 2</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="38" data-room="6" data-mode="in_person"
+                  data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="7"
+                  style="border-left-color:#22c55e" title="Class 38 | Fri 15:30-16:20 | Room 6 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">15:30–16:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>38</b></div>
+                  <div class="event-sub">Room: 6</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="47" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="105"
+                  style="border-left-color:#22c55e" title="Class 47 | Fri 16:30-17:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>47</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="89" data-room="3" data-mode="in_person"
+                  data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="134"
+                  style="border-left-color:#22c55e" title="Class 89 | Fri 16:30-17:20 | Room 3 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>89</b></div>
+                  <div class="event-sub">Room: 3</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="90" data-room="7" data-mode="in_person"
+                  data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="134"
+                  style="border-left-color:#22c55e" title="Class 90 | Fri 16:30-17:20 | Room 7 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>90</b></div>
+                  <div class="event-sub">Room: 7</div>
+                </button>
+                
+
+                <button class="event-card" type="button"
+                  data-class="92" data-room="4" data-mode="in_person"
+                  data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="134"
+                  style="border-left-color:#22c55e" title="Class 92 | Fri 16:30-17:20 | Room 4 | in_person">
+                  <div class="event-top">
+                    <div class="event-time">16:30–17:20</div>
+                    <div class="event-badge">in_person</div>
+                  </div>
+                  <div class="event-main">Class <b>92</b></div>
+                  <div class="event-sub">Room: 4</div>
+                </button>
+                </div>
+            </div>
+            
+        </div>
+      </div>
+
+      <div id="viewGrid" class="hidden">
+        <div class="grid-wrap">
+          <div class="hour-grid">
+            <div class="grid-header">
+              <div></div>
+              <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">07:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="138" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="07:30" data-end="09:20" data-timeid="110"
+                      style="--pill:#22c55e" title="Class 138 | Wed 07:30-09:20 | Room 2 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 138</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="141" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="07:30" data-end="08:20" data-timeid="133"
+                      style="--pill:#22c55e" title="Class 141 | Wed 07:30-08:20 | Room 3 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 141</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="37" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="07:30" data-end="08:20" data-timeid="133"
+                      style="--pill:#22c55e" title="Class 37 | Wed 07:30-08:20 | Room 6 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 37</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="60" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="07:30" data-end="10:20" data-timeid="138"
+                      style="--pill:#22c55e" title="Class 60 | Wed 07:30-10:20 | Room 2 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 60</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="109" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:20" data-timeid="20"
+                      style="--pill:#22c55e" title="Class 109 | Thu 07:30-08:20 | Room 6 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 109</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="119" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                      style="--pill:#22c55e" title="Class 119 | Thu 07:30-08:45 | Room 6 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 119</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="146" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                      style="--pill:#22c55e" title="Class 146 | Thu 07:30-08:45 | Room 3 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 146</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="22" data-room="1" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="09:20" data-timeid="109"
+                      style="--pill:#22c55e" title="Class 22 | Thu 07:30-09:20 | Room 1 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 22</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="43" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:20" data-timeid="61"
+                      style="--pill:#22c55e" title="Class 43 | Thu 07:30-08:20 | Room 7 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 43</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="55" data-room="2" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="10:20" data-timeid="137"
+                      style="--pill:#22c55e" title="Class 55 | Thu 07:30-10:20 | Room 2 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 55</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="68" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:20" data-timeid="61"
+                      style="--pill:#22c55e" title="Class 68 | Thu 07:30-08:20 | Room 3 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 68</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="79" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                      style="--pill:#22c55e" title="Class 79 | Thu 07:30-08:45 | Room 7 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 79</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="82" data-room="4" data-mode="in_person"
+                      data-day="Thu" data-start="07:30" data-end="08:45" data-timeid="147"
+                      style="--pill:#22c55e" title="Class 82 | Thu 07:30-08:45 | Room 4 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 82</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="122" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="18"
+                      style="--pill:#22c55e" title="Class 122 | Fri 07:30-08:20 | Room 6 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 122</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="141" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="133"
+                      style="--pill:#22c55e" title="Class 141 | Fri 07:30-08:20 | Room 3 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 141</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="17" data-room="1" data-mode="in_person"
+                      data-day="Fri" data-start="07:30" data-end="09:20" data-timeid="108"
+                      style="--pill:#22c55e" title="Class 17 | Fri 07:30-09:20 | Room 1 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 17</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="34" data-room="2" data-mode="in_person"
+                      data-day="Fri" data-start="07:30" data-end="09:20" data-timeid="108"
+                      style="--pill:#22c55e" title="Class 34 | Fri 07:30-09:20 | Room 2 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 34</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="37" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="133"
+                      style="--pill:#22c55e" title="Class 37 | Fri 07:30-08:20 | Room 6 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 37</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="69" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="07:30" data-end="08:20" data-timeid="60"
+                      style="--pill:#22c55e" title="Class 69 | Fri 07:30-08:20 | Room 7 | in_person">
+                      <span class="pill-time">07:30</span>
+                      <span class="pill-main">Class 69</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">08:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="116" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="67"
+                      style="--pill:#22c55e" title="Class 116 | Wed 08:30-09:20 | Room 2 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 116</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="144" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="0"
+                      style="--pill:#22c55e" title="Class 144 | Wed 08:30-09:20 | Room 6 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 144</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="44" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="67"
+                      style="--pill:#22c55e" title="Class 44 | Wed 08:30-09:20 | Room 4 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 44</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="98" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="08:30" data-end="09:20" data-timeid="0"
+                      style="--pill:#22c55e" title="Class 98 | Wed 08:30-09:20 | Room 3 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 98</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="150" data-room="2" data-mode="in_person"
+                      data-day="Thu" data-start="08:30" data-end="09:20" data-timeid="66"
+                      style="--pill:#22c55e" title="Class 150 | Thu 08:30-09:20 | Room 2 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 150</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="3" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="08:30" data-end="09:20" data-timeid="24"
+                      style="--pill:#22c55e" title="Class 3 | Thu 08:30-09:20 | Room 6 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 3</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="8" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="08:30" data-end="09:20" data-timeid="66"
+                      style="--pill:#22c55e" title="Class 8 | Thu 08:30-09:20 | Room 6 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 8</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="133" data-room="4" data-mode="in_person"
+                      data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="65"
+                      style="--pill:#22c55e" title="Class 133 | Fri 08:30-09:20 | Room 4 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 133</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="144" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="0"
+                      style="--pill:#22c55e" title="Class 144 | Fri 08:30-09:20 | Room 6 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 144</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="46" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="65"
+                      style="--pill:#22c55e" title="Class 46 | Fri 08:30-09:20 | Room 7 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 46</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="98" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="08:30" data-end="09:20" data-timeid="0"
+                      style="--pill:#22c55e" title="Class 98 | Fri 08:30-09:20 | Room 3 | in_person">
+                      <span class="pill-time">08:30</span>
+                      <span class="pill-main">Class 98</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">09:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="107" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="09:30" data-end="10:20" data-timeid="72"
+                      style="--pill:#22c55e" title="Class 107 | Wed 09:30-10:20 | Room 2 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 107</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="23" data-room="1" data-mode="in_person"
+                      data-day="Wed" data-start="09:30" data-end="11:20" data-timeid="113"
+                      style="--pill:#22c55e" title="Class 23 | Wed 09:30-11:20 | Room 1 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 23</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="7" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="09:30" data-end="10:20" data-timeid="72"
+                      style="--pill:#22c55e" title="Class 7 | Wed 09:30-10:20 | Room 4 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 7</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="93" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="09:30" data-end="10:20" data-timeid="1"
+                      style="--pill:#22c55e" title="Class 93 | Wed 09:30-10:20 | Room 3 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 93</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="142" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="09:00" data-end="10:15" data-timeid="148"
+                      style="--pill:#22c55e" title="Class 142 | Thu 09:00-10:15 | Room 6 | in_person">
+                      <span class="pill-time">09:00</span>
+                      <span class="pill-main">Class 142</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="85" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="09:00" data-end="10:15" data-timeid="148"
+                      style="--pill:#22c55e" title="Class 85 | Thu 09:00-10:15 | Room 7 | in_person">
+                      <span class="pill-time">09:00</span>
+                      <span class="pill-main">Class 85</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="132" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="09:30" data-end="10:20" data-timeid="71"
+                      style="--pill:#22c55e" title="Class 132 | Thu 09:30-10:20 | Room 3 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 132</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="137" data-room="2" data-mode="in_person"
+                      data-day="Thu" data-start="09:30" data-end="11:20" data-timeid="112"
+                      style="--pill:#22c55e" title="Class 137 | Thu 09:30-11:20 | Room 2 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 137</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="24" data-room="1" data-mode="in_person"
+                      data-day="Thu" data-start="09:30" data-end="11:20" data-timeid="112"
+                      style="--pill:#22c55e" title="Class 24 | Thu 09:30-11:20 | Room 1 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 24</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="101" data-room="2" data-mode="in_person"
+                      data-day="Fri" data-start="09:30" data-end="10:20" data-timeid="70"
+                      style="--pill:#22c55e" title="Class 101 | Fri 09:30-10:20 | Room 2 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 101</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="21" data-room="1" data-mode="in_person"
+                      data-day="Fri" data-start="09:30" data-end="11:20" data-timeid="111"
+                      style="--pill:#22c55e" title="Class 21 | Fri 09:30-11:20 | Room 1 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 21</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="5" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="09:30" data-end="10:20" data-timeid="26"
+                      style="--pill:#22c55e" title="Class 5 | Fri 09:30-10:20 | Room 6 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 5</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="93" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="09:30" data-end="10:20" data-timeid="1"
+                      style="--pill:#22c55e" title="Class 93 | Fri 09:30-10:20 | Room 3 | in_person">
+                      <span class="pill-time">09:30</span>
+                      <span class="pill-main">Class 93</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">10:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="13" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="77"
+                      style="--pill:#22c55e" title="Class 13 | Wed 10:30-11:20 | Room 7 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 13</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="143" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="2"
+                      style="--pill:#22c55e" title="Class 143 | Wed 10:30-11:20 | Room 3 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 143</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="32" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="31"
+                      style="--pill:#22c55e" title="Class 32 | Wed 10:30-11:20 | Room 7 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 32</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="39" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="2"
+                      style="--pill:#22c55e" title="Class 39 | Wed 10:30-11:20 | Room 6 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 39</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="95" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="10:30" data-end="11:20" data-timeid="2"
+                      style="--pill:#22c55e" title="Class 95 | Wed 10:30-11:20 | Room 7 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 95</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="80" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="10:30" data-end="11:45" data-timeid="149"
+                      style="--pill:#22c55e" title="Class 80 | Thu 10:30-11:45 | Room 7 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 80</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="131" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="75"
+                      style="--pill:#22c55e" title="Class 131 | Fri 10:30-11:20 | Room 6 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 131</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="143" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="2"
+                      style="--pill:#22c55e" title="Class 143 | Fri 10:30-11:20 | Room 3 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 143</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="39" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="2"
+                      style="--pill:#22c55e" title="Class 39 | Fri 10:30-11:20 | Room 6 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 39</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="53" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="30"
+                      style="--pill:#22c55e" title="Class 53 | Fri 10:30-11:20 | Room 6 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 53</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="95" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="10:30" data-end="11:20" data-timeid="2"
+                      style="--pill:#22c55e" title="Class 95 | Fri 10:30-11:20 | Room 7 | in_person">
+                      <span class="pill-time">10:30</span>
+                      <span class="pill-main">Class 95</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">11:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="114" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="3"
+                      style="--pill:#22c55e" title="Class 114 | Wed 11:30-12:20 | Room 3 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 114</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="145" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="3"
+                      style="--pill:#22c55e" title="Class 145 | Wed 11:30-12:20 | Room 6 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 145</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="27" data-room="1" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="13:20" data-timeid="116"
+                      style="--pill:#22c55e" title="Class 27 | Wed 11:30-13:20 | Room 1 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 27</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="36" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="13:20" data-timeid="116"
+                      style="--pill:#22c55e" title="Class 36 | Wed 11:30-13:20 | Room 2 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 36</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="56" data-room="5" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="14:20" data-timeid="142"
+                      style="--pill:#22c55e" title="Class 56 | Wed 11:30-14:20 | Room 5 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 56</span>
+                      <span class="pill-room">5</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="63" data-room="1" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="14:20" data-timeid="142"
+                      style="--pill:#22c55e" title="Class 63 | Wed 11:30-14:20 | Room 1 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 63</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="75" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="82"
+                      style="--pill:#22c55e" title="Class 75 | Wed 11:30-12:20 | Room 4 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 75</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="94" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="11:30" data-end="12:20" data-timeid="3"
+                      style="--pill:#22c55e" title="Class 94 | Wed 11:30-12:20 | Room 7 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 94</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="62" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="11:30" data-end="14:20" data-timeid="141"
+                      style="--pill:#22c55e" title="Class 62 | Thu 11:30-14:20 | Room 7 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 62</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="111" data-room="2" data-mode="in_person"
+                      data-day="Fri" data-start="11:30" data-end="13:20" data-timeid="114"
+                      style="--pill:#22c55e" title="Class 111 | Fri 11:30-13:20 | Room 2 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 111</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="114" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="11:30" data-end="12:20" data-timeid="3"
+                      style="--pill:#22c55e" title="Class 114 | Fri 11:30-12:20 | Room 3 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 114</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="145" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="11:30" data-end="12:20" data-timeid="3"
+                      style="--pill:#22c55e" title="Class 145 | Fri 11:30-12:20 | Room 6 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 145</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="20" data-room="1" data-mode="in_person"
+                      data-day="Fri" data-start="11:30" data-end="13:20" data-timeid="114"
+                      style="--pill:#22c55e" title="Class 20 | Fri 11:30-13:20 | Room 1 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 20</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="61" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="11:30" data-end="14:20" data-timeid="140"
+                      style="--pill:#22c55e" title="Class 61 | Fri 11:30-14:20 | Room 6 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 61</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="94" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="11:30" data-end="12:20" data-timeid="3"
+                      style="--pill:#22c55e" title="Class 94 | Fri 11:30-12:20 | Room 7 | in_person">
+                      <span class="pill-time">11:30</span>
+                      <span class="pill-main">Class 94</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">12:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="147" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="87"
+                      style="--pill:#22c55e" title="Class 147 | Wed 12:30-13:20 | Room 2 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 147</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="31" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="39"
+                      style="--pill:#22c55e" title="Class 31 | Wed 12:30-13:20 | Room 7 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 31</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="96" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="4"
+                      style="--pill:#22c55e" title="Class 96 | Wed 12:30-13:20 | Room 6 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 96</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="97" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="12:30" data-end="13:20" data-timeid="4"
+                      style="--pill:#22c55e" title="Class 97 | Wed 12:30-13:20 | Room 3 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 97</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="127" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="12:00" data-end="13:15" data-timeid="150"
+                      style="--pill:#22c55e" title="Class 127 | Thu 12:00-13:15 | Room 3 | in_person">
+                      <span class="pill-time">12:00</span>
+                      <span class="pill-main">Class 127</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="83" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="12:00" data-end="13:15" data-timeid="150"
+                      style="--pill:#22c55e" title="Class 83 | Thu 12:00-13:15 | Room 7 | in_person">
+                      <span class="pill-time">12:00</span>
+                      <span class="pill-main">Class 83</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="29" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="12:30" data-end="13:20" data-timeid="85"
+                      style="--pill:#22c55e" title="Class 29 | Fri 12:30-13:20 | Room 6 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 29</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="96" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="12:30" data-end="13:20" data-timeid="4"
+                      style="--pill:#22c55e" title="Class 96 | Fri 12:30-13:20 | Room 6 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 96</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="97" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="12:30" data-end="13:20" data-timeid="4"
+                      style="--pill:#22c55e" title="Class 97 | Fri 12:30-13:20 | Room 3 | in_person">
+                      <span class="pill-time">12:30</span>
+                      <span class="pill-main">Class 97</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">13:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="1" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="5"
+                      style="--pill:#22c55e" title="Class 1 | Wed 13:30-14:20 | Room 6 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 1</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="11" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="92"
+                      style="--pill:#22c55e" title="Class 11 | Wed 13:30-14:20 | Room 7 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 11</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="115" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="92"
+                      style="--pill:#22c55e" title="Class 115 | Wed 13:30-14:20 | Room 2 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 115</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="136" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="15:20" data-timeid="119"
+                      style="--pill:#22c55e" title="Class 136 | Wed 13:30-15:20 | Room 2 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 136</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="19" data-room="1" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="15:20" data-timeid="119"
+                      style="--pill:#22c55e" title="Class 19 | Wed 13:30-15:20 | Room 1 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 19</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="77" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="92"
+                      style="--pill:#22c55e" title="Class 77 | Wed 13:30-14:20 | Room 4 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 77</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="91" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="13:30" data-end="14:20" data-timeid="5"
+                      style="--pill:#22c55e" title="Class 91 | Wed 13:30-14:20 | Room 4 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 91</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="110" data-room="2" data-mode="in_person"
+                      data-day="Thu" data-start="13:30" data-end="15:20" data-timeid="118"
+                      style="--pill:#22c55e" title="Class 110 | Thu 13:30-15:20 | Room 2 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 110</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="148" data-room="2" data-mode="in_person"
+                      data-day="Thu" data-start="13:30" data-end="14:20" data-timeid="91"
+                      style="--pill:#22c55e" title="Class 148 | Thu 13:30-14:20 | Room 2 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 148</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="26" data-room="1" data-mode="in_person"
+                      data-day="Thu" data-start="13:30" data-end="15:20" data-timeid="118"
+                      style="--pill:#22c55e" title="Class 26 | Thu 13:30-15:20 | Room 1 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 26</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="54" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="13:30" data-end="14:20" data-timeid="44"
+                      style="--pill:#22c55e" title="Class 54 | Thu 13:30-14:20 | Room 6 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 54</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="81" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="13:30" data-end="14:45" data-timeid="151"
+                      style="--pill:#22c55e" title="Class 81 | Thu 13:30-14:45 | Room 6 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 81</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="84" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="13:30" data-end="14:45" data-timeid="151"
+                      style="--pill:#22c55e" title="Class 84 | Thu 13:30-14:45 | Room 3 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 84</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="1" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="13:30" data-end="14:20" data-timeid="5"
+                      style="--pill:#22c55e" title="Class 1 | Fri 13:30-14:20 | Room 6 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 1</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="149" data-room="2" data-mode="in_person"
+                      data-day="Fri" data-start="13:30" data-end="14:20" data-timeid="90"
+                      style="--pill:#22c55e" title="Class 149 | Fri 13:30-14:20 | Room 2 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 149</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="18" data-room="1" data-mode="in_person"
+                      data-day="Fri" data-start="13:30" data-end="15:20" data-timeid="117"
+                      style="--pill:#22c55e" title="Class 18 | Fri 13:30-15:20 | Room 1 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 18</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="91" data-room="4" data-mode="in_person"
+                      data-day="Fri" data-start="13:30" data-end="14:20" data-timeid="5"
+                      style="--pill:#22c55e" title="Class 91 | Fri 13:30-14:20 | Room 4 | in_person">
+                      <span class="pill-time">13:30</span>
+                      <span class="pill-main">Class 91</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">14:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="128" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="49"
+                      style="--pill:#22c55e" title="Class 128 | Wed 14:30-15:20 | Room 6 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 128</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="72" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="97"
+                      style="--pill:#22c55e" title="Class 72 | Wed 14:30-15:20 | Room 7 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 72</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="78" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="97"
+                      style="--pill:#22c55e" title="Class 78 | Wed 14:30-15:20 | Room 4 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 78</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="88" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="14:30" data-end="15:20" data-timeid="6"
+                      style="--pill:#22c55e" title="Class 88 | Wed 14:30-15:20 | Room 6 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 88</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="126" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="14:30" data-end="15:20" data-timeid="96"
+                      style="--pill:#22c55e" title="Class 126 | Thu 14:30-15:20 | Room 6 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 126</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="16" data-room="4" data-mode="in_person"
+                      data-day="Thu" data-start="14:30" data-end="15:20" data-timeid="96"
+                      style="--pill:#22c55e" title="Class 16 | Thu 14:30-15:20 | Room 4 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 16</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="42" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="14:30" data-end="15:20" data-timeid="96"
+                      style="--pill:#22c55e" title="Class 42 | Thu 14:30-15:20 | Room 3 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 42</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="128" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="14:30" data-end="15:20" data-timeid="49"
+                      style="--pill:#22c55e" title="Class 128 | Fri 14:30-15:20 | Room 6 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 128</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="48" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="14:30" data-end="15:20" data-timeid="95"
+                      style="--pill:#22c55e" title="Class 48 | Fri 14:30-15:20 | Room 3 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 48</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="88" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="14:30" data-end="15:20" data-timeid="6"
+                      style="--pill:#22c55e" title="Class 88 | Fri 14:30-15:20 | Room 6 | in_person">
+                      <span class="pill-time">14:30</span>
+                      <span class="pill-main">Class 88</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">15:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="2" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="15:00" data-end="16:50" data-timeid="16"
+                      style="--pill:#22c55e" title="Class 2 | Wed 15:00-16:50 | Room 6 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 2</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="57" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="15:00" data-end="17:50" data-timeid="146"
+                      style="--pill:#22c55e" title="Class 57 | Wed 15:00-17:50 | Room 6 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 57</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="64" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="15:00" data-end="17:50" data-timeid="146"
+                      style="--pill:#22c55e" title="Class 64 | Wed 15:00-17:50 | Room 4 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 64</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="66" data-room="5" data-mode="in_person"
+                      data-day="Wed" data-start="15:00" data-end="17:50" data-timeid="146"
+                      style="--pill:#22c55e" title="Class 66 | Wed 15:00-17:50 | Room 5 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 66</span>
+                      <span class="pill-room">5</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="100" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="102"
+                      style="--pill:#22c55e" title="Class 100 | Wed 15:30-16:20 | Room 2 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 100</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="113" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="7"
+                      style="--pill:#22c55e" title="Class 113 | Wed 15:30-16:20 | Room 3 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 113</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="121" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="7"
+                      style="--pill:#22c55e" title="Class 121 | Wed 15:30-16:20 | Room 7 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 121</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="38" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="7"
+                      style="--pill:#22c55e" title="Class 38 | Wed 15:30-16:20 | Room 6 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 38</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="70" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="102"
+                      style="--pill:#22c55e" title="Class 70 | Wed 15:30-16:20 | Room 3 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 70</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="71" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="15:30" data-end="16:20" data-timeid="102"
+                      style="--pill:#22c55e" title="Class 71 | Wed 15:30-16:20 | Room 6 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 71</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="140" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="15:00" data-end="16:15" data-timeid="152"
+                      style="--pill:#22c55e" title="Class 140 | Thu 15:00-16:15 | Room 3 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 140</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="2" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="15:00" data-end="16:50" data-timeid="16"
+                      style="--pill:#22c55e" title="Class 2 | Thu 15:00-16:50 | Room 6 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 2</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="65" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="15:00" data-end="17:50" data-timeid="145"
+                      style="--pill:#22c55e" title="Class 65 | Thu 15:00-17:50 | Room 7 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 65</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="25" data-room="1" data-mode="in_person"
+                      data-day="Thu" data-start="15:30" data-end="17:20" data-timeid="121"
+                      style="--pill:#22c55e" title="Class 25 | Thu 15:30-17:20 | Room 1 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 25</span>
+                      <span class="pill-room">1</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="52" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="15:30" data-end="16:20" data-timeid="52"
+                      style="--pill:#22c55e" title="Class 52 | Thu 15:30-16:20 | Room 6 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 52</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="2" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="15:00" data-end="16:50" data-timeid="16"
+                      style="--pill:#22c55e" title="Class 2 | Fri 15:00-16:50 | Room 6 | in_person">
+                      <span class="pill-time">15:00</span>
+                      <span class="pill-main">Class 2</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="113" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="7"
+                      style="--pill:#22c55e" title="Class 113 | Fri 15:30-16:20 | Room 3 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 113</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="12" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="100"
+                      style="--pill:#22c55e" title="Class 12 | Fri 15:30-16:20 | Room 7 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 12</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="121" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="7"
+                      style="--pill:#22c55e" title="Class 121 | Fri 15:30-16:20 | Room 7 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 121</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="135" data-room="2" data-mode="in_person"
+                      data-day="Fri" data-start="15:30" data-end="17:20" data-timeid="120"
+                      style="--pill:#22c55e" title="Class 135 | Fri 15:30-17:20 | Room 2 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 135</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="38" data-room="6" data-mode="in_person"
+                      data-day="Fri" data-start="15:30" data-end="16:20" data-timeid="7"
+                      style="--pill:#22c55e" title="Class 38 | Fri 15:30-16:20 | Room 6 | in_person">
+                      <span class="pill-time">15:30</span>
+                      <span class="pill-main">Class 38</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">16:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="103" data-room="2" data-mode="in_person"
+                      data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="107"
+                      style="--pill:#22c55e" title="Class 103 | Wed 16:30-17:20 | Room 2 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 103</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="129" data-room="6" data-mode="in_person"
+                      data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="55"
+                      style="--pill:#22c55e" title="Class 129 | Wed 16:30-17:20 | Room 6 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 129</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="89" data-room="3" data-mode="in_person"
+                      data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="134"
+                      style="--pill:#22c55e" title="Class 89 | Wed 16:30-17:20 | Room 3 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 89</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="90" data-room="7" data-mode="in_person"
+                      data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="134"
+                      style="--pill:#22c55e" title="Class 90 | Wed 16:30-17:20 | Room 7 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 90</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="92" data-room="4" data-mode="in_person"
+                      data-day="Wed" data-start="16:30" data-end="17:20" data-timeid="134"
+                      style="--pill:#22c55e" title="Class 92 | Wed 16:30-17:20 | Room 4 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 92</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="120" data-room="3" data-mode="in_person"
+                      data-day="Thu" data-start="16:30" data-end="17:45" data-timeid="153"
+                      style="--pill:#22c55e" title="Class 120 | Thu 16:30-17:45 | Room 3 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 120</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="4" data-room="6" data-mode="in_person"
+                      data-day="Thu" data-start="16:30" data-end="17:20" data-timeid="56"
+                      style="--pill:#22c55e" title="Class 4 | Thu 16:30-17:20 | Room 6 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 4</span>
+                      <span class="pill-room">6</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="86" data-room="4" data-mode="in_person"
+                      data-day="Thu" data-start="16:30" data-end="17:45" data-timeid="153"
+                      style="--pill:#22c55e" title="Class 86 | Thu 16:30-17:45 | Room 4 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 86</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="87" data-room="7" data-mode="in_person"
+                      data-day="Thu" data-start="16:30" data-end="17:45" data-timeid="153"
+                      style="--pill:#22c55e" title="Class 87 | Thu 16:30-17:45 | Room 7 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 87</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="99" data-room="2" data-mode="in_person"
+                      data-day="Thu" data-start="16:30" data-end="17:20" data-timeid="106"
+                      style="--pill:#22c55e" title="Class 99 | Thu 16:30-17:20 | Room 2 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 99</span>
+                      <span class="pill-room">2</span>
+                    </button>
+                    </div>
+                
+
+                <div class="grid-cell">
+                    <button class="grid-pill" type="button"
+                      data-class="47" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="105"
+                      style="--pill:#22c55e" title="Class 47 | Fri 16:30-17:20 | Room 7 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 47</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="89" data-room="3" data-mode="in_person"
+                      data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="134"
+                      style="--pill:#22c55e" title="Class 89 | Fri 16:30-17:20 | Room 3 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 89</span>
+                      <span class="pill-room">3</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="90" data-room="7" data-mode="in_person"
+                      data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="134"
+                      style="--pill:#22c55e" title="Class 90 | Fri 16:30-17:20 | Room 7 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 90</span>
+                      <span class="pill-room">7</span>
+                    </button>
+                    
+
+                    <button class="grid-pill" type="button"
+                      data-class="92" data-room="4" data-mode="in_person"
+                      data-day="Fri" data-start="16:30" data-end="17:20" data-timeid="134"
+                      style="--pill:#22c55e" title="Class 92 | Fri 16:30-17:20 | Room 4 | in_person">
+                      <span class="pill-time">16:30</span>
+                      <span class="pill-main">Class 92</span>
+                      <span class="pill-room">4</span>
+                    </button>
+                    </div>
+                
+            </div>
+            
+            <div class="grid-row">
+              <div class="grid-time">17:00</div>
+              
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+
+                <div class="grid-cell"></div>
+                
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="card" id="details">
+      <div class="section"><h3>Details</h3></div>
+      <div class="section" id="detailsBody">
+        <div class="onboard">
+          <div><b>How to read this timetable</b></div>
+          <div class="step"><b>1)</b> Pick a view: <b>Agenda</b> (lists classes per day) or <b>Hourly grid</b> (shows classes by start hour).</div>
+          <div class="step"><b>2)</b> Use <b>Search</b> to find a class id (e.g. <b>114</b>) or a room (e.g. <b>__online__</b>).</div>
+          <div class="step"><b>3)</b> Click a class card/pill to see its exact day/time/room/mode.</div>
+          <div class="step"><b>What solver decided:</b> each class gets one allowed <b>time</b>, one <b>room</b> (or online), and a <b>mode</b>.</div>
+        </div>
+      </div>
+    </aside>
+
+    <div id="eventsContainer" class="hidden"></div>
+  </div>
+
+  <script>
+    const allEvents = Array.from(document.querySelectorAll('.event-card, .grid-pill'));
+
+    // Populate room dropdown
+    const rooms = Array.from(new Set(allEvents.map(e => e.dataset.room))).sort();
+    const roomFilter = document.getElementById('roomFilter');
+    for (const r of rooms) {
+      const opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = r;
+      roomFilter.appendChild(opt);
+    }
+
+    function showDetails(el) {
+      const body = document.getElementById('detailsBody');
+      body.innerHTML = `
+        <div class="kv">
+          <div>Class</div><div><b>${el.dataset.class}</b></div>
+          <div>Day</div><div>${el.dataset.day}</div>
+          <div>Time</div><div>${el.dataset.start} – ${el.dataset.end}</div>
+          <div>Room</div><div>${el.dataset.room}</div>
+          <div>Mode</div><div>${el.dataset.mode}</div>
+          <div>Time ID</div><div>${el.dataset.timeid}</div>
+        </div>
+      `;
+    }
+
+    function applyFilters() {
+      const q = (document.getElementById('search').value || '').trim().toLowerCase();
+      const mode = (document.getElementById('modeFilter').value || '').trim().toLowerCase();
+      const room = (document.getElementById('roomFilter').value || '');
+
+      for (const el of allEvents) {
+        let ok = true;
+        if (q) {
+          ok = ok && (
+            (el.dataset.class || '').toLowerCase().includes(q) ||
+            (el.dataset.room || '').toLowerCase().includes(q)
+          );
+        }
+        if (mode) ok = ok && ((el.dataset.mode || '').toLowerCase() === mode);
+        if (room) ok = ok && ((el.dataset.room || '') === room);
+        el.classList.toggle('hidden', !ok);
+      }
+    }
+
+    document.getElementById('search').addEventListener('input', applyFilters);
+    document.getElementById('modeFilter').addEventListener('change', applyFilters);
+    document.getElementById('roomFilter').addEventListener('change', applyFilters);
+    document.getElementById('clear').addEventListener('click', () => {
+      document.getElementById('search').value = '';
+      document.getElementById('modeFilter').value = '';
+      document.getElementById('roomFilter').value = '';
+      applyFilters();
+    });
+
+    document.getElementById('resetView').addEventListener('click', () => {
+      const body = document.getElementById('detailsBody');
+      body.innerHTML = '<div class="details-empty">Click a class card/pill to see details here.</div>';
+    });
+
+    for (const el of allEvents) {
+      el.addEventListener('click', () => showDetails(el));
+    }
+
+    // View toggle
+    const tabAgenda = document.getElementById('tabAgenda');
+    const tabGrid = document.getElementById('tabGrid');
+    const viewAgenda = document.getElementById('viewAgenda');
+    const viewGrid = document.getElementById('viewGrid');
+
+    function setView(name) {
+      const isAgenda = name === 'agenda';
+      tabAgenda.classList.toggle('active', isAgenda);
+      tabGrid.classList.toggle('active', !isAgenda);
+      viewAgenda.classList.toggle('hidden', !isAgenda);
+      viewGrid.classList.toggle('hidden', isAgenda);
+    }
+
+    tabAgenda.addEventListener('click', () => setView('agenda'));
+    tabGrid.addEventListener('click', () => setView('grid'));
+
+    applyFilters();
+  </script>
+
+</body>
+</html>

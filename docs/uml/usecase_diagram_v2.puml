@@ -1,0 +1,83 @@
+@startuml Use Case Diagram - CORRECTED
+!theme plain
+
+title University Timetabling Solver - Use Case Diagram
+
+left to right direction
+
+actor "User" as User
+actor "Student" as Student
+
+rectangle "University Timetabling System" {
+    
+    package "Data Management" {
+        usecase "Import ITC-2019 XML" as UC_Import
+        usecase "Parse Instance Data" as UC_Parse
+        usecase "Export Solution JSON" as UC_Export
+    }
+    
+    package "Solver Configuration" {
+        usecase "Configure Time Limit" as UC_Time
+        usecase "Configure LNS Iterations" as UC_LNS
+    }
+    
+    package "Constraint Solving" {
+        usecase "Run CP-SAT Solver" as UC_Solve
+        usecase "Apply Room-Time Constraints" as UC_RoomTime
+        usecase "Apply Capacity Constraints" as UC_Capacity
+        usecase "Apply Student Clash Constraints" as UC_Clashes
+        usecase "Apply Mode Constraints" as UC_Mode
+    }
+    
+    package "Optimization" {
+        usecase "Lexicographic Optimization (z1-z5)" as UC_Lex
+        usecase "LNS Local Search" as UC_LNSOpt
+    }
+    
+    package "Solution Management" {
+        usecase "Validate Solution" as UC_Validate
+        usecase "View Timetable" as UC_View
+        usecase "View Student Schedule" as UC_ViewStudent
+    }
+}
+
+' User relationships
+User --> UC_Import
+User --> UC_Time
+User --> UC_LNS
+User --> UC_Solve
+User --> UC_Validate
+User --> UC_Export
+User --> UC_View
+
+' Student relationships
+Student --> UC_ViewStudent
+
+' Include relationships
+UC_Solve ..> UC_RoomTime : <<include>>
+UC_Solve ..> UC_Capacity : <<include>>
+UC_Solve ..> UC_Clashes : <<include>>
+UC_Solve ..> UC_Mode : <<include>>
+UC_Solve ..> UC_Lex : <<include>>
+UC_Solve ..> UC_LNSOpt : <<include>> (when enabled)
+UC_Solve ..> UC_Validate : <<include>>
+
+UC_Import ..> UC_Parse : <<include>>
+
+note right of UC_Lex
+  Multi-objective optimization:
+  1. Maximize elective assignments (z1)
+  2. Minimize mode deviation (z2)
+  3. Minimize student clashes (z3)
+  4. Minimize online penalty (z4)
+  5. Minimize late-evening classes (z5)
+end note
+
+note right of UC_LNSOpt
+  Large Neighborhood Search:
+  Destroy 20% of schedule,
+  re-solve with hints,
+  accept improvements
+end note
+
+@enduml

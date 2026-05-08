@@ -1,0 +1,179 @@
+@startuml Class Diagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Dataclass>> LightBlue
+    BackgroundColor<<Solver>> LightGreen
+    BackgroundColor<<Parser>> LightYellow
+    BackgroundColor<<Runner>> LightCoral
+    BackgroundColor<<Visualizer>> LightPink
+}
+
+title University Timetabling Solver - Class Diagram
+
+package "Configuration & Data" <<Rectangle>> {
+    class SolveConfig <<Dataclass>> {
+        +max_time_seconds: float = 10.0
+        +lns_iterations: int = 5
+        +lns_iteration_time_seconds: float = 1.0
+        +lns_destroy_fraction: float = 0.2
+        +random_seed: int = 0
+    }
+
+    class Itc2019ParseOptions <<Dataclass>> {
+        +include_students: bool = False
+        +n_core: int = 3
+    }
+
+    class Instance {
+        +classes: Dict[str, Dict]
+        +rooms: Dict[str, Dict]
+        +times: List[int]
+        +time_meta: Dict[int, Dict]
+        +students: List[str]
+        +student_requests: Dict[str, List]
+        +class_to_course: Dict[str, str]
+        +conflicts: List[Tuple[str, str]]
+        +class_allowed_times: Dict[str, List[int]]
+        +class_allowed_rooms: Dict[str, List[str]]
+    }
+
+    class SolutionResult {
+        +status: str
+        +schedule: Dict[str, Dict]
+        +students: Dict[str, Dict]
+        +objectives: Dict[str, int]
+        +time_meta: Dict[int, Dict]
+        +class_to_course: Dict[str, str]
+        +baseline_objectives: Dict
+        +lns_objectives: Dict
+        +baseline_runtime: float
+        +lns_runtime: float
+    }
+}
+
+package "Solver Engine (CP-SAT)" <<Rectangle>> {
+    class TimetablingSolver <<Solver>> {
+        -model: CpModel
+        -solver: CpSolver
+        -x_phys: Dict[Tuple, IntVar]
+        -x_onl: Dict[Tuple, IntVar]
+        -y_time: Dict[Tuple, IntVar]
+        -y_phys: Dict[Tuple, IntVar]
+        -y_onl: Dict[Tuple, IntVar]
+        -z_assign: Dict[Tuple, IntVar]
+        +__init__(instance: Instance)
+        +build_model()
+        +add_constraints()
+        +set_objectives()
+        +solve(): SolutionResult
+        +_add_schedule_hints()
+        +_estimate_class_demand(cid): int
+    }
+
+    class LNSOptimizer {
+        +solve_instance_lns(instance, config): SolutionResult
+        -_relax_schedule(model, schedule, fraction)
+        -_apply_fixed_schedule(model, fixed_schedule)
+    }
+
+    class ConstraintBuilder {
+        +add_room_time_conflicts(model)
+        +add_capacity_constraints(model)
+        +add_student_clash_constraints(model)
+        +add_mode_constraints(model)
+    }
+
+    class ObjectiveManager {
+        +set_lexicographic_objectives(model)
+        +evaluate_objectives(solution): Tuple
+    }
+
+    class SolutionValidator {
+        +validate_solution(result): Dict
+        +check_room_time_conflicts()
+        +check_student_clashes()
+        +check_capacity_violations()
+    }
+}
+
+package "Parser" <<Rectangle>> {
+    class ITC2019Parser <<Parser>> {
+        +parse_itc2019_xml_to_instance(xml_path, options): Instance
+        -_build_time_domain(root): Tuple
+        -_collect_rooms(root): Dict
+        -_parse_students(root): List
+        -_int_attr(elem, name): Optional[int]
+        -_time_key(time_elem): Tuple
+    }
+}
+
+package "Runner & Entry Point" <<Rectangle>> {
+    class SolverRunner <<Runner>> {
+        +main()
+        +load_instance(xml_path): Instance
+        +run_solver(instance, config): SolutionResult
+        +_summarize(result): Dict
+        +_print_examiner_output()
+        +save_solution(result, output_path)
+    }
+}
+
+package "Visualization" <<Rectangle>> {
+    class SolutionVisualizer <<Visualizer>> {
+        +generate_charts(result)
+        +plot_room_utilization()
+        +plot_class_occupancy()
+        +plot_objective_comparison()
+    }
+
+    class DashboardRenderer {
+        +render_summary(data): HTML
+        +render_timetable(data): HTML
+        +render_student_view(student_id)
+        +render_course_view(course_id)
+    }
+}
+
+' Relationships
+SolveConfig ..> TimetablingSolver : uses
+Itc2019ParseOptions ..> ITC2019Parser : uses
+
+ITC2019Parser ..> Instance : creates
+TimetablingSolver ..> Instance : uses
+TimetablingSolver ..> SolutionResult : produces
+
+TimetablingSolver "1" *-- "1" LNSOptimizer : contains
+TimetablingSolver "1" *-- "1" ConstraintBuilder : uses
+TimetablingSolver "1" *-- "1" ObjectiveManager : uses
+
+LNSOptimizer ..> SolutionValidator : uses
+SolverRunner ..> ITC2019Parser : uses
+SolverRunner ..> TimetablingSolver : uses
+SolverRunner ..> SolutionResult : processes
+
+SolutionVisualizer ..> SolutionResult : renders
+DashboardRenderer ..> SolutionResult : displays
+
+note right of TimetablingSolver
+  Core CP-SAT solver using
+  Google OR-Tools library
+  with Large Neighborhood
+  Search (LNS) extension
+end note
+
+note right of ITC2019Parser
+  Parses ITC-2019 benchmark
+  XML format (UniTime)
+end note
+
+note bottom of SolutionResult
+  Multi-objective optimization:
+  z1: Maximize elective assignments
+  z2: Minimize mode deviation
+  z3: Minimize student clashes
+  z4: Minimize online penalty
+  z5: Minimize late-evening classes
+end note
+
+@enduml

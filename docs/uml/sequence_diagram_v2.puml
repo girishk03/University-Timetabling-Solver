@@ -1,0 +1,104 @@
+@startuml Sequence Diagram - CORRECTED
+!theme plain
+
+title University Timetabling Solver - Sequence Diagram (Actual Code Flow)
+
+actor User
+participant "run_solver.py" as Runner <<Entry Point>>
+participant "itc2019_parser.py" as Parser <<Parser Module>>
+participant "SolveConfig" as Config <<Dataclass>>
+participant "solver_cp_sat.py" as Solver <<Solver Module>>
+participant "CpModel" as Model <<OR-Tools>>
+participant "CpSolver" as CPSolver <<OR-Tools>>
+participant "full_solution.json" as JSON <<Output File>>
+
+User -> Runner: Execute run_solver.py
+activate Runner
+
+Runner -> Parser: parse_itc2019_xml_to_instance(xml_path, options)
+activate Parser
+Parser --> Runner: return Instance (dict with classes, rooms, students)
+deactivate Parser
+
+Runner -> Config: Create SolveConfig(max_time_seconds=10.0, lns_iterations=5, ...)
+Config --> Runner: return config dataclass
+
+Runner -> Solver: solve_instance(instance, config)
+activate Solver
+
+Solver -> Solver: _estimate_class_demand(data)
+Solver -> Model: Create CpModel()
+Model --> Solver: model object
+
+Solver -> Solver: Create decision variables
+note right
+  Variables created:
+  - x_phys (physical room assignment)
+  - x_onl (online assignment)
+  - y_time, y_phys, y_onl (class-time booleans)
+  - n, mvar, a (student assignment vars)
+  - alpha_inp, alpha_onl, tau (attendance vars)
+end note
+
+Solver -> Solver: Add constraints (in-line code)
+note right
+  Constraints added directly:
+  - Room-time conflict constraints
+  - Capacity constraints
+  - Student clash soft constraints
+  - Mode compatibility constraints
+end note
+
+Solver -> Solver: Apply decision strategy
+Solver -> Solver: _add_schedule_hints(model, ...)
+
+Solver -> CPSolver: Create CpSolver()
+CPSolver --> Solver: solver object
+
+Solver -> CPSolver: solver.solve(model) [lexicographic: z1 max]
+activate CPSolver
+CPSolver --> Solver: status, z1_value
+
+Solver -> CPSolver: solver.solve(model) [z2 min]
+CPSolver --> Solver: status, z2_value
+
+Solver -> CPSolver: solver.solve(model) [z3 min]
+CPSolver --> Solver: status, z3_value
+
+Solver -> CPSolver: solver.solve(model) [z4 min]
+CPSolver --> Solver: status, z4_value
+
+Solver -> CPSolver: solver.solve(model) [z5 min]
+CPSolver --> Solver: status, z5_value
+deactivate CPSolver
+
+alt LNS Enabled (config.lns_iterations > 0)
+    loop For each iteration
+        Solver -> Solver: solve_instance_lns() [destroy 20%, re-solve]
+        Solver -> CPSolver: Re-solve with hints
+        CPSolver --> Solver: improved solution (if any)
+    end
+end
+
+Solver -> Solver: Extract schedule dict from solver values
+Solver -> Solver: Extract student_out dict
+Solver --> Runner: return SolutionResult dict
+
+deactivate Solver
+
+Runner -> Solver: validate_solution(instance, result)
+activate Solver
+Solver -> Solver: Check room-time conflicts
+Solver -> Solver: Check student time clashes
+Solver -> Solver: Check capacity violations
+Solver --> Runner: validation report dict
+
+deactivate Solver
+
+Runner -> Runner: _print_examiner_output()
+Runner -> JSON: Save solution JSON
+Runner --> User: Display summary
+
+deactivate Runner
+
+@enduml

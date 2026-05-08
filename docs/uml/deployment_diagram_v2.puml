@@ -1,0 +1,68 @@
+@startuml Deployment Diagram - CORRECTED
+!theme plain
+
+title University Timetabling Solver - Deployment Diagram (Simplified)
+
+node "Developer Machine" as DevMachine {
+    
+    component "Python 3.10+" as Python <<Runtime>>
+    
+    package "Python Packages" {
+        artifact "ortools" <<Package>>
+        artifact "numpy" <<Package>>
+    }
+    
+    package "Solver Application" {
+        artifact "run_solver.py"
+        artifact "solver_cp_sat.py"
+        artifact "itc2019_parser.py"
+    }
+    
+    database "Input XML" {
+        artifact "wbg-fal10.xml"
+    }
+    
+    database "Output JSON" {
+        artifact "full_solution.json"
+        artifact "student_names.json"
+        artifact "course_names.json"
+    }
+}
+
+node "Web Browser" as Browser {
+    component "Dashboard UI" {
+        artifact "index.html"
+        artifact "timetabling-dashboard.html"
+    }
+}
+
+cloud "External Resources" {
+    artifact "PyPI Repository"
+    artifact "ITC-2019 Benchmarks"
+}
+
+' Connections
+DevMachine --> Browser : HTTP localhost:8000
+Python --> "Solver Application" : executes
+"Solver Application" --> "Input XML" : reads
+"Solver Application" --> "Output JSON" : writes
+Browser --> "Output JSON" : fetch via HTTP
+"Python Packages" --> "PyPI Repository" : installed from
+
+note right of "Solver Application"
+  CP-SAT solver using
+  Google OR-Tools library
+  with LNS heuristic
+end note
+
+note right of Browser
+  Static HTML/JS dashboard
+  renders solution data
+end note
+
+note right of "Python Packages"
+  ortools: Google's optimization
+  library with C++ backend
+end note
+
+@enduml

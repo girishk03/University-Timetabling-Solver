@@ -1,0 +1,100 @@
+@startuml Object Diagram - CORRECTED
+!theme plain
+skinparam object {
+    BackgroundColor LightYellow
+    BorderColor Black
+}
+
+title University Timetabling Solver - Object Diagram (Runtime Snapshot)
+
+object "config: SolveConfig" as Config {
+    max_time_seconds = 10.0
+    lns_iterations = 5
+    lns_iteration_time_seconds = 1.0
+    lns_destroy_fraction = 0.2
+    random_seed = 0
+}
+
+object "instance: Instance" as Instance {
+    classes = List of class dicts
+    rooms = Dict of room capacities
+    times = List of time IDs
+    students = List of student dicts
+    modules = List of module dicts
+    conflicts = List of tuples
+}
+
+object "result: SolutionResult" as Result {
+    status = "optimal"
+    baseline_runtime = 8.5s
+    lns_runtime = 12.3s
+    objectives = Dict z1-z5
+}
+
+object "schedule[c1]: ClassSchedule" as Schedule1 {
+    room = "R1"
+    time = 0
+    mode = "hybrid"
+}
+
+object "schedule[c2]: ClassSchedule" as Schedule2 {
+    room = "R2"
+    time = 1
+    mode = "in_person"
+}
+
+object "student[s1]: StudentRecord" as Student1 {
+    taken_modules = List of module IDs
+    attended = Dict of class attendance
+}
+
+object "student[s2]: StudentRecord" as Student2 {
+    taken_modules = List of module IDs
+    attended = Dict of class attendance
+}
+
+' Relationships
+Config --> Instance : configures processing of
+Instance --> Result : transformed by solve_instance() into
+Result --> Schedule1 : contains
+Result --> Schedule2 : contains
+Result --> Student1 : contains
+Result --> Student2 : contains
+
+Schedule1 --> Student1 : attended by (in-person)
+Schedule1 --> Student2 : attended by (online)
+Schedule2 --> Student2 : attended by (in-person)
+
+note right of Config
+  Configuration dataclass passed
+  to solve_instance() function
+end note
+
+note right of Instance
+  Data structure created by
+  parse_itc2019_xml_to_instance()
+end note
+
+note right of Result
+  Produced by solve_instance()
+  or solve_instance_lns() functions
+  objectives.z1_electives = 245
+  objectives.z2_mode = 12
+  objectives.z3_clashes = 3
+  objectives.z4_online = 45
+  objectives.z5_late = 8
+end note
+
+note right of Schedule1
+  Example: Class c1 scheduled
+  in Room R1 at Time 0
+  with hybrid mode
+end note
+
+note right of Student1
+  Example: Student s1
+  attended modules m1, m2
+  attended class c1 in-person
+end note
+
+@enduml

@@ -1,0 +1,137 @@
+@startuml Class Diagram - CORRECTED
+!theme plain
+skinparam classAttributeIconSize 0
+
+title University Timetabling Solver - Class Diagram (Academically Safe)
+
+package "Configuration & Data Structures" <<Rectangle>> {
+    class SolveConfig <<Dataclass>> {
+        +max_time_seconds: float
+        +lns_iterations: int
+        +lns_iteration_time_seconds: float
+        +lns_destroy_fraction: float
+        +random_seed: int
+    }
+
+    class Instance <<Data>> {
+        +classes: List[Dict]
+        +rooms: Dict[str, Dict]
+        +times: List[int]
+        +time_meta: Dict[int, Dict]
+        +students: List[Dict]
+        +modules: List[Dict]
+        +conflicts: List[Tuple]
+    }
+
+    class SolutionResult <<Data>> {
+        +status: str
+        +schedule: Dict[str, Dict]
+        +students: Dict[str, Dict]
+        +objectives: Dict[str, int]
+        +baseline_objectives: Dict
+        +lns_objectives: Dict
+        +baseline_runtime: float
+        +lns_runtime: float
+    }
+}
+
+package "Core Solver Module (solver_cp_sat.py)" <<Rectangle>> {
+    class TimetablingSolver <<Functions>> {
+        +solve_instance(data, cfg): SolutionResult
+        +solve_instance_lns(data, cfg): SolutionResult
+        +validate_solution(data, result): Dict
+        -_add_schedule_hints(...)
+        -_estimate_class_demand(data): Dict
+        -_apply_fixed_schedule(...)
+        -_objective_tuple(obj): Tuple
+        -_better(a, b): bool
+        -_cfg_without_lns(cfg, ...): SolveConfig
+    }
+}
+
+package "Parser Module (itc2019_parser.py)" <<Rectangle>> {
+    class ITC2019Parser <<Functions>> {
+        +parse_itc2019_xml_to_instance(xml_path, options): Instance
+        -_build_time_domain(root): Tuple
+        -_collect_rooms(root): Dict
+        -_parse_students(root): List
+        -_time_key(time_elem): Tuple
+        -_int_attr(elem, name): Optional[int]
+    }
+}
+
+package "Entry Point (run_solver.py)" <<Rectangle>> {
+    class SolverRunner <<Functions>> {
+        +main()
+        +_summarize(result): Dict
+        +_print_examiner_output(...)
+        +_build_class_to_course(data): Dict
+        +_minutes_to_hhmm(m): str
+        +_decode_days(days): str
+    }
+}
+
+package "External Library" <<Rectangle>> {
+    class CpModel <<OR-Tools>> {
+        +new_bool_var(name): IntVar
+        +add(expression)
+        +maximize(expr)
+        +minimize(expr)
+    }
+
+    class CpSolver <<OR-Tools>> {
+        +parameters: SolverParameters
+        +solve(model): CpSolverStatus
+        +value(var): int
+        +objective_value: int
+    }
+}
+
+' Relationships (dependency only, no fake composition)
+SolveConfig ..> TimetablingSolver : used by
+ITC2019Parser ..> Instance : creates
+TimetablingSolver ..> Instance : uses
+TimetablingSolver ..> SolutionResult : produces
+TimetablingSolver ..> SolveConfig : reads
+
+SolverRunner ..> ITC2019Parser : calls
+SolverRunner ..> TimetablingSolver : calls
+SolverRunner ..> SolutionResult : processes
+
+TimetablingSolver ..> CpModel : creates
+TimetablingSolver ..> CpSolver : uses
+
+note right of TimetablingSolver
+  Core module implemented as
+  functions (not classes).
+  ~800 lines implementing:
+  - CP-SAT model building
+  - Lexicographic optimization
+  - LNS heuristic wrapper
+  - Solution validation
+end note
+
+note right of ITC2019Parser
+  Parses ITC-2019 benchmark XML
+  format (UniTime instances)
+end note
+
+note bottom of SolverRunner
+  CLI entry point that
+  orchestrates workflow:
+  1. Parse XML
+  2. Run CP-SAT solver
+  3. Validate solution
+  4. Export JSON output
+end note
+
+note bottom of SolutionResult
+  5-objective lexicographic optimization:
+  z1: Max elective assignments
+  z2: Min mode deviation
+  z3: Min student clashes
+  z4: Min online penalty
+  z5: Min late-evening classes
+end note
+
+@enduml

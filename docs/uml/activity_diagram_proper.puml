@@ -1,0 +1,52 @@
+@startuml Activity Diagram - PROPER
+!theme plain
+skinparam backgroundColor transparent
+skinparam ActivityBackgroundColor LightYellow
+skinparam ActivityBorderColor Black
+
+title University Timetabling Solver - Activity Diagram
+
+|User|
+start
+:Run solver with XML file;
+
+|Parser Module|
+:Parse ITC-2019 XML;
+:Extract classes, rooms, times, students;
+:Create Instance data structure;
+
+|Solver Module|
+:Create SolveConfig;
+:Build CP-SAT Model;
+note right
+  Boolean variables:
+  - y_time, y_phys, y_onl
+  - x_phys, x_onl
+  - n, a, alpha_inp, alpha_onl
+  Constraints: one-time, no-conflicts, capacity
+end note
+
+|OR-Tools Engine|
+:Solve Stage 1 (Max z1 - electives);
+:Solve Stage 2 (Min z2 - mode);
+:Solve Stage 3 (Min z3 - clashes);
+:Solve Stage 4 (Min z4 - online);
+:Solve Stage 5 (Min z5 - late);
+
+|Solver Module|
+if (LNS enabled?) then (yes)
+  :LNS: Destroy 20% schedule;
+  :Fix remaining 80%;
+  :Re-solve with hints;
+  :Accept if improved;
+endif
+
+:Extract final solution;
+:Validate (conflicts, clashes, capacity);
+:Export to JSON;
+
+|User|
+:View results in dashboard;
+stop
+
+@enduml

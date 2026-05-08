@@ -1,0 +1,35 @@
+[
+  {
+    "scenario": "u10",
+    "updates": 10,
+    "accept_pct": 90.0,
+    "warning_pct": 10.0,
+    "reject_pct": 0.0,
+    "defer_pct": 0.0,
+    "effective_sla_pct": 95.0,
+    "service_rate_pct": 100.0,
+    "avg_changed_classes": 2.5
+  },
+  {
+    "scenario": "u30",
+    "updates": 30,
+    "accept_pct": 96.67,
+    "warning_pct": 3.33,
+    "reject_pct": 0.0,
+    "defer_pct": 0.0,
+    "effective_sla_pct": 98.33,
+    "service_rate_pct": 100.0,
+    "avg_changed_classes": 2.4
+  },
+  {
+    "scenario": "u50",
+    "updates": 50,
+    "accept_pct": 98.0,
+    "warning_pct": 2.0,
+    "reject_pct": 0.0,
+    "defer_pct": 0.0,
+    "effective_sla_pct": 99.0,
+    "service_rate_pct": 100.0,
+    "avg_changed_classes": 2.46
+  }
+]

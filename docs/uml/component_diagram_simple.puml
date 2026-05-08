@@ -1,0 +1,51 @@
+@startuml Component Diagram - SIMPLE
+!theme plain
+skinparam backgroundColor transparent
+
+title University Timetabling Solver - Components
+
+package "Python Application" {
+    [run_solver.py] as Runner
+    [solver_cp_sat.py] as Solver
+    [itc2019_parser.py] as Parser
+}
+
+package "External Library" {
+    [Google OR-Tools] as ORTools
+}
+
+package "Web Dashboard" {
+    [index.html] as Dashboard
+}
+
+package "Data Files" {
+    [ITC-2019 XML] as XMLInput
+    [full_solution.json] as JSONOutput
+}
+
+' Relationships
+Runner --> Parser : calls
+Runner --> Solver : calls
+Solver --> ORTools : uses
+Parser --> XMLInput : reads
+Runner --> JSONOutput : writes
+Dashboard --> JSONOutput : loads
+
+note right of Solver
+  CP-SAT solver with LNS
+  Functions: solve_instance,
+  solve_instance_lns,
+  validate_solution
+end note
+
+note right of ORTools
+  Constraint Programming
+  SAT solver backend
+end note
+
+note right of Dashboard
+  Static HTML/JS
+  Visualizes solution
+end note
+
+@enduml

@@ -1,0 +1,125 @@
+@startuml Use Case Diagram
+!theme plain
+
+title University Timetabling Solver - Use Case Diagram
+
+left to right direction
+
+actor "University Administrator" as Admin
+actor "Student" as Student
+actor "Course Coordinator" as Coordinator
+actor "OR-Tools CP-SAT Engine" as ORTools <<System>>
+
+rectangle "University Timetabling System" {
+    
+    package "Data Management" {
+        usecase "Import ITC-2019 XML Dataset" as UC_Import
+        usecase "Parse Course Data" as UC_ParseCourse
+        usecase "Parse Room Information" as UC_ParseRoom
+        usecase "Parse Student Requests" as UC_ParseStudent
+        usecase "Export Solution to JSON" as UC_Export
+    }
+    
+    package "Solver Configuration" {
+        usecase "Configure Solver Parameters" as UC_Config
+        usecase "Set Time Limits" as UC_TimeLimit
+        usecase "Enable/Disable LNS" as UC_LNS
+        usecase "Set Random Seed" as UC_Seed
+    }
+    
+    package "Constraint Management" {
+        usecase "Define Room-Time Conflicts" as UC_RoomTime
+        usecase "Set Capacity Constraints" as UC_Capacity
+        usecase "Prevent Student Clashes" as UC_Clashes
+        usecase "Configure Mode Constraints" as UC_Mode
+    }
+    
+    package "Optimization" {
+        usecase "Run CP-SAT Solver" as UC_Solve
+        usecase "Execute LNS Optimization" as UC_LNSOpt
+        usecase "Optimize Elective Assignments" as UC_Electives
+        usecase "Minimize Mode Deviation" as UC_ModeDev
+        usecase "Minimize Student Clashes" as UC_MinClash
+        usecase "Minimize Online Penalty" as UC_Online
+        usecase "Minimize Late-Evening Classes" as UC_Late
+    }
+    
+    package "Solution Management" {
+        usecase "View Timetable" as UC_ViewTimetable
+        usecase "View Student Schedule" as UC_ViewStudent
+        usecase "View Course Details" as UC_ViewCourse
+        usecase "Validate Solution" as UC_Validate
+        usecase "Generate Reports" as UC_Report
+        usecase "Compare Baseline vs LNS" as UC_Compare
+    }
+    
+    package "Visualization" {
+        usecase "View Room Utilization Chart" as UC_RoomChart
+        usecase "View Class Occupancy" as UC_Occupancy
+        usecase "View Objectives Dashboard" as UC_Objectives
+        usecase "Filter Classes" as UC_Filter
+        usecase "Search Students/Courses" as UC_Search
+    }
+}
+
+' Admin relationships
+Admin --> UC_Import
+Admin --> UC_Config
+Admin --> UC_Solve
+Admin --> UC_Validate
+Admin --> UC_Export
+Admin --> UC_ViewTimetable
+Admin --> UC_Report
+Admin --> UC_Compare
+
+' Student relationships
+Student --> UC_ViewStudent
+Student --> UC_ViewTimetable
+
+' Coordinator relationships
+Coordinator --> UC_ViewCourse
+Coordinator --> UC_ViewStudent
+
+' OR-Tools system relationship
+UC_Solve --> ORTools : invokes
+UC_LNSOpt --> ORTools : invokes
+
+' Include relationships
+UC_Solve ..> UC_LNSOpt : <<include>> (when enabled)
+UC_Solve ..> UC_Validate : <<include>>
+UC_Import ..> UC_ParseCourse : <<include>>
+UC_Import ..> UC_ParseRoom : <<include>>
+UC_Solve ..> UC_Electives : <<include>>
+UC_Solve ..> UC_ModeDev : <<include>>
+UC_Solve ..> UC_MinClash : <<include>>
+
+' Extend relationships
+UC_Config ..> UC_TimeLimit : <<extend>>
+UC_Config ..> UC_LNS : <<extend>>
+UC_Config ..> UC_Seed : <<extend>>
+
+UC_ViewTimetable ..> UC_Filter : <<extend>>
+UC_ViewTimetable ..> UC_Search : <<extend>>
+
+' Constraint use cases
+UC_Solve ..> UC_RoomTime : <<include>>
+UC_Solve ..> UC_Capacity : <<include>>
+UC_Solve ..> UC_Clashes : <<include>>
+UC_Solve ..> UC_Mode : <<include>>
+
+' Visualization relationships
+UC_ViewTimetable ..> UC_RoomChart : <<extend>>
+UC_ViewTimetable ..> UC_Occupancy : <<extend>>
+UC_ViewTimetable ..> UC_Objectives : <<extend>>
+
+note right of UC_Solve
+  Multi-objective optimization
+  with lexicographic priorities
+end note
+
+note right of UC_LNSOpt
+  Large Neighborhood Search
+  for local improvement
+end note
+
+@enduml

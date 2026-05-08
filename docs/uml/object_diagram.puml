@@ -1,0 +1,139 @@
+@startuml Object Diagram
+!theme plain
+skinparam object {
+    BackgroundColor LightYellow
+    BorderColor Black
+}
+
+title University Timetabling Solver - Object Diagram (Runtime Snapshot)
+
+object "config: SolveConfig" as Config {
+    max_time_seconds = 10.0
+    lns_iterations = 5
+    lns_iteration_time_seconds = 1.0
+    lns_destroy_fraction = 0.2
+    random_seed = 0
+}
+
+object "instance: Instance" as Instance {
+    classes = {c1, c2, c3, ..., c100}
+    rooms = {R1, R2, R3, ..., R50}
+    times = [0, 1, 2, ..., 40]
+    students = [s1, s2, ..., s500]
+}
+
+object "solver: TimetablingSolver" as Solver {
+    model = CpModel
+    solver = CpSolver
+    x_phys = {(c1,R1,0): var1, ...}
+    x_onl = {(c1,0): var2, ...}
+    y_time = {(c1,0): var3, ...}
+}
+
+object "result: SolutionResult" as Result {
+    status = "optimal"
+    baseline_runtime = 8.5s
+    lns_runtime = 12.3s
+    objectives = {
+        z1_electives = 245
+        z2_mode = 12
+        z3_clashes = 3
+        z4_online = 45
+        z5_late = 8
+    }
+}
+
+object "schedule[c1]: ClassSchedule" as Schedule1 {
+    class_id = "c1"
+    time = 0
+    room = "R1"
+    mode = "hybrid"
+}
+
+object "schedule[c2]: ClassSchedule" as Schedule2 {
+    class_id = "c2"
+    time = 1
+    room = "R2"
+    mode = "in_person"
+}
+
+object "schedule[c3]: ClassSchedule" as Schedule3 {
+    class_id = "c3"
+    time = 2
+    room = "__online__"
+    mode = "online"
+}
+
+object "student[s1]: StudentAttendance" as Student1 {
+    student_id = "s1"
+    attended = {c1: {in_person:1, online:0}}
+    clashes = []
+}
+
+object "student[s2]: StudentAttendance" as Student2 {
+    student_id = "s2"
+    attended = {c1: {in_person:0, online:1}, c2: {in_person:1, online:0}}
+    clashes = ["c1-c2"]
+}
+
+object "time_meta[0]: TimeSlot" as Time0 {
+    days = "1000000"
+    start_min = 480
+    length_min = 60
+    weeks = "1111111"
+}
+
+object "time_meta[1]: TimeSlot" as Time1 {
+    days = "1000000"
+    start_min = 600
+    length_min = 60
+    weeks = "1111111"
+}
+
+object "room[R1]: Room" as Room1 {
+    room_id = "R1"
+    cap = 100
+    hybrid = True
+}
+
+object "room[__online__]: OnlineRoom" as OnlineRoom {
+    room_id = "__online__"
+    cap = 999999999
+    hybrid = True
+}
+
+' Relationships
+Config --> Solver : configured with
+Instance --> Solver : input to
+Solver --> Result : produces
+
+Result --> Schedule1 : contains
+Result --> Schedule2 : contains
+Result --> Schedule3 : contains
+Result --> Student1 : contains
+Result --> Student2 : contains
+Result --> Time0 : references via time_meta
+Result --> Time1 : references via time_meta
+Result --> Room1 : references
+Result --> OnlineRoom : references
+
+Schedule1 --> Room1 : assigned to
+Schedule2 --> Room1 : assigned to
+Schedule3 --> OnlineRoom : assigned to
+Student1 --> Schedule1 : attends
+Student2 --> Schedule1 : attends (online)
+Student2 --> Schedule2 : attends (in-person)
+
+note right of Solver
+  CP-SAT solver state
+  with decision variables
+  and constraint model
+end note
+
+note bottom of Result
+  Optimal solution found
+  with 5-objective
+  lexicographic optimization
+end note
+
+@enduml

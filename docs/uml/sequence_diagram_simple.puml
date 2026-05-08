@@ -1,0 +1,52 @@
+@startuml Sequence Diagram - SIMPLE
+!theme plain
+skinparam backgroundColor transparent
+
+title University Timetabling Solver - Sequence Diagram
+
+actor User
+participant "run_solver.py" as Runner
+participant "itc2019_parser.py" as Parser
+participant "solver_cp_sat.py" as Solver
+participant "OR-Tools CP-SAT" as ORTools
+database "full_solution.json" as Output
+
+User -> Runner: Execute solver
+activate Runner
+
+Runner -> Parser: parse_itc2019_xml_to_instance()
+activate Parser
+Parser --> Runner: Instance (rooms, classes, times, students)
+deactivate Parser
+
+Runner -> Solver: solve_instance(instance, config)
+activate Solver
+
+Solver -> Solver: Build CP-SAT model
+note right
+  Create boolean variables
+  Add hard constraints
+end note
+
+Solver -> ORTools: Solve 5 objectives (z1→z5)
+activate ORTools
+ORTools --> Solver: Optimal values for z1-z5
+deactivate ORTools
+
+alt LNS enabled
+    Solver -> ORTools: LNS iterations (destroy 20%, re-solve)
+    ORTools --> Solver: Improved solution
+end
+
+Solver -> Solver: Extract schedule & students
+Solver --> Runner: SolutionResult
+
+Runner -> Solver: validate_solution()
+Solver --> Runner: Validation report
+deactivate Solver
+
+Runner -> Output: Save JSON
+Runner --> User: Display summary
+deactivate Runner
+
+@enduml

@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>University Timetabling Solver – Output</title>
+  <style>
+    /* ======== CSS VARIABLES & DESIGN TOKENS ======== */
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --accent: #2563eb;
+      --accent-light: #3b82f6;
+      --success: #059669;
+      --success-bg: #ecfdf5;
+      --success-border: #6ee7b7;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --warning-border: #fcd34d;
+      --error: #dc2626;
+      --error-bg: #fef2f2;
+      --error-border: #fca5a5;
+      --late-bg: #fef3c7;
+      --late-border: #fbbf24;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    /* ======== RESET & BASE STYLES ======== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ======== HEADER ======== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(248, 250, 252, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      margin: 2px 0 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ======== TOOLBAR ======== */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      background: var(--bg);
+      border-color: var(--border-strong);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-light);
+      border-color: var(--accent-light);
+    }
+
+    .btn-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+
+    /* ======== SEARCH & FILTERS ======== */
+    .search-input {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--card);
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      width: 200px;
+      transition: all 0.15s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .select {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+      padding: 8px 32px 8px 12px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.loading {
+      background: var(--bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .status-badge.success {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    .status-badge.error {
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1px solid var(--error-border);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .filter-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .btn-clear {
+      color: var(--error);
+      border-color: var(--error-border);
+      background: var(--error-bg);
+    }
+
+    .btn-clear:hover {
+      background: #fee2e2;
+    }
+
+    /* ======== MAIN CONTENT ======== */
+    main {
+      padding: 24px 0 48px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: 380px 1fr;
+        align-items: start;
+      }
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ======== CARDS ======== */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 4px 0 0 0;
+    }
+
+    /* ======== SUMMARY SECTION ======== */
+    .summary-section {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .summary-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .status-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .status-icon.optimal {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+    }
+
+    .status-icon.feasible {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+    }
+
+    .status-icon.infeasible {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+    }
+
+    .status-text {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--mono);
+      text-transform: capitalize;
+    }
+
+    .counts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .count-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: center;
+    }
+
+    .count-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: var(--mono);
+      line-height: 1;
+    }
+
+    .count-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .mode-breakdown {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .mode-item {
+      flex: 1;
+      padding: 8px;
+      border-radius: var(--radius);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .mode-item.in_person {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success);
+    }
+
+    .mode-item.hybrid {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning);
+    }
+
+    .mode-item.online {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+
+    .mode-count {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: var(--mono);
+    }
+
+    /* ======== OBJECTIVES ======== */
+    .objective-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .objective-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .objective-item:first-child {
+      padding-top: 0;
+    }
+
+    .objective-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .objective-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .objective-code {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .objective-value {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--mono);
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .objective-value.good {
+      color: var(--success);
+    }
+
+    .objective-value.warning {
+      color: var(--warning);
+    }
+
+    .objective-value.bad {
+      color: var(--error);
+    }
+
+    .objective-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .objective-indicator.good {
+      background: var(--success);
+    }
+
+    .objective-indicator.warning {
+      background: var(--warning);
+    }
+
+    .objective-indicator.bad {
+      background: var(--error);
+    }
+
+    /* ======== ROOM STATS ======== */
+    .room-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .room-stat-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .room-stat-label {
+      width: 60px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--mono);
+      color: var(--text-secondary);
+    }
+
+    .room-stat-bar {
+      flex: 1;
+      height: 20px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .room-stat-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .room-stat-count {
+      width: 35px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--mono);
+      color: var(--text);
+    }
+
+    /* ======== OCCUPANCY ======== */
+    .occupancy-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .occupancy-label {
+      width: 70px;
+      font-family: var(--mono);
+      font-weight: 500;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .occupancy-bar-wrap {
+      flex: 1;
+      height: 18px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .occupancy-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-light));
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .occupancy-count {
+      width: 30px;
+      text-align: right;
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--text);
+    }
+
+    /* ======== TABLE ======== */
+    .table-card {
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .table-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .result-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .result-count strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--card);
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 2px solid var(--border);
+      text-align: center;
+      padding: 12px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    thead th:nth-child(2) {
+      text-align: left;
+    }
+
+    tbody td {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 10px;
+      vertical-align: middle;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    tbody td:nth-child(2) {
+      text-align: left;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    tbody tr:hover {
+      background: #f1f5f9;
+    }
+
+    tbody tr.late-class {
+      background: var(--late-bg) !important;
+    }
+
+    tbody tr.late-class:hover {
+      background: #fde68a !important;
+    }
+
+    .late-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--warning);
+      font-size: 11px;
+      margin-left: 4px;
+    }
+
+    .late-indicator svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .cell-mono {
+      font-family: var(--mono);
+      font-weight: 500;
+    }
+
+    /* ======== MODE PILLS ======== */
+    .pill {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .pill[data-mode="in_person"] {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success);
+    }
+
+    .pill[data-mode="hybrid"] {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning);
+    }
+
+    .pill[data-mode="online"] {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+
+    /* ======== LINKS ======== */
+    .link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .link:hover {
+      color: var(--accent-light);
+      text-decoration: underline;
+    }
+
+    /* ======== EMPTY & ERROR STATES ======== */
+    .state-message {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+    }
+
+    .state-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      opacity: 0.5;
+    }
+
+    .state-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .state-text {
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .error-message {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin: 16px 0;
+      color: var(--error);
+      font-size: 13px;
+    }
+
+    .error-message strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ======== UPLOAD ZONE ======== */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    .upload-zone-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      color: var(--muted);
+    }
+
+    .upload-zone-text {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .upload-zone-hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: var(--radius);
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .file-info-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .file-info-size {
+      color: var(--muted);
+    }
+
+    /* ======== LOADING SPINNER ======== */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ======== HINT TEXT ======== */
+    .hint {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 16px;
+    }
+
+    .hint strong {
+      color: var(--text);
+    }
+
+    /* ======== MODAL ======== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      width: min(900px, 96vw);
+      max-height: 85vh;
+      overflow: auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 10;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .modal-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .mini-table th {
+      text-align: left;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mini-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      font-family: var(--mono);
+    }
+
+    .mini-table tr:hover {
+      background: var(--bg);
+    }
+
+    .names-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--bg);
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .names-search {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .names-list {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 260px;
+      background: #fff;
+    }
+
+    .name-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .name-item:last-child {
+      border-bottom: none;
+    }
+
+    .name-left {
+      min-width: 0;
+    }
+
+    .name-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .name-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .name-id {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ======== FOOTER ======== */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ======== RESPONSIVE ======== */
+    @media (max-width: 768px) {
+      .container {
+        padding: 12px 16px;
+      }
+
+      .toolbar {
+        gap: 6px;
+      }
+
+      .search-input {
+        width: 100%;
+      }
+
+      .toolbar-divider {
+        display: none;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .counts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      thead th, tbody td {
+        padding: 8px 6px;
+      }
+    }
+
+    /* ======== HIDDEN UTILITY ======== */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="brand">
+          <div class="brand-icon">TS</div>
+          <div>
+            <h1>University Timetabling Solver</h1>
+            <p class="subtitle">Solution Output Viewer</p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-group">
+            <button id="reloadBtn" class="btn primary" title="Auto-load full_solution.json">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              Reload JSON
+            </button>
+            <label class="btn">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Choose File
+              <input type="file" id="filePicker" accept=".json" style="display: none" />
+            </label>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-group">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search classes, courses, rooms..." />
+            <select id="roomFilter" class="select">
+              <option value="">All rooms</option>
+            </select>
+            <select id="modeFilter" class="select">
+              <option value="">All modes</option>
+              <option value="in_person">In-person</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="online">Online</option>
+            </select>
+            <button id="clearFilters" class="btn btn-clear hidden">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Clear
+            </button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-group">
+            <button id="downloadBtn" class="btn" disabled>
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </button>
+            <span id="statusBadge" class="status-badge loading">
+              <span class="status-dot"></span>
+              Waiting
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="grid">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <!-- Summary Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Solution Summary</h2>
+                <p class="card-subtitle">Solver objectives and quality metrics</p>
+              </div>
+            </div>
+            <div id="summary">
+              <div class="state-message">
+                <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 17H5a2 2 0 00-2 2 2 2 0 002 2h2a2 2 0 002-2zm12-2h-4a2 2 0 00-2 2 2 2 0 002 2h2a2 2 0 002-2zM5 11V9a2 2 0 012-2h2a2 2 0 002 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2zm12-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zM3 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                <div class="state-title">No Data Loaded</div>
+                <div class="state-text">Load a full_solution.json file to view summary metrics.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Stats Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Room Utilization</h2>
+                <p class="card-subtitle">Classes per room</p>
+              </div>
+            </div>
+            <div id="roomStats">
+              <div class="state-message" style="padding: 24px 16px;">
+                <div class="state-text">No room data available</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Occupancy Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Class Occupancy</h2>
+                <p class="card-subtitle">Students per class</p>
+              </div>
+            </div>
+            <div id="occupancy">
+              <div class="state-message" style="padding: 24px 16px;">
+                <div class="state-text">No occupancy data available</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Names</h2>
+                <p class="card-subtitle">Student and course mappings</p>
+              </div>
+            </div>
+            <div class="names-tabs">
+              <button id="namesTabStudents" class="tab-btn active" type="button">Students</button>
+              <button id="namesTabCourses" class="tab-btn" type="button">Courses</button>
+            </div>
+            <input id="namesSearch" class="names-search" type="text" placeholder="Search names..." />
+            <div id="namesStudents" class="names-list"></div>
+            <div id="namesCourses" class="names-list hidden"></div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="card table-card">
+          <div class="table-header">
+            <div>
+              <h2 class="card-title">Timetable</h2>
+              <p class="card-subtitle">Sorted by day and start time</p>
+            </div>
+            <div class="table-info">
+              <span id="resultCount" class="result-count"></span>
+            </div>
+          </div>
+
+          <div id="tableContainer">
+            <!-- Upload Zone (shown when no data) -->
+            <div id="uploadZone" class="upload-zone">
+              <svg class="upload-zone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <div class="upload-zone-text">Drag & drop your JSON file here</div>
+              <div class="upload-zone-hint">or click "Choose File" button above</div>
+              <div id="fileInfo" class="file-info hidden"></div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message hidden"></div>
+
+            <!-- Table -->
+            <div id="tableWrapper" class="table-wrapper hidden">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">Class ID</th>
+                    <th>Course Name</th>
+                    <th style="width: 80px;">Day</th>
+                    <th style="width: 70px;">Start</th>
+                    <th style="width: 70px;">End</th>
+                    <th style="width: 70px;">Room</th>
+                    <th style="width: 100px;">Mode</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- No Results -->
+            <div id="noResults" class="state-message hidden">
+              <svg class="state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <div class="state-title">No Matching Classes</div>
+              <div class="state-text">No classes match your current filters.</div>
+              <button id="resetFiltersBtn" class="btn">Reset Filters</button>
+            </div>
+          </div>
+
+          <div class="hint">
+            <strong>Tip:</strong> If you double-clicked this file and data does not auto-load, use the "Choose File" button to select <code>full_solution.json</code>. Late evening classes (after 17:00) are highlighted in amber.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    University Timetabling Solver &copy; 2025 &bull; Names auto-load from student_names.json and course_names.json if available
+  </footer>
+
+  <!-- Modal for Course Details -->
+  <div id="detailsBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Course Details</h3>
+        <div class="modal-controls">
+          <select id="modalStudentFilter" class="select">
+            <option value="">All students</option>
+          </select>
+          <select id="modalCourseFilter" class="select">
+            <option value="">All courses</option>
+          </select>
+          <button id="closeModal" class="btn">Close</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Course</th>
+              <th>Mode</th>
+            </tr>
+          </thead>
+          <tbody id="modalTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======== CONSTANTS ========
+    const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const LATE_THRESHOLD = 1020; // 17:00 in minutes
+    const DEBOUNCE_DELAY = 150;
+
+    // ======== STATE ========
+    let __allRows = [];
+    let __currentData = null;
+    let __studentNames = {};
+    let __courseNames = {};
+    let __debounceTimer = null;
+
+    // ======== UTILITY FUNCTIONS ========
+    
+    /**
+     * Convert minutes from midnight to HH:MM format
+     * @param {number} m - Minutes from midnight
+     * @returns {string} - Formatted time string
+     */
+    function minutesToHHMM(m) {
+      if (typeof m !== "number" || !isFinite(m) || m < 0) return "?";
+      const h = Math.floor(m / 60);
+      const mm = m % 60;
+      return String(h).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+    }
+
+    /**
+     * Decode binary day string to readable format
+     * @param {string} days - Binary string (e.g., "1000000" for Monday)
+     * @returns {string} - Comma-separated day names
+     */
+    function decodeDays(days) {
+      const s = (days || "").trim();
+      if (s.length !== 7 || /[^01]/.test(s)) return "?";
+      const out = [];
+      for (let i = 0; i < 7; i++) if (s[i] === "1") out.push(DAY_NAMES[i]);
+      return out.length ? out.join(",") : "?";
+    }
+
+    /**
+     * Debounce function execution
+     * @param {Function} fn - Function to debounce
+     * @param {number} delay - Delay in milliseconds
+     */
+    function debounce(fn, delay) {
+      return function(...args) {
+        clearTimeout(__debounceTimer);
+        __debounceTimer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    /**
+     * Format file size for display
+     * @param {number} bytes - File size in bytes
+     * @returns {string} - Formatted size string
+     */
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    /**
+     * Get status class and icon based on solution status
+     * @param {string} status - Solution status
+     * @returns {object} - Class name and icon
+     */
+    function getStatusInfo(status) {
+      const s = (status || "").toLowerCase();
+      if (s === "optimal") return { class: "optimal", icon: "✓", color: "var(--success)" };
+      if (s === "feasible") return { class: "feasible", icon: "~", color: "var(--warning)" };
+      return { class: "infeasible", icon: "✗", color: "var(--error)" };
+    }
+
+    /**
+     * Get objective quality indicator
+     * @param {string} key - Objective key (z1-z5)
+     * @param {number} value - Objective value
+     * @returns {string} - Quality class (good, warning, bad)
+     */
+    function getObjectiveQuality(key, value) {
+      // z1_electives: higher is better
+      if (key === "z1_electives") {
+        return value > 0 ? "good" : "warning";
+      }
+      // z2-z4: 0 is good, higher is worse
+      if (["z2_mode", "z3_clashes", "z4_online"].includes(key)) {
+        if (value === 0) return "good";
+        if (value <= 5) return "warning";
+        return "bad";
+      }
+      // z5_late: 0 is good, any positive is warning/bad
+      if (key === "z5_late") {
+        if (value === 0) return "good";
+        if (value <= 3) return "warning";
+        return "bad";
+      }
+      return "good";
+    }
+
+    // ======== DATA PROCESSING ========
+
+    /**
+     * Count classes by mode
+     * @param {object} schedule - Schedule data
+     * @returns {object} - Mode counts
+     */
+    function getModeCounts(schedule) {
+      const counts = { in_person: 0, hybrid: 0, online: 0 };
+      if (!schedule) return counts;
+      for (const cid of Object.keys(schedule)) {
+        const m = schedule[cid]?.mode;
+        if (m && counts[m] !== undefined) counts[m] += 1;
+      }
+      return counts;
+    }
+
+    /**
+     * Get room usage statistics
+     * @param {object} schedule - Schedule data
+     * @returns {object} - Room counts
+     */
+    function getRoomCounts(schedule) {
+      const counts = {};
+      if (!schedule) return counts;
+      for (const cid of Object.keys(schedule)) {
+        const room = schedule[cid]?.room;
+        if (room && room !== "0") {
+          counts[room] = (counts[room] || 0) + 1;
+        }
+      }
+      return counts;
+    }
+
+    /**
+     * Build table rows from data
+     * @param {object} data - Full solution data
+     * @returns {array} - Sorted row objects
+     */
+    function buildRows(data) {
+      const schedule = data.schedule || {};
+      const timeMeta = data.time_meta || {};
+      const classToCourse = data.class_to_course || {};
+      const rows = [];
+
+      for (const cid of Object.keys(schedule)) {
+        const entry = schedule[cid] || {};
+        const timeId = entry.time;
+        const meta = (timeId !== undefined && timeId !== null)
+          ? (timeMeta[String(timeId)] || timeMeta[Number(timeId)] || null)
+          : null;
+
+        const days = meta ? decodeDays(meta.days) : "?";
+        const startMin = meta?.start_min;
+        const lengthMin = meta?.length_min;
+        const start = meta ? minutesToHHMM(startMin) : "?";
+        const end = meta ? minutesToHHMM((startMin ?? -1) + (lengthMin ?? -1)) : "?";
+        const isLate = typeof startMin === "number" && startMin >= LATE_THRESHOLD;
+
+        rows.push({
+          classId: cid,
+          course: __courseNames[classToCourse[String(cid)]] || classToCourse[String(cid)] || "-",
+          courseId: classToCourse[String(cid)] ?? "-",
+          day: days,
+          start,
+          end,
+          startMin: startMin ?? 0,
+          room: entry.room ?? "",
+          mode: entry.mode ?? "",
+          isLate,
+          sortKey: [days, (typeof startMin === "number" && isFinite(startMin)) ? startMin : 1e9, cid]
+        });
+      }
+
+      rows.sort((a, b) => {
+        if (a.sortKey[0] !== b.sortKey[0]) return a.sortKey[0].localeCompare(b.sortKey[0]);
+        if (a.sortKey[1] !== b.sortKey[1]) return a.sortKey[1] - b.sortKey[1];
+        return String(a.sortKey[2]).localeCompare(String(b.sortKey[2]));
+      });
+
+      return rows;
+    }
+
+    // ======== RENDERING FUNCTIONS ========
+
+    /**
+     * Update status badge
+     * @param {string} status - Status text
+     * @param {string} type - Badge type (loading, success, error)
+     */
+    function updateStatusBadge(status, type = "loading") {
+      const badge = document.getElementById("statusBadge");
+      badge.className = `status-badge ${type}`;
+      badge.innerHTML = `<span class="status-dot"></span>${status}`;
+    }
+
+    /**
+     * Show error message
+     * @param {string} message - Error message
+     */
+    function showError(message) {
+      const errorEl = document.getElementById("errorMessage");
+      errorEl.innerHTML = `<strong>Error loading data</strong>${message}`;
+      errorEl.classList.remove("hidden");
+      document.getElementById("uploadZone").classList.remove("hidden");
+      document.getElementById("tableWrapper").classList.add("hidden");
+      updateStatusBadge("Error", "error");
+    }
+
+    /**
+     * Hide error message
+     */
+    function hideError() {
+      document.getElementById("errorMessage").classList.add("hidden");
+    }
+
+    /**
+     * Render summary section with grouped metrics
+     * @param {object} data - Full solution data
+     */
+    function renderSummary(data) {
+      const summary = document.getElementById("summary");
+      const schedule = data.schedule || {};
+      const students = data.students || {};
+      const objectives = data.objectives || {};
+      const counts = getModeCounts(schedule);
+      const nClasses = Object.keys(schedule).length;
+      const nStudents = Object.keys(students).length;
+      const statusInfo = getStatusInfo(data.status);
+
+      const objectiveLabels = {
+        z1_electives: "Electives Assigned",
+        z2_mode: "Mode Deviation",
+        z3_clashes: "Student Clashes",
+        z4_online: "Online Penalty",
+        z5_late: "Late Evening Penalty"
+      };
+
+      let html = `
+        <!-- Status Section -->
+        <div class="summary-section">
+          <div class="section-label">Solution Status</div>
+          <div class="status-display">
+            <div class="status-icon ${statusInfo.class}">${statusInfo.icon}</div>
+            <span class="status-text" style="color: ${statusInfo.color}">${data.status ?? 'Unknown'}</span>
+          </div>
+        </div>
+
+        <!-- Counts Section -->
+        <div class="summary-section">
+          <div class="section-label">Overview</div>
+          <div class="counts-grid">
+            <div class="count-item">
+              <div class="count-value">${nClasses}</div>
+              <div class="count-label">Total Classes</div>
+            </div>
+            <div class="count-item">
+              <div class="count-value">${nStudents}</div>
+              <div class="count-label">Total Students</div>
+            </div>
+          </div>
+          <div class="mode-breakdown">
+            <div class="mode-item in_person">
+              <div class="mode-count">${counts.in_person}</div>
+              <div>In-person</div>
+            </div>
+            <div class="mode-item hybrid">
+              <div class="mode-count">${counts.hybrid}</div>
+              <div>Hybrid</div>
+            </div>
+            <div class="mode-item online">
+              <div class="mode-count">${counts.online}</div>
+              <div>Online</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objectives Section -->
+        <div class="summary-section">
+          <div class="section-label">Optimization Objectives</div>
+      `;
+
+      for (const [key, label] of Object.entries(objectiveLabels)) {
+        const value = objectives[key] ?? 0;
+        const quality = getObjectiveQuality(key, value);
+        html += `
+          <div class="objective-item">
+            <div class="objective-indicator ${quality}"></div>
+            <div class="objective-info">
+              <div class="objective-name">${label}</div>
+              <div class="objective-code">${key}</div>
+            </div>
+            <div class="objective-value ${quality}">${value}</div>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      summary.innerHTML = html;
+    }
+
+    /**
+     * Render room utilization statistics
+     * @param {object} data - Full solution data
+     */
+    function renderRoomStats(data) {
+      const container = document.getElementById("roomStats");
+      const roomCounts = getRoomCounts(data.schedule);
+      const rooms = Object.entries(roomCounts).sort((a, b) => b[1] - a[1]);
+
+      if (rooms.length === 0) {
+        container.innerHTML = `<div class="state-message" style="padding: 24px 16px;"><div class="state-text">No room data available</div></div>`;
+        return;
+      }
+
+      const maxCount = Math.max(...rooms.map(r => r[1]));
+      let html = '';
+
+      for (const [room, count] of rooms.slice(0, 10)) {
+        const pct = (count / maxCount) * 100;
+        html += `
+          <div class="room-stat-item">
+            <div class="room-stat-label">Room ${room}</div>
+            <div class="room-stat-bar">
+              <div class="room-stat-fill" style="width: ${pct}%"></div>
+            </div>
+            <div class="room-stat-count">${count}</div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    /**
+     * Render class occupancy chart
+     * @param {object} data - Full solution data
+     */
+    function renderOccupancyChart(data) {
+      const container = document.getElementById("occupancy");
+      const students = data.students || {};
+      const classCounts = {};
+
+      for (const sid of Object.keys(students)) {
+        const attended = students[sid]?.attended || {};
+        for (const cid of Object.keys(attended)) {
+          classCounts[cid] = (classCounts[cid] || 0) + 1;
+        }
+      }
+
+      const classes = Object.entries(classCounts).sort((a, b) => b[1] - a[1]);
+
+      if (classes.length === 0) {
+        container.innerHTML = `<div class="state-message" style="padding: 24px 16px;"><div class="state-text">No occupancy data available</div></div>`;
+        return;
+      }
+
+      const maxCount = Math.max(...classes.map(c => c[1]));
+      let html = '';
+
+      for (const [classId, count] of classes.slice(0, 12)) {
+        const pct = (count / maxCount) * 100;
+        html += `
+          <div class="occupancy-item">
+            <div class="occupancy-label">Class ${classId}</div>
+            <div class="occupancy-bar-wrap">
+              <div class="occupancy-bar" style="width: ${pct}%"></div>
+            </div>
+            <div class="occupancy-count">${count}</div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    /**
+     * Render table using DocumentFragment for performance
+     * @param {array} rows - Filtered row data
+     */
+    function renderTable(rows) {
+      const tbody = document.getElementById("tbody");
+      const fragment = document.createDocumentFragment();
+
+      for (const r of rows) {
+        const tr = document.createElement("tr");
+        if (r.isLate) tr.classList.add("late-class");
+
+        const cells = [
+          { value: r.classId, mono: true },
+          { value: r.course, link: true, courseId: r.courseId },
+          { value: r.day, mono: true },
+          { value: r.start, mono: true, late: r.isLate },
+          { value: r.end, mono: true },
+          { value: r.room || "-", mono: true },
+          { value: r.mode, pill: true }
+        ];
+
+        for (let i = 0; i < cells.length; i++) {
+          const td = document.createElement("td");
+          const cell = cells[i];
+
+          if (cell.pill) {
+            const span = document.createElement("span");
+            span.className = "pill";
+            span.textContent = String(cell.value).replace("_", " ");
+            span.setAttribute("data-mode", String(cell.value));
+            td.appendChild(span);
+          } else if (cell.link) {
+            const a = document.createElement("a");
+            a.href = "#";
+            a.className = "link";
+            a.textContent = String(cell.value);
+            a.addEventListener("click", (ev) => {
+              ev.preventDefault();
+              if (cell.courseId && cell.courseId !== "-") openCourseDetails(String(cell.courseId));
+            });
+            td.appendChild(a);
+          } else {
+            if (cell.mono) td.classList.add("cell-mono");
+            td.textContent = String(cell.value);
+            if (cell.late) {
+              const indicator = document.createElement("span");
+              indicator.className = "late-indicator";
+              indicator.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+              indicator.title = "Late evening class (after 17:00)";
+              td.appendChild(indicator);
+            }
+          }
+          tr.appendChild(td);
+        }
+        fragment.appendChild(tr);
+      }
+
+      tbody.innerHTML = "";
+      tbody.appendChild(fragment);
+    }
+
+    // ======== FILTER FUNCTIONS ========
+
+    /**
+     * Apply search and filter criteria
+     * @param {array} rows - All rows
+     * @returns {array} - Filtered rows
+     */
+    function applyFilters(rows) {
+      const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      const room = (document.getElementById('roomFilter').value || '');
+      const mode = (document.getElementById('modeFilter').value || '');
+
+      if (!q && !room && !mode) return rows;
+
+      return rows.filter(r => {
+        if (room && String(r.room) !== room) return false;
+        if (mode && String(r.mode) !== mode) return false;
+        if (!q) return true;
+        return String(r.classId).toLowerCase().includes(q) ||
+               String(r.course).toLowerCase().includes(q) ||
+               String(r.room).toLowerCase().includes(q) ||
+               String(r.mode).toLowerCase().includes(q) ||
+               String(r.day).toLowerCase().includes(q);
+      });
+    }
+
+    /**
+     * Check if any filters are active
+     * @returns {boolean}
+     */
+    function hasActiveFilters() {
+      return !!(
+        document.getElementById('searchInput').value.trim() ||
+        document.getElementById('roomFilter').value ||
+        document.getElementById('modeFilter').value
+      );
+    }
+
+    /**
+     * Update filter UI and result count
+     */
+    function updateFilterUI() {
+      const clearBtn = document.getElementById("clearFilters");
+      const noResults = document.getElementById("noResults");
+      const tableWrapper = document.getElementById("tableWrapper");
+      const resultCount = document.getElementById("resultCount");
+
+      if (hasActiveFilters()) {
+        clearBtn.classList.remove("hidden");
+      } else {
+        clearBtn.classList.add("hidden");
+      }
+
+      const filtered = applyFilters(__allRows);
+      resultCount.innerHTML = `<strong>${filtered.length}</strong> of ${__allRows.length} classes`;
+
+      if (filtered.length === 0 && __allRows.length > 0) {
+        tableWrapper.classList.add("hidden");
+        noResults.classList.remove("hidden");
+      } else {
+        tableWrapper.classList.remove("hidden");
+        noResults.classList.add("hidden");
+      }
+    }
+
+    /**
+     * Re-render table with current filters (debounced)
+     */
+    const rerenderWithFilters = debounce(() => {
+      requestAnimationFrame(() => {
+        const filtered = applyFilters(__allRows);
+        renderTable(filtered);
+        updateFilterUI();
+      });
+    }, DEBOUNCE_DELAY);
+
+    /**
+     * Clear all filters
+     */
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('roomFilter').value = '';
+      document.getElementById('modeFilter').value = '';
+      rerenderWithFilters();
+    }
+
+    // ======== DATA LOADING ========
+
+    /**
+     * Load name mapping files
+     */
+    async function loadNamesByFetch() {
+      try {
+        const resp = await fetch("student_names.json", { cache: "no-store" });
+        if (resp.ok) __studentNames = await resp.json();
+      } catch (e) { /* optional file */ }
+
+      try {
+        const resp = await fetch("course_names.json", { cache: "no-store" });
+        if (resp.ok) __courseNames = await resp.json();
+      } catch (e) { /* optional file */ }
+    }
+
+    function normalizeNameEntries(mapObj) {
+      return Object.entries(mapObj || {})
+        .map(([id, name]) => ({ id: String(id), name: String(name ?? "") }))
+        .sort((a, b) => {
+          const na = Number(a.id);
+          const nb = Number(b.id);
+          if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+          return a.id.localeCompare(b.id);
+        });
+    }
+
+    function renderNameList(container, entries, q) {
+      if (!container) return;
+      const qq = String(q || "").trim().toLowerCase();
+      const filtered = qq
+        ? entries.filter(e => e.name.toLowerCase().includes(qq) || e.id.toLowerCase().includes(qq))
+        : entries;
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="state-message" style="padding: 18px 12px;"><div class="state-text">No matches</div></div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(e => `
+        <div class="name-item">
+          <div class="name-left">
+            <div class="name-title" title="${e.name}">${e.name}</div>
+            <div class="name-sub">ID ${e.id}</div>
+          </div>
+          <div class="name-id">${e.id}</div>
+        </div>
+      `).join("");
+    }
+
+    function setNamesTab(which) {
+      const btnS = document.getElementById("namesTabStudents");
+      const btnC = document.getElementById("namesTabCourses");
+      const boxS = document.getElementById("namesStudents");
+      const boxC = document.getElementById("namesCourses");
+      if (!btnS || !btnC || !boxS || !boxC) return;
+
+      if (which === "courses") {
+        btnS.classList.remove("active");
+        btnC.classList.add("active");
+        boxS.classList.add("hidden");
+        boxC.classList.remove("hidden");
+      } else {
+        btnS.classList.add("active");
+        btnC.classList.remove("active");
+        boxS.classList.remove("hidden");
+        boxC.classList.add("hidden");
+      }
+    }
+
+    function renderNamesSection() {
+      const boxS = document.getElementById("namesStudents");
+      const boxC = document.getElementById("namesCourses");
+      const q = document.getElementById("namesSearch")?.value || "";
+
+      const students = normalizeNameEntries(__studentNames);
+      const courses = normalizeNameEntries(__courseNames);
+
+      if (boxS) renderNameList(boxS, students, q);
+      if (boxC) renderNameList(boxC, courses, q);
+    }
+
+    /**
+     * Load solution JSON via fetch
+     * @returns {object} - Parsed JSON data
+     */
+    async function loadByFetch() {
+      const resp = await fetch("full_solution.json", { cache: "no-store" });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      return await resp.json();
+    }
+
+    /**
+     * Validate JSON schema
+     * @param {object} data - Parsed JSON
+     * @returns {boolean}
+     */
+    function validateSchema(data) {
+      return data && typeof data === "object" && 
+             (data.schedule || data.time_meta || data.class_to_course);
+    }
+
+    /**
+     * Load and render data
+     * @param {object} data - Solution data
+     */
+    async function loadAndRender(data) {
+      if (!validateSchema(data)) {
+        throw new Error("Invalid JSON schema. Expected schedule, time_meta, or class_to_course fields.");
+      }
+
+      __currentData = data;
+      await loadNamesByFetch();
+      renderNamesSection();
+
+      // Update UI
+      document.getElementById("uploadZone").classList.add("hidden");
+      document.getElementById("tableWrapper").classList.remove("hidden");
+      document.getElementById("downloadBtn").disabled = false;
+      hideError();
+      updateStatusBadge(data.status || "Loaded", "success");
+
+      // Progressive rendering
+      renderSummary(data);
+      
+      requestAnimationFrame(() => {
+        renderRoomStats(data);
+        renderOccupancyChart(data);
+
+        const rows = buildRows(data);
+        __allRows = rows;
+
+        // Populate room filter
+        const roomSel = document.getElementById('roomFilter');
+        const rooms = Array.from(new Set(rows.map(r => String(r.room)).filter(x => x && x !== "0")));
+        rooms.sort((a, b) => Number(a) - Number(b));
+        roomSel.innerHTML = '<option value="">All rooms</option>' +
+          rooms.map(r => `<option value="${r}">Room ${r}</option>`).join('');
+
+        rerenderWithFilters();
+      });
+    }
+
+    /**
+     * Try to auto-load full_solution.json
+     */
+    async function tryAutoLoad() {
+      updateStatusBadge("Loading...", "loading");
+      try {
+        const data = await loadByFetch();
+        await loadAndRender(data);
+      } catch (e) {
+        console.log("Auto-load failed:", e.message);
+        updateStatusBadge("Waiting", "loading");
+      }
+    }
+
+    /**
+     * Handle file selection
+     * @param {File} file - Selected file
+     */
+    async function handleFile(file) {
+      if (!file) return;
+
+      // Show file info
+      const fileInfo = document.getElementById("fileInfo");
+      fileInfo.innerHTML = `<span class="file-info-name">${file.name}</span><span class="file-info-size">(${formatFileSize(file.size)})</span>`;
+      fileInfo.classList.remove("hidden");
+
+      updateStatusBadge("Loading...", "loading");
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        await loadAndRender(data);
+      } catch (e) {
+        showError(e.message);
+      }
+    }
+
+    // ======== MODAL FUNCTIONS ========
+
+    function openModal() {
+      document.getElementById("detailsBackdrop").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("detailsBackdrop").style.display = "none";
+    }
+
+    function openCourseDetails(courseId) {
+      // Implementation for course details modal
+      // This would show students enrolled in the course
+      openModal();
+      document.querySelector(".modal-title").textContent = `Course ${__courseNames[courseId] || courseId}`;
+      
+      const students = __currentData?.students || {};
+      const rows = [];
+      
+      for (const [sid, sdata] of Object.entries(students)) {
+        const attended = sdata.attended || {};
+        for (const [cid, modes] of Object.entries(attended)) {
+          if (__currentData?.class_to_course?.[cid] === courseId) {
+            rows.push({
+              student: __studentNames[sid] || `Student ${sid}`,
+              classId: cid,
+              mode: modes.in_person ? "In-person" : "Online"
+            });
+          }
+        }
+      }
+
+      const tbody = document.getElementById("modalTbody");
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${r.student}</td>
+          <td>Class ${r.classId}</td>
+          <td>${r.mode}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ======== EVENT LISTENERS ========
+
+    function initEventListeners() {
+      // Filter events
+      document.getElementById('searchInput').addEventListener('input', rerenderWithFilters);
+      document.getElementById('roomFilter').addEventListener('change', rerenderWithFilters);
+      document.getElementById('modeFilter').addEventListener('change', rerenderWithFilters);
+      document.getElementById('clearFilters').addEventListener('click', clearFilters);
+      document.getElementById('resetFiltersBtn').addEventListener('click', clearFilters);
+
+      // Names card
+      const tabStudents = document.getElementById('namesTabStudents');
+      const tabCourses = document.getElementById('namesTabCourses');
+      const namesSearch = document.getElementById('namesSearch');
+      if (tabStudents) tabStudents.addEventListener('click', () => setNamesTab('students'));
+      if (tabCourses) tabCourses.addEventListener('click', () => setNamesTab('courses'));
+      if (namesSearch) namesSearch.addEventListener('input', debounce(() => renderNamesSection(), 100));
+
+      // Default state
+      setNamesTab('students');
+      renderNamesSection();
+
+      // File handling
+      document.getElementById("reloadBtn").addEventListener("click", tryAutoLoad);
+      document.getElementById("filePicker").addEventListener("change", (e) => {
+        handleFile(e.target.files[0]);
+      });
+
+      // Drag and drop
+      const uploadZone = document.getElementById("uploadZone");
+      uploadZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadZone.classList.add("dragover");
+      });
+      uploadZone.addEventListener("dragleave", () => {
+        uploadZone.classList.remove("dragover");
+      });
+      uploadZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        uploadZone.classList.remove("dragover");
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith(".json")) {
+          handleFile(file);
+        } else {
+          showError("Please drop a .json file");
+        }
+      });
+
+      // Download
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        if (!__currentData) return;
+        const blob = new Blob([JSON.stringify(__currentData, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "full_solution.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Modal
+      document.getElementById("closeModal").addEventListener("click", closeModal);
+      document.getElementById("detailsBackdrop").addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
+    }
+
+    // ======== INITIALIZATION ========
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      initEventListeners();
+      tryAutoLoad();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+@startuml State Chart Diagram
+!theme plain
+
+title University Timetabling Solver - State Diagram
+
+[*] --> Idle : Start
+
+state Idle {
+  [*] --> WaitingForInput
+  WaitingForInput --> ParsingXML : XML file provided
+}
+
+Idle --> Parsing : parse_itc2019_xml_to_instance()
+
+state Parsing {
+  [*] --> ExtractingData
+  ExtractingData --> BuildingInstance : Extract rooms, times, classes, students
+  BuildingInstance --> [*] : Instance created
+}
+
+Parsing --> Configuring : Create SolveConfig
+
+state Configuring {
+  [*] --> SettingParameters
+  SettingParameters --> [*] : max_time, lns_iterations set
+}
+
+Configuring --> Solving : solve_instance()
+
+state Solving {
+  [*] --> BuildingModel
+  
+  BuildingModel --> CreatingVariables : Create y_time, y_phys, y_onl, x_phys, x_onl
+  CreatingVariables --> AddingConstraints : Add hard constraints
+  AddingConstraints --> SettingObjectives : Set z1-z5 objectives
+  
+  SettingObjectives --> BaselineSolve : Start CP-SAT solve
+  
+  state BaselineSolve {
+    [*] --> SolvingZ1 : Maximize electives
+    SolvingZ1 --> SolvingZ2 : z1 fixed
+    SolvingZ2 --> SolvingZ3 : z2 fixed
+    SolvingZ3 --> SolvingZ4 : z3 fixed
+    SolvingZ4 --> SolvingZ5 : z4 fixed
+    SolvingZ5 --> [*] : Baseline solution found
+  }
+  
+  BaselineSolve --> LNSOptimization : LNS enabled?
+  BaselineSolve --> [*] : LNS disabled
+  
+  state LNSOptimization {
+    [*] --> Destroying : Randomly destroy 20%
+    Destroying --> Fixing : Fix remaining 80%
+    Fixing --> ReSolving : Re-solve with hints
+    ReSolving --> CheckingImprovement : Compare objectives
+    CheckingImprovement --> Destroying : Improvement found, next iteration
+    CheckingImprovement --> [*] : No improvement or max iterations
+  }
+  
+  LNSOptimization --> [*] : Solution ready
+}
+
+Solving --> Validating : validate_solution()
+
+state Validating {
+  [*] --> CheckingConflicts
+  CheckingConflicts --> CheckingClashes : Room-time OK
+  CheckingClashes --> CheckingCapacity : Student clashes OK
+  CheckingCapacity --> [*] : All checks passed
+}
+
+Validating --> Exporting : Validation passed
+
+state Exporting {
+  [*] --> BuildingJSON
+  BuildingJSON --> WritingFiles : Add schedule, students, objectives
+  WritingFiles --> [*] : full_solution.json saved
+}
+
+Exporting --> Viewing : Load in browser
+
+state Viewing {
+  [*] --> RenderingDashboard
+  RenderingDashboard --> DisplayingResults : Show timetable, charts
+  DisplayingResults --> [*] : User viewing
+}
+
+Viewing --> [*] : Done
+
+' Error transitions
+Parsing --> [*] : Parse error
+Solving --> [*] : Infeasible / timeout
+Validating --> [*] : Validation failed
+
+@enduml

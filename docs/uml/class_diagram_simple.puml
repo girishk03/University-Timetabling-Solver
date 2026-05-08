@@ -1,0 +1,65 @@
+@startuml Class Diagram - SIMPLE
+!theme plain
+skinparam backgroundColor transparent
+skinparam classAttributeIconSize 0
+
+title University Timetabling Solver - Class Diagram
+
+class "SolveConfig" <<Dataclass>> {
+    +max_time_seconds: float
+    +lns_iterations: int
+    +lns_iteration_time_seconds: float
+    +lns_destroy_fraction: float
+}
+
+class "Instance" <<Data>> {
+    +classes: List[Dict]
+    +rooms: Dict
+    +times: List[int]
+    +students: List[Dict]
+}
+
+class "SolutionResult" <<Data>> {
+    +status: str
+    +schedule: Dict
+    +students: Dict
+    +objectives: Dict
+}
+
+class "solver_cp_sat.py" <<Module>> {
+    +solve_instance(): SolutionResult
+    +solve_instance_lns(): SolutionResult
+    +validate_solution(): Dict
+}
+
+class "itc2019_parser.py" <<Module>> {
+    +parse_itc2019_xml_to_instance(): Instance
+}
+
+class "run_solver.py" <<Module>> {
+    +main()
+}
+
+class "CpModel" <<OR-Tools>> {
+    +new_bool_var(): IntVar
+    +add()
+    +maximize()
+}
+
+class "CpSolver" <<OR-Tools>> {
+    +solve(): Status
+    +value(): int
+}
+
+' Relationships
+SolveConfig ..> "solver_cp_sat.py" : configures
+"itc2019_parser.py" ..> Instance : creates
+"solver_cp_sat.py" ..> Instance : uses
+"solver_cp_sat.py" ..> SolutionResult : produces
+"solver_cp_sat.py" ..> CpModel : creates
+"solver_cp_sat.py" ..> CpSolver : uses
+"run_solver.py" ..> "itc2019_parser.py" : calls
+"run_solver.py" ..> "solver_cp_sat.py" : calls
+"run_solver.py" ..> SolutionResult : processes
+
+@enduml

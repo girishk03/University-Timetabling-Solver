@@ -1,0 +1,53 @@
+@startuml Activity Diagram - COMPACT
+!theme plain
+skinparam ActivityBackgroundColor LightYellow
+skinparam ActivityBorderColor Black
+
+title Timetabling Solver - Compact Workflow
+
+start
+:Load ITC-2019 XML;
+:Parse into Instance (rooms, times, classes, students);
+:Create SolveConfig (time limits, LNS settings);
+
+:Build CP-SAT Model;
+note right
+  Create boolean variables:
+  - y_time, y_phys, y_onl (class scheduling)
+  - x_phys, x_onl (room assignment)
+  - n, a (student assignment)
+  Add constraints:
+  - One time per class
+  - No room conflicts
+  - Capacity limits
+end note
+
+:Lexicographic Optimization;
+note right
+  Stage 1: Max z1 (electives)
+  Stage 2: Min z2 (mode deviation)
+  Stage 3: Min z3 (clashes)
+  Stage 4: Min z4 (online penalty)
+  Stage 5: Min z5 (late-evening)
+end note
+
+if (Solution found?) then (yes)
+  if (LNS enabled?) then (yes)
+    :LNS: Destroy 20% → Fix 80% → Re-solve;
+    note right
+      Repeat 5 iterations
+      Accept improvements
+    end note
+  endif
+  
+  :Extract SolutionResult;
+  :Validate (check conflicts, clashes, capacity);
+  :Export to full_solution.json;
+  :View in Dashboard (index.html);
+else (no)
+  :Return infeasible;
+endif
+
+stop
+
+@enduml

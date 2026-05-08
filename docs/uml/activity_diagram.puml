@@ -1,0 +1,107 @@
+@startuml Activity Diagram
+!theme plain
+skinparam ActivityBackgroundColor LightYellow
+skinparam ActivityBorderColor Black
+
+title University Timetabling Solver - Activity Diagram (Solver Workflow)
+
+|User|
+start
+:Run run_solver.py;
+:Parse command-line arguments;
+
+|Parser|
+:Parse ITC-2019 XML file;
+:Extract classes, rooms, times;
+:Build time domain mappings;
+:Parse student requests;
+:Create Instance object;
+
+|Solver|
+:Initialize SolveConfig;
+:Create CpModel;
+:Define decision variables
+(x_phys, x_onl, y_time, y_phys, y_onl, z_assign);
+
+:Apply search strategy
+(demand-based ordering);
+
+:Build constraint model;
+
+while (More constraints to add?) is (yes)
+  if (Constraint type?) then (Room-Time)
+    :Add room-time conflict constraints;
+  elseif (Capacity) then (yes)
+    :Add room capacity constraints;
+  elseif (Student Clash) then (yes)
+    :Add student schedule conflict constraints;
+  else (Mode)
+    :Add mode compatibility constraints;
+  endif
+endwhile (done)
+
+:Set lexicographic objectives;
+note right
+  Objective priority:
+  1. Maximize elective assignments
+  2. Minimize mode deviation
+  3. Minimize student clashes
+  4. Minimize online penalty
+  5. Minimize late-evening classes
+end note
+
+:Add schedule hints for warm start;
+
+:Create CpSolver;
+:Set solver parameters
+(max_time, random_seed);
+
+|OR-Tools CP-SAT|
+:Run baseline solve;
+
+if (Solution found?) then (optimal/feasible)
+  if (LNS enabled?) then (yes)
+    :Start LNS optimization;
+    
+    while (Iterations < max?) is (yes)
+      :Select destroy fraction (20%);
+      :Relax selected variables;
+      :Re-solve with hints;
+      :Accept if improvement;
+      :Increment iteration counter;
+    endwhile (done)
+    
+  else (no)
+  endif
+  
+  :Extract solution values;
+  :Build schedule dictionary;
+  :Build student attendance records;
+  :Calculate objective values;
+  
+else (infeasible)
+  :Report failure status;
+  stop
+endif
+
+|Validator|
+:Validate solution integrity;
+:Check room-time conflicts;
+:Check student clashes;
+:Check capacity violations;
+
+if (Validation passed?) then (PASS)
+else (FAIL)
+  :Report violations;
+endif
+
+|Runner|
+:Print examiner summary;
+:Compare baseline vs LNS metrics;
+:Save to full_solution.json;
+
+|User|
+:View results in dashboard;
+stop
+
+@enduml

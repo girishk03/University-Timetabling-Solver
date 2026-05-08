@@ -1,0 +1,106 @@
+@startuml Sequence Diagram
+!theme plain
+
+title University Timetabling Solver - Sequence Diagram (Solver Execution Flow)
+
+actor User
+participant "SolverRunner" as Runner <<Runner>>
+participant "ITC2019Parser" as Parser <<Parser>>
+participant "SolveConfig" as Config <<Dataclass>>
+participant "TimetablingSolver" as Solver <<Solver>>
+participant "ConstraintBuilder" as Builder <<ConstraintBuilder>>
+participant "ObjectiveManager" as ObjMgr <<ObjectiveManager>>
+participant "CpModel" as Model <<OR-Tools>>
+participant "CpSolver" as CpSolver <<OR-Tools>>
+participant "LNSOptimizer" as LNS <<LNSOptimizer>>
+participant "SolutionValidator" as Validator <<Validator>>
+participant "JSONFile" as File <<Storage>>
+
+User -> Runner: Execute run_solver.py
+activate Runner
+
+Runner -> Parser: parse_itc2019_xml_to_instance(xml_path, options)
+activate Parser
+Parser -> Parser: _build_time_domain(root)
+Parser -> Parser: _collect_rooms(root)
+Parser -> Parser: _parse_students(root)
+Parser --> Runner: return Instance
+
+Runner -> Config: Create SolveConfig()
+Config --> Runner: return config
+
+deactivate Parser
+
+Runner -> Solver: solve_instance(instance, config)
+activate Solver
+
+Solver -> Solver: _estimate_class_demand()
+Solver -> Model: Create CpModel()
+Model --> Solver: model initialized
+
+Solver -> Builder: add_constraints(model)
+activate Builder
+Builder -> Model: Add room-time conflict constraints
+Builder -> Model: Add capacity constraints
+Builder -> Model: Add student clash constraints
+Builder -> Model: Add mode constraints
+deactivate Builder
+
+Solver -> ObjMgr: set_lexicographic_objectives(model)
+activate ObjMgr
+ObjMgr -> Model: Maximize z1 (electives)
+ObjMgr -> Model: Minimize z2 (mode deviation)
+ObjMgr -> Model: Minimize z3 (clashes)
+ObjMgr -> Model: Minimize z4 (online penalty)
+ObjMgr -> Model: Minimize z5 (late-evening)
+deactivate ObjMgr
+
+Solver -> Solver: _add_schedule_hints()
+Solver -> CpSolver: Create CpSolver()
+CpSolver --> Solver: solver initialized
+
+Solver -> CpSolver: Solve(model)
+activate CpSolver
+CpSolver -> CpSolver: Search with decision strategy
+CpSolver --> Solver: return baseline solution
+deactivate CpSolver
+
+alt LNS Enabled (config.lns_iterations > 0)
+    Solver -> LNS: solve_instance_lns(instance, config)
+    activate LNS
+    
+    loop For each LNS iteration (5 iterations)
+        LNS -> LNS: _relax_schedule(model, current_best, 0.2)
+        LNS -> Solver: Re-solve with hints
+        Solver -> CpSolver: Solve(model)
+        activate CpSolver
+        CpSolver --> Solver: improved solution
+        deactivate CpSolver
+    end
+    
+    LNS --> Solver: return LNS-optimized solution
+    deactivate LNS
+end
+
+Solver -> Solver: Extract solution variables
+Solver --> Runner: return SolutionResult
+
+deactivate Solver
+
+Runner -> Validator: validate_solution(result)
+activate Validator
+Validator -> Validator: check_room_time_conflicts()
+Validator -> Validator: check_student_clashes()
+Validator -> Validator: check_capacity_violations()
+Validator --> Runner: validation report
+
+deactivate Validator
+
+Runner -> Runner: _print_examiner_output()
+Runner -> File: Save full_solution.json
+
+Runner --> User: Display summary & results
+
+deactivate Runner
+
+@enduml

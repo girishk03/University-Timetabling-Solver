@@ -1,0 +1,69 @@
+{
+  "rooms": {
+    "R1": {"cap": 2, "hybrid": true},
+    "R2": {"cap": 2, "hybrid": false},
+    "__online__": {"cap": 999999999, "hybrid": true}
+  },
+  "times": [0, 1, 2],
+  "classes": [
+    {
+      "id": "C1",
+      "allowed_times": [0, 1],
+      "allowed_rooms": ["R1", "R2", "__online__"],
+      "subscription": 3
+    },
+    {
+      "id": "C2",
+      "allowed_times": [0, 1],
+      "allowed_rooms": ["R1", "__online__"],
+      "subscription": 3
+    },
+    {
+      "id": "C3",
+      "allowed_times": [1, 2],
+      "allowed_rooms": ["R2", "__online__"],
+      "subscription": 3
+    }
+  ],
+  "modules": [
+    {
+      "id": "M1",
+      "configs": [
+        {
+          "id": "F1",
+          "subparts": [
+            {"id": "P1", "class_ids": ["C1"]},
+            {"id": "P2", "class_ids": ["C2"]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "configs": [
+        {
+          "id": "F1",
+          "subparts": [
+            {"id": "P1", "class_ids": ["C3"]}
+          ]
+        }
+      ]
+    }
+  ],
+  "students": [
+    {
+      "id": "S1",
+      "requested_modules": ["M1", "M2"],
+      "compulsory_modules": ["M1"],
+      "module_cap": 2,
+      "mode_pref": 1
+    },
+    {
+      "id": "S2",
+      "requested_modules": ["M1", "M2"],
+      "compulsory_modules": [],
+      "module_cap": 1,
+      "mode_pref": -1
+    }
+  ]
+}
