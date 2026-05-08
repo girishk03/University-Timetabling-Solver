@@ -7,33 +7,45 @@ This targets real operational constraints (room capacity, student clashes, hybri
 
 ## Key Highlights
 
-- Detects room-capacity infeasibility in physical-only timetables
-- Automatically converts infeasible schedules into feasible hybrid timetables (in-person / online / hybrid)
-- Minimizes student clashes and unnecessary timetable disruption
-- Lexicographic multi-objective optimization + LNS improvement loop
-- Interactive dashboard for diagnostics, visualization, and timetable analysis
+- **Infeasibility Detection**: Identifies room-capacity bottlenecks in physical-only schedules.
+- **Hybrid Optimization**: Automatically generates feasible schedules by balancing in-person, online, and hybrid delivery.
+- **Stability-Aware Repair**: Minimizes timetable "churn" and disruption during re-optimization.
+- **Lexicographic Solver**: Multi-objective CP-SAT formulation (Electives > Mode > Clashes > Evening).
+- **Interactive Analytics**: Full diagnostic dashboard for room utilization and student conflict analysis.
 
 ## Visuals
 
 ### Dashboard Landing
-![Dashboard Landing](docs/screenshots/dashboard-landing.jpeg)
+<img src="docs/screenshots/dashboard-landing.jpeg" width="800"/>
+
+*Modern entry point for uploading ITC-2019 instances and initiating the optimization pipeline.*
 
 ### Feasibility Analysis (Physical vs. Hybrid)
-![Feasibility Analysis](docs/screenshots/feasibility-physical-vs-hybrid.jpeg)
+<img src="docs/screenshots/feasibility-physical-vs-hybrid.jpeg" width="800"/>
+
+*The core engine: detecting 0% physical feasibility and automatically repairing it to 100% hybrid feasibility.*
 
 ### Student Schedule View
-![Student Schedule](docs/screenshots/student-weekly-schedule.jpeg)
+<img src="docs/screenshots/student-weekly-schedule.jpeg" width="800"/>
+
+*Granular student-level validation ensuring zero clashes and respecting individual delivery preferences.*
 
 ## Additional Dashboard Features
 
 ### Optimization Objectives & Room Utilization
-![Optimization Objectives](docs/screenshots/summary-room-utilization-objectives.jpeg)
+<img src="docs/screenshots/summary-room-utilization-objectives.jpeg" width="800"/>
+
+*Real-time tracking of the 5-tier objective stack and precise room occupancy heatmaps.*
 
 ### Diagnostics & Occupancy
-![Diagnostics](docs/screenshots/diagnostics-class-occupancy.jpeg)
+<img src="docs/screenshots/diagnostics-class-occupancy.jpeg" width="800"/>
+
+*Automated risk assessment and ranked recommendations for infrastructure planning.*
 
 ### Interactive Timetable
-![Timetable View](docs/screenshots/timetable-table.jpeg)
+<img src="docs/screenshots/timetable-table.jpeg" width="800"/>
+
+*Searchable, filtered view of the final optimized schedule with direct links to student diagnostics.*
 
 ## System Workflow
 
