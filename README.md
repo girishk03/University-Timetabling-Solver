@@ -1,6 +1,8 @@
 
 # University Timetabling Optimization System
 
+[**🚀 Live Demo**](https://girishk03.github.io/University-Timetabling-Solver/)
+
 A hybrid scheduling + optimization system that detects infeasible university timetables and automatically generates feasible schedules using Google OR-Tools CP-SAT and Large Neighborhood Search (LNS).
 
 This targets real operational constraints (room capacity, student clashes, hybrid delivery) and produces a decision-support JSON output with diagnostics + recommendations.
