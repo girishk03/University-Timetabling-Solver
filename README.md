@@ -1,5 +1,9 @@
 
 # University Timetabling Optimization System
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=for-the-badge)](https://girishk03.github.io/University-Timetabling-Solver/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat&logo=python)](https://python.org)
+[![OR-Tools](https://img.shields.io/badge/OR--Tools-CP--SAT-orange?style=flat)](https://developers.google.com/optimization)
+
 
 [**🚀 Live Demo**](https://girishk03.github.io/University-Timetabling-Solver/)
 
