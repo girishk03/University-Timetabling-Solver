@@ -67,17 +67,6 @@ Interactive Dashboard + JSON Output
 
 ## Architecture (high-level)
 
-```mermaid
-```mermaid
-```mermaid
-flowchart TD
-  A[ITC-2019 XML instance] --> B[itc2019_parser.py]
-  B --> C[CP-SAT model + solve]
-  C --> D[LNS improvement loop]
-  D --> E[Validation + Diagnostics]
-  E --> F[Solution JSON]
-  F --> G[index.html dashboard]
-```
 
 ## Quick Start
 
