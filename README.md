@@ -69,6 +69,7 @@ Interactive Dashboard + JSON Output
 
 ```mermaid
 ```mermaid
+```mermaid
 flowchart TD
   A[ITC-2019 XML instance] --> B[itc2019_parser.py]
   B --> C[CP-SAT model + solve]
