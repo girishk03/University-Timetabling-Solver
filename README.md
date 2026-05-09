@@ -5,7 +5,7 @@
 [![OR-Tools](https://img.shields.io/badge/OR--Tools-CP--SAT-orange?style=flat)](https://developers.google.com/optimization)
 
 
-[**🚀 Live Demo**](https://girishk03.github.io/University-Timetabling-Solver/)
+[**🚀 Live Demo**](https://girishk03.github.io/University-Timetabling-Solver/) | [**⚡ Live API**](https://university-timetabling-solver.onrender.com/docs)
 
 A hybrid scheduling + optimization system that detects infeasible university timetables and automatically generates feasible schedules using Google OR-Tools CP-SAT and Large Neighborhood Search (LNS).
 
