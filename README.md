@@ -43,10 +43,10 @@ pip install -r requirements.txt
 ### 4. Run the solver
 
 ```bash
-python -m src.run_solver instances/itc2019/wbg-fal10.xml full_solution.json
+python -m src.run_solver instances/toy_hybrid.json full_solution.json
 ```
 
-The command parses the XML instance, runs the optimization pipeline, validates the result, and writes a JSON solution for the dashboard.
+The included toy instance completes quickly and exercises the CP-SAT, LNS, validation, and JSON-output pipeline. Larger ITC-2019 XML instances can require a longer time budget; see [Solver Configuration](#solver-configuration).
 
 ### 5. Run the tests
 
@@ -94,14 +94,16 @@ Hard constraints define a valid strict-mode timetable. A solution is rejected if
 
 ### Soft constraints and objectives
 
-Soft constraints express schedule quality. The solver optimizes them lexicographically, preserving a higher-priority result before optimizing the next objective.
+Soft constraints express schedule quality. The solver optimizes applicable objectives lexicographically, fixing each higher-priority result before moving to the next:
 
-- Maximize assigned students and elective-module satisfaction.
-- Minimize bounded relaxation penalties when fallback mode is enabled.
-- Minimize changes from a previous timetable during real-time repair.
-- Minimize delivery-mode preference deviations.
-- Minimize unnecessary online delivery.
-- Minimize late and consecutive scheduling penalties.
+1. Maximize students receiving at least one attended class.
+2. Minimize bounded relaxation penalties when fallback mode is enabled.
+3. Minimize timetable changes during real-time repair.
+4. Maximize elective-module satisfaction.
+5. Minimize delivery-mode preference deviations.
+6. Minimize unnecessary online delivery.
+7. Minimize late classes.
+8. Minimize consecutive-class penalties.
 
 When `RELAX_ON_INFEASIBLE=1`, selected student-overlap and room-capacity constraints may be relaxed within configured limits and converted into penalties. Other invariants, including room-time exclusivity, remain hard.
 
@@ -199,7 +201,13 @@ python -m pytest \
 
 The tests cover hard-constraint enforcement, day decoding, online-mode behavior, strict-to-relaxed status handling, diagnostics, student-to-class mapping, affected-set construction, real-time control policies, and timetable stability during incremental updates.
 
-> Core solver tests pass. Three real-time control tests currently fail and are tracked as known issues.
+Current local result: **35 passed, 3 failed**. Core solver hard-constraint tests pass; the three failures are confined to real-time control policy expectations.
+
+## Known Issues
+
+- Two real-time control tests expect a large quality drop or accumulated drift to return `REJECT_ESCALATE`, while the current policy returns `ACCEPT_WITH_WARNING`.
+- One repeated-update stability test expects an accept/reject result on the third update, while the current reject-streak reset returns `DEFER`.
+- These are visible behavioral contract mismatches, not hidden as a passing suite. The policy or its tests must be reconciled before claiming full test health.
 
 ## Dashboard
 
