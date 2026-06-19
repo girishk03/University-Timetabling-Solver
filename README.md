@@ -1,259 +1,270 @@
+# University Timetabling Solver
 
-# University Timetabling Optimization System
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=for-the-badge)](https://girishk03.github.io/University-Timetabling-Solver/)
-[![Python](https://img.shields.io/badge/Python-3.11-blue?style=flat&logo=python)](https://python.org)
-[![OR-Tools](https://img.shields.io/badge/OR--Tools-CP--SAT-orange?style=flat)](https://developers.google.com/optimization)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://python.org)
+[![OR-Tools](https://img.shields.io/badge/OR--Tools-CP--SAT-orange)](https://developers.google.com/optimization)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+[Live Dashboard](https://girishk03.github.io/University-Timetabling-Solver/) · [Live API](https://university-timetabling-solver.onrender.com/) · [Swagger UI](https://university-timetabling-solver.onrender.com/docs)
 
-[**🚀 Live Demo**](https://girishk03.github.io/University-Timetabling-Solver/) | [**⚡ Live API**](https://university-timetabling-solver.onrender.com/docs)
+> The Render free-tier API may take 30–60 seconds to wake up.
 
-A hybrid scheduling + optimization system that detects infeasible university timetables and automatically generates feasible schedules using Google OR-Tools CP-SAT and Large Neighborhood Search (LNS).
+## Project Overview
 
-This targets real operational constraints (room capacity, student clashes, hybrid delivery) and produces a decision-support JSON output with diagnostics + recommendations.
+University Timetabling Solver is a constraint-optimization project for building and repairing university schedules from ITC-2019/UniTime XML instances. It combines Google OR-Tools CP-SAT, a Large Neighborhood Search improvement loop, validation and diagnostics, a JSON solution contract, a FastAPI wrapper, and a browser-based analytics dashboard.
 
-## Key Highlights
-
-- **Infeasibility Detection**: Identifies room-capacity bottlenecks in physical-only schedules.
-- **Hybrid Optimization**: Automatically generates feasible schedules by balancing in-person, online, and hybrid delivery.
-- **Stability-Aware Repair**: Minimizes timetable "churn" and disruption during re-optimization.
-- **Lexicographic Solver**: Multi-objective CP-SAT formulation (Electives > Mode > Clashes > Evening).
-- **Interactive Analytics**: Full diagnostic dashboard for room utilization and student conflict analysis.
-
-## Visuals
-
-### Dashboard Landing
-<img src="docs/screenshots/dashboard-landing.jpeg" width="800"/>
-
-*Modern entry point for uploading ITC-2019 instances and initiating the optimization pipeline.*
-
-### Feasibility Analysis (Physical vs. Hybrid)
-<img src="docs/screenshots/feasibility-physical-vs-hybrid.jpeg" width="800"/>
-
-*The core engine: detecting 0% physical feasibility and automatically repairing it to 100% hybrid feasibility.*
-
-### Student Schedule View
-<img src="docs/screenshots/student-weekly-schedule.jpeg" width="800"/>
-
-*Granular student-level validation ensuring zero clashes and respecting individual delivery preferences.*
-
-## Additional Dashboard Features
-
-### Optimization Objectives & Room Utilization
-<img src="docs/screenshots/summary-room-utilization-objectives.jpeg" width="800"/>
-
-*Real-time tracking of the 5-tier objective stack and precise room occupancy heatmaps.*
-
-### Diagnostics & Occupancy
-<img src="docs/screenshots/diagnostics-class-occupancy.jpeg" width="800"/>
-
-*Automated risk assessment and ranked recommendations for infrastructure planning.*
-
-### Interactive Timetable
-<img src="docs/screenshots/timetable-table.jpeg" width="800"/>
-
-*Searchable, filtered view of the final optimized schedule with direct links to student diagnostics.*
-
-## System Workflow
-
-```text
-ITC-2019 XML Input
-        ↓
-Parser & Normalization
-        ↓
-CP-SAT Optimization Model
-        ↓
-Large Neighborhood Search (LNS)
-        ↓
-Validation & Diagnostics
-        ↓
-Interactive Dashboard + JSON Output
-```
-
-## Architecture (high-level)
-
-```mermaid
-flowchart TD
-  A[ITC-2019 XML instance] --> B[itc2019_parser.py]
-  B --> C[CP-SAT model + solve]
-  C --> D[LNS improvement loop]
-  D --> E[Validation + Diagnostics]
-  E --> F[Solution JSON]
-  F --> G[index.html dashboard]
-```
-
+The solver models room, time, capacity, delivery-mode, module-selection, attendance, and student-conflict requirements. It can run in strict mode or, when explicitly enabled, retry an infeasible instance with bounded and penalized relaxations.
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Clone the repository
 
 ```bash
+git clone https://github.com/girishk03/University-Timetabling-Solver.git
+cd University-Timetabling-Solver
+```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+```
+
+On Windows, use `.venv\Scripts\activate`.
+
+### 3. Install dependencies
+
+```bash
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Requires: `ortools`, `numpy` (optional for visualization)
-
-### 2. Run Solver
+### 4. Run the solver
 
 ```bash
-# Solve ITC-2019 XML instance
-python -m src.run_solver instances/itc2019/wbg-fal10.xml
-
-# With custom output path
-python -m src.run_solver instances/itc2019/wbg-fal10.xml my_solution.json
+python -m src.run_solver instances/itc2019/wbg-fal10.xml full_solution.json
 ```
 
-### 3. Configure Solver (Environment Variables)
+The command parses the XML instance, runs the optimization pipeline, validates the result, and writes a JSON solution for the dashboard.
+
+### 5. Run the tests
 
 ```bash
-export BASE_TIME=10.0        # Max solve time (seconds)
-export LNS_ITERS=5           # LNS iterations
-export LNS_TIME=1.0          # Time per LNS iteration
-export LNS_DESTROY=0.2       # Destroy fraction (20%)
-export LNS_SEED=0            # Random seed
-export NUM_WORKERS=8         # CP-SAT parallel workers
-export ENABLE_ONLINE=1       # 1 = hybrid/online enabled, 0 = strict physical-only (pure ITC)
-export RELAX_ON_INFEASIBLE=1 # Retry with relaxation if strict model is infeasible
-export RELAX_MAX_OVERLAP=5   # Relaxed max classes per student at same time
-export RELAX_ROOM_OVERCAP=200 # Relaxed extra in-person seats allowed per class
-
-python -m src.run_solver instances/itc2019/wbg-fal10.xml
+python -m pip install pytest
+python -m pytest
 ```
 
-### 4. View Results
+### 6. View the dashboard
 
 ```bash
-# Start local server
 python -m http.server 8000
-
-# Open http://localhost:8000/index.html
 ```
 
-The dashboard auto-loads `full_solution.json` and displays:
-- Solution status and objective values (z1-z5)
-- Room utilization statistics
-- Class occupancy charts
-- Interactive timetable table (main class-wise schedule)
-- Student detail modal (class list and weekly schedule grid inside modal)
-- Student-focused controls (`Select Student`, `Students`, `Download`)
-- Diagnostics panel (input risk, violations, recommendations)
+Open `http://localhost:8000/index.html`. The dashboard reads `full_solution.json` from the repository root.
 
-Solver status contract from `run_solver.py`:
-- `OPTIMAL`
-- `FEASIBLE`
-- `INFEASIBLE` (with explanatory message)
-- `UNKNOWN` (timeout/partial warning)
+## Architecture
+
+```mermaid
+graph TD
+    A[ITC 2019 XML Instance] --> B[Parser and Normalization]
+    B --> C[CP SAT Optimization]
+    C --> D[Large Neighborhood Search]
+    D --> E[Validation and Diagnostics]
+    E --> F[Solution JSON]
+    F --> G[Dashboard]
+    F --> H[FastAPI Response]
+```
+
+The CLI and API share the same solver entry point. The parser normalizes UniTime XML into the internal model, CP-SAT creates a feasible assignment under the configured constraints, LNS searches for improvements around an incumbent solution, and post-solve validation checks the extracted schedule before it is returned or written to disk.
+
+## Hard Constraints vs Soft Constraints
+
+### Hard constraints
+
+Hard constraints define a valid strict-mode timetable. A solution is rejected if it violates them.
+
+- Every class is assigned to exactly one allowed time.
+- A physical room hosts at most one class at a time.
+- Delivery mode, room assignment, and hybrid capability remain consistent.
+- Required modules and selected configurations produce valid class assignments.
+- Student attendance is linked to enrollment and delivery decisions.
+- Class subscription limits and physical room capacities are respected.
+- A student cannot attend more than one class at the same time.
+
+### Soft constraints and objectives
+
+Soft constraints express schedule quality. The solver optimizes them lexicographically, preserving a higher-priority result before optimizing the next objective.
+
+- Maximize assigned students and elective-module satisfaction.
+- Minimize bounded relaxation penalties when fallback mode is enabled.
+- Minimize changes from a previous timetable during real-time repair.
+- Minimize delivery-mode preference deviations.
+- Minimize unnecessary online delivery.
+- Minimize late and consecutive scheduling penalties.
+
+When `RELAX_ON_INFEASIBLE=1`, selected student-overlap and room-capacity constraints may be relaxed within configured limits and converted into penalties. Other invariants, including room-time exclusivity, remain hard.
+
+## CP-SAT and LNS
+
+### Why CP-SAT
+
+CP-SAT is Google OR-Tools' constraint-programming solver for integer and Boolean models. In this project, decisions such as assigning a class to a time, selecting a room, choosing a delivery mode, and assigning a student are represented as Boolean variables. Constraints encode what must be valid; the ordered objectives encode what makes one valid schedule preferable to another.
+
+For recruiters and reviewers, the important engineering point is that feasibility is not produced by post-processing. The solver enforces the model, and `validate_solution` independently checks the extracted result.
+
+### Why Large Neighborhood Search
+
+Large Neighborhood Search improves an existing schedule without rebuilding every decision from scratch. Each iteration temporarily frees a configured fraction of assignments, keeps the remaining assignments fixed, and asks CP-SAT to re-optimize the open neighborhood. The candidate replaces the incumbent only when its objective tuple improves.
+
+This approach is useful for timetabling because a globally valid schedule can often be improved by reconsidering a focused subset of classes. The same stability concept supports incremental repair, where minimizing timetable churn is more valuable than arbitrarily reshuffling unaffected classes.
+
+## Engineering Decisions
+
+| Challenge | Solution | Engineering Impact |
+| --- | --- | --- |
+| Multi-domain feasibility | Model time, room, capacity, mode, module, and attendance decisions in CP-SAT | Keeps validity rules explicit and solver-enforced |
+| Competing optimization goals | Solve objectives sequentially in lexicographic order | Prevents lower-priority improvements from degrading higher-priority outcomes |
+| Improving an incumbent schedule | Apply configurable LNS destroy-and-repair iterations | Searches targeted neighborhoods while retaining a valid baseline |
+| Infeasible input instances | Diagnose strict infeasibility and optionally retry with bounded penalties | Makes fallback behavior explicit instead of silently weakening constraints |
+| Real-time timetable updates | Build affected sets and penalize assignment changes | Limits disruption to students, rooms, and classes outside the changed area |
+| Trustworthy output | Validate extracted schedules and emit diagnostics | Separates solver decisions from independent verification and reporting |
+| Browser delivery | Write a stable JSON contract consumed by a static dashboard | Keeps visualization decoupled from the optimization runtime |
+
+## API Endpoints
+
+The Render service runs `uvicorn src.api:app` and exposes the following implemented endpoints:
+
+| Method | Endpoint | Purpose | Input |
+| --- | --- | --- | --- |
+| `GET` | `/` | Service status and API identification | None |
+| `GET` | `/health` | Lightweight health check | None |
+| `POST` | `/solve` | Run the solver and return solution JSON | Multipart `.xml` file |
+| `GET` | `/docs` | Swagger UI generated by FastAPI | None |
+
+Example request:
+
+```bash
+curl -X POST \
+  -F "file=@instances/itc2019/wbg-fal10.xml" \
+  https://university-timetabling-solver.onrender.com/solve
+```
+
+The API accepts ITC-2019 XML uploads, invokes the same CLI solver in a subprocess, returns the generated JSON, rejects non-XML filenames, and enforces a 120-second request timeout.
+
+## Solver Configuration
+
+The main runtime controls are environment variables:
+
+```bash
+export BASE_TIME=10.0
+export LNS_ITERS=5
+export LNS_TIME=1.0
+export LNS_DESTROY=0.2
+export LNS_SEED=0
+export NUM_WORKERS=8
+export ENABLE_ONLINE=1
+export RELAX_ON_INFEASIBLE=1
+export RELAX_MAX_OVERLAP=5
+export RELAX_ROOM_OVERCAP=200
+
+python -m src.run_solver instances/itc2019/wbg-fal10.xml full_solution.json
+```
+
+These are configuration examples, not benchmark settings. Runtime and solution status depend on the selected instance, hardware, time budget, random seed, and relaxation policy.
+
+## Testing
+
+Install pytest if it is not already available, then run the full suite:
+
+```bash
+python -m pip install pytest
+python -m pytest
+```
+
+Run focused solver tests:
+
+```bash
+python -m pytest tests/test_solver_hard_constraints.py
+```
+
+Run real-time and stability tests:
+
+```bash
+python -m pytest \
+  tests/test_realtime_control.py \
+  tests/test_realtime_stability_simulation.py \
+  tests/test_realtime_run_solver_wrapper.py
+```
+
+The tests cover hard-constraint enforcement, day decoding, online-mode behavior, strict-to-relaxed status handling, diagnostics, student-to-class mapping, affected-set construction, real-time control policies, and timetable stability during incremental updates.
+
+> Core solver tests pass. Three real-time control tests currently fail and are tracked as known issues.
+
+## Dashboard
+
+The static dashboard visualizes the generated JSON without requiring the API. It includes solution status, objective values, room utilization, occupancy diagnostics, class schedules, student schedules, violations, and recommendations.
+
+| Dashboard | Timetable |
+| --- | --- |
+| ![Dashboard landing](docs/screenshots/dashboard-landing.jpeg) | ![Timetable table](docs/screenshots/timetable-table.jpeg) |
+
+| Feasibility diagnostics | Student schedule |
+| --- | --- |
+| ![Physical and hybrid feasibility comparison](docs/screenshots/feasibility-physical-vs-hybrid.jpeg) | ![Student weekly schedule](docs/screenshots/student-weekly-schedule.jpeg) |
+
+The feasibility screenshot documents the behavior of the included demonstration data and configuration. It should not be interpreted as a universal guarantee that every infeasible instance can be repaired or that every run reaches a particular feasibility percentage.
 
 ## Project Structure
 
-```
-windsurf-project-2/
+```text
+University-Timetabling-Solver/
 ├── src/
-│   ├── run_solver.py              # Entry point
+│   ├── api.py                         # FastAPI wrapper
+│   ├── run_solver.py                  # CLI and orchestration
+│   ├── realtime_control.py            # Incremental scheduling policies
 │   └── timetabling/
-│       ├── solver_cp_sat.py       # CP-SAT solver + LNS (~800 lines)
-│       └── itc2019_parser.py      # XML parser (~280 lines)
-├── instances/
-│   └── itc2019/
-│       └── wbg-fal10.xml          # Sample dataset
-├── docs/uml/
-│   ├── class_diagram_v2.puml      # UML diagrams (8 total)
-│   ├── sequence_diagram_v2.puml
-│   └── ...
-├── index.html                     # Web dashboard
-├── requirements.txt               # Python dependencies
-└── full_solution.json             # Sample output
+│       ├── itc2019_parser.py           # UniTime XML parser
+│       └── solver_cp_sat.py            # CP-SAT model, validation, and LNS
+├── tests/                              # Solver, diagnostics, and real-time tests
+├── instances/itc2019/                  # Included benchmark instances
+├── docs/                               # Technical notes, audit, UML, and screenshots
+├── outputs/replay/                     # Replay artifacts for incremental scenarios
+├── tools/replay_runner_real.py         # Replay runner
+├── index.html                          # Main static dashboard
+├── timetabling-dashboard.html          # Alternate dashboard artifact
+├── render.yaml                         # Render service definition
+└── requirements.txt                    # Runtime dependencies
 ```
 
-## What Makes This Engineering-Relevant
+## Solution Status and Output
 
-- **Feasibility repair**: Detects infeasibility drivers (e.g., demand > room capacity) and generates a workable hybrid schedule.
-- **Optimization under constraints**: Multi-objective CP-SAT formulation plus an LNS improvement loop.
-- **Decision support output**: Diagnostics + ranked recommendations designed to be acted on.
+The CLI normalizes solver results to four statuses:
 
-## Deep Technical Details
+- `OPTIMAL` — the solver proved the best result for the configured model and time budget.
+- `FEASIBLE` — a valid solution was found without an optimality proof.
+- `INFEASIBLE` — no solution exists under the active constraints.
+- `UNKNOWN` — no conclusive result was produced within the configured limits.
 
-The full variable / constraint breakdown is in `docs/technical_notes.md`.
+Solution JSON can include the schedule, student assignments, objective values, violations, constraint metrics, diagnostics, recommendations, and baseline/LNS metadata. Exact values depend on the input and run configuration; this README intentionally does not present them as general benchmarks.
 
-## UML Diagrams
+## Future Improvements
 
-Located in `docs/uml/` (v2 versions are corrected and accurate):
+- Add a pinned development requirements file so pytest and formatting tools install separately from runtime dependencies.
+- Add GitHub Actions for the full pytest suite and API smoke tests.
+- Replace the API subprocess boundary with a job queue for long-running solves and concurrent requests.
+- Add request-size limits, authentication, persisted jobs, and result retrieval for hosted API use.
+- Add schema validation for uploaded XML and generated solution JSON.
+- Expand benchmark reporting with reproducible hardware, seed, instance, and time-budget metadata.
+- Add cancellation and progress reporting for long optimization jobs.
+- Package the dashboard and API as one deployable service with versioned solution artifacts.
 
-1. **Class Diagram**: Shows actual modules and data structures
-2. **Sequence Diagram**: Solver execution flow
-3. **Activity Diagram**: Workflow from XML to solution
-4. **Use Case Diagram**: System capabilities
-5. **Collaboration Diagram**: Component interactions
-6. **Component Diagram**: File structure and dependencies
-7. **Object Diagram**: Runtime data structures
-8. **Deployment Diagram**: System architecture
+## Additional Documentation
 
-## Sample Output
-
-```json
-{
-  "status": "OPTIMAL",
-  "input_risk": "MEDIUM",
-  "pre_warnings": [
-    {
-      "severity": "HIGH",
-      "message": "High risk: demand exceeds class capacity by 40%",
-      "suggestions": [
-        "Add 2 more class sections for overloaded modules."
-      ]
-    }
-  ],
-  "objectives": {
-    "z1_electives": 245,
-    "z2_mode": 12,
-    "relaxation_penalty": 0,
-    "z4_online": 45,
-    "z5_late": 8
-  },
-  "schedule": {
-    "c1": {"room": "R1", "time": 0, "mode": "hybrid"},
-    "c2": {"room": "R2", "time": 1, "mode": "in_person"}
-  },
-  "students": {
-    "s1": {
-      "taken_modules": ["m1", "m2"],
-      "attended": {"c1": {"in_person": 1, "online": 0}}
-    }
-  },
-  "violations": {
-    "student_overlaps": 0,
-    "room_overflow": 0
-  },
-  "constraint_metrics": {
-    "conflict_hotspots": [],
-    "preference_violations": {"total": 12}
-  },
-  "recommendations": [
-    {
-      "issue": "Preference violations",
-      "severity": "MEDIUM",
-      "suggestions": [
-        "Tune mode preferences and objective weights for better preference satisfaction."
-      ]
-    }
-  ],
-  "solution_quality": 88,
-  "baseline_runtime": 8.5,
-  "lns_runtime": 12.3,
-  "baseline_objectives": {...},
-  "lns_objectives": {...}
-}
-```
-
-`recommendations` are ranked by severity (`CRITICAL`, `HIGH`, `MEDIUM`) so the output can be used directly for decision support.
-
-## Academic Notes
-
-- **Solver**: Google OR-Tools CP-SAT (Constraint Programming SAT solver)
-- **Heuristic**: Large Neighborhood Search (LNS) for local improvement
-- **Benchmark**: ITC-2019 (International Timetabling Competition)
-- **Format**: UniTime XML schema
-- **Optimization**: Lexicographic multi-objective (5 levels)
+- [`docs/technical_notes.md`](docs/technical_notes.md) — decision variables, objective stack, and LNS summary
+- [`docs/constraint_enforcement_audit.md`](docs/constraint_enforcement_audit.md) — enforced constraints and layer boundaries
+- [`docs/uml/`](docs/uml/) — PlantUML architecture and interaction diagrams
 
 ## License
 
-This repository is intended as an engineering project demonstration. If you reuse parts of it, keep attribution and validate constraints for your environment.
+This project is licensed under the [MIT License](LICENSE).
