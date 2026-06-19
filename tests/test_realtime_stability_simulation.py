@@ -50,7 +50,7 @@ class RealtimeStabilitySimulationTests(unittest.TestCase):
         self.assertIn("1", out)
 
     @patch("src.run_solver.solve_instance")
-    def test_repeated_update_is_stable(self, mock_solve) -> None:
+    def test_repeated_rejections_trigger_deferred_global_reset(self, mock_solve) -> None:
         prev = _mk_solution(quality=90)
         cand = _mk_solution(quality=90)
         cand["status"] = "feasible"
@@ -67,9 +67,11 @@ class RealtimeStabilitySimulationTests(unittest.TestCase):
         r1 = process_update(update, state)
         r2 = process_update(update, state)
         r3 = process_update(update, state)
-        self.assertIn(r1["status"], {"ACCEPT", "ACCEPT_WITH_WARNING", "REJECT"})
-        self.assertIn(r2["status"], {"ACCEPT", "ACCEPT_WITH_WARNING", "REJECT"})
-        self.assertIn(r3["status"], {"ACCEPT", "ACCEPT_WITH_WARNING", "REJECT"})
+        self.assertEqual(r1["status"], "REJECT")
+        self.assertEqual(r2["status"], "REJECT")
+        self.assertEqual(r3["status"], "DEFER")
+        self.assertTrue(bool(state.get("force_global_reopt")))
+        self.assertEqual(state.get("last_reset_reason"), "reject_streak")
 
     @patch("src.run_solver.solve_instance")
     def test_drift_exceed_forces_defer_and_flag(self, mock_solve) -> None:

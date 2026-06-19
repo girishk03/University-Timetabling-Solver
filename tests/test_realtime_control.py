@@ -129,6 +129,22 @@ class RealtimeControlTests(unittest.TestCase):
         )
         self.assertEqual(state2, AcceptanceState.REJECT_ESCALATE)
 
+    def test_evaluate_rejects_objective_degradation_beyond_threshold(self) -> None:
+        prev = _mk_payload(z2=10)
+        cand = _mk_payload(z2=31)
+        state, diagnostics = evaluate_candidate(
+            previous=prev,
+            candidate=cand,
+            impact=0.1,
+            total_students=100,
+            total_classes=200,
+            changed_classes=1,
+            max_student_changes=1,
+            drift=None,
+        )
+        self.assertEqual(state, AcceptanceState.REJECT_ESCALATE)
+        self.assertEqual(diagnostics["reject_code"], 5)
+
     def test_tiered_attempts_accepts_second_tier(self) -> None:
         prev = _mk_payload()
 
@@ -156,4 +172,3 @@ class RealtimeControlTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

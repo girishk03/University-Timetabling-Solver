@@ -189,15 +189,38 @@ def evaluate_candidate(
     d3 = _obj(candidate, "z3_relaxation_penalty") - _obj(previous, "z3_relaxation_penalty")
     d4 = _obj(candidate, "z4_online") - _obj(previous, "z4_online")
     d5 = _obj(candidate, "z5_late") - _obj(previous, "z5_late")
+    z0_drop = max(0, _obj(previous, "z0_assigned_count") - _obj(candidate, "z0_assigned_count"))
     quality_drop = max(0, _quality(previous) - _quality(candidate))
 
     diagnostics.update({
+        "z0_drop": int(z0_drop),
         "d2": int(d2),
         "d3": int(d3),
         "d4": int(d4),
         "d5": int(d5),
         "quality_drop": int(quality_drop),
     })
+
+    if int(changed_classes) > int(warning_changed_classes):
+        diagnostics["reject_code"] = 2
+        return AcceptanceState.REJECT_ESCALATE, diagnostics
+
+    if int(z0_drop) > int(thresholds.z0_tol):
+        diagnostics["reject_code"] = 4
+        return AcceptanceState.REJECT_ESCALATE, diagnostics
+
+    if (
+        int(d2) > int(thresholds.b2_mode_deviation)
+        or int(d3) > int(thresholds.b3_relaxation_penalty)
+        or int(d4) > int(thresholds.b4_online_penalty)
+        or int(d5) > int(thresholds.b5_late_penalty)
+    ):
+        diagnostics["reject_code"] = 5
+        return AcceptanceState.REJECT_ESCALATE, diagnostics
+
+    if int(quality_drop) > int(thresholds.quality_drop_cap):
+        diagnostics["reject_code"] = 6
+        return AcceptanceState.REJECT_ESCALATE, diagnostics
 
     warning = (
         int(changed_classes) > int(max_changed_classes)
@@ -217,6 +240,9 @@ def evaluate_candidate(
             float(drift.drift_z3_total) / float(z3_cap),
         )
         diagnostics["drift_ratio_permille"] = int(round(drift_ratio * 1000))
+        if drift.exceeds():
+            diagnostics["reject_code"] = 7
+            return AcceptanceState.REJECT_ESCALATE, diagnostics
         if drift_ratio > 0.70:
             warning = True
 
