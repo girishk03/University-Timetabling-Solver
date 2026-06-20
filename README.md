@@ -201,13 +201,7 @@ python -m pytest \
 
 The tests cover hard-constraint enforcement, day decoding, online-mode behavior, strict-to-relaxed status handling, diagnostics, student-to-class mapping, affected-set construction, real-time control policies, and timetable stability during incremental updates.
 
-Current local result: **35 passed, 3 failed**. Core solver hard-constraint tests pass; the three failures are confined to real-time control policy expectations.
-
-## Known Issues
-
-- Two real-time control tests expect a large quality drop or accumulated drift to return `REJECT_ESCALATE`, while the current policy returns `ACCEPT_WITH_WARNING`.
-- One repeated-update stability test expects an accept/reject result on the third update, while the current reject-streak reset returns `DEFER`.
-- These are visible behavioral contract mismatches, not hidden as a passing suite. The policy or its tests must be reconciled before claiming full test health.
+Current local result: **39 passed**.
 
 ## Dashboard
 
